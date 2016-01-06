@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("WiFiDB Client")]
+[assembly: AssemblyTitle("WDBAPI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Random Intervals")]
-[assembly: AssemblyProduct("WiFiDB Client")]
-[assembly: AssemblyCopyright("Copyright 2016")]
+[assembly: AssemblyCompany("CA, Inc.")]
+[assembly: AssemblyProduct("WDBAPI")]
+[assembly: AssemblyCopyright("Copyright © CA, Inc. 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e7f2e53a-0e95-4beb-898b-344ba4e4eb13")]
+[assembly: Guid("61f6ac56-a30e-4f9b-971f-647a8a9c8584")]
 
 // Version information for an assembly consists of the following four values:
 //
