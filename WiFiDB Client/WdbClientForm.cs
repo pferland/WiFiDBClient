@@ -50,7 +50,30 @@ namespace WiFiDB_Uploader
         private void uploadSelectionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string[] array = {""};
-            WDBAPIObj.ApiPostFile(array, "");
+            string response = WDBAPIObj.ApiImportFile(array, @"C:\GitHub\VS1Files\2016-01-08 15-48-26.VS1");
+
+            WDBAPIObj.ParseApiResponse(response);
+        }
+
+        private void getWaitingListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string response = WDBAPIObj.ApiGetWaitingImports();
+
+            WDBAPIObj.ParseApiResponse(response);
+        }
+
+        private void getFinishedListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string response = WDBAPIObj.ApiGetFinishedIports();
+
+            WDBAPIObj.ParseApiResponse(response);
+        }
+
+        private void getImportingListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string response = WDBAPIObj.ApiGetCurrentImporting();
+
+            WDBAPIObj.ParseApiResponse(response);
         }
     }
 }
