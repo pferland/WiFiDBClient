@@ -49,10 +49,28 @@ namespace WiFiDB_Uploader
 
         private void uploadSelectionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string[] array = {""};
-            string response = WDBAPIObj.ApiImportFile(array, @"C:\GitHub\VS1Files\2016-01-08 15-48-26.VS1");
+            string[] ParamsArray = { };
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
-            WDBAPIObj.ParseApiResponse(response);
+            openFileDialog1.InitialDirectory = "c:\\";
+            openFileDialog1.Filter = "VS1 files (*.VS1)|*.VS1|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string response = WDBAPIObj.ApiImportFile(ParamsArray, openFileDialog1.FileName);
+                    WDBAPIObj.ParseApiResponse(response);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+
+            
         }
 
         private void getWaitingListToolStripMenuItem_Click(object sender, EventArgs e)
@@ -74,6 +92,18 @@ namespace WiFiDB_Uploader
             string response = WDBAPIObj.ApiGetCurrentImporting();
 
             WDBAPIObj.ParseApiResponse(response);
+        }
+
+        private void getBadImportsListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string response = WDBAPIObj.ApiGetBadIports();
+
+            WDBAPIObj.ParseApiResponse(response);
+        }
+
+        private void selectFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

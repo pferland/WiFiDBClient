@@ -12,33 +12,81 @@ namespace WDBAPI
 {
     public class WDBAPI
     {
-        public string address = "http://dev.randomintervals.com//wifidb/api/import.php";
-
         public string ApiGetWaitingImports()
         {
+            string address = "http://dev.randomintervals.com/wifidb/api/v2/schedule.php";
+            string response;
+            //Console.WriteLine("Upload FIle: " + UploadFile);
+            using (WebClient client = new WebClient())
+            {
+                NameValueCollection parameters = new NameValueCollection();
+                parameters.Add("func", "waiting");
+                parameters.Add("output", "xml");
 
-
-            return "";
+                var responseBytes = client.UploadValues(address, "POST", parameters);
+                response = Encoding.ASCII.GetString(responseBytes);
+            }
+           return response;
         }
 
 
         public string ApiGetFinishedIports()
         {
+            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
+            string response;
+            //Console.WriteLine("Upload FIle: " + UploadFile);
+            using (WebClient client = new WebClient())
+            {
+                NameValueCollection parameters = new NameValueCollection();
+                parameters.Add("func", "finished");
+                parameters.Add("output", "xml");
+
+                var responseBytes = client.UploadValues(address, "POST", parameters);
+                response = Encoding.ASCII.GetString(responseBytes);
+            }
+            return response;
+        }
 
 
-            return "";
+        public string ApiGetBadIports()
+        {
+            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
+            string response;
+            //Console.WriteLine("Upload FIle: " + UploadFile);
+            using (WebClient client = new WebClient())
+            {
+                NameValueCollection parameters = new NameValueCollection();
+                parameters.Add("func", "bad");
+                parameters.Add("output", "xml");
+
+                var responseBytes = client.UploadValues(address, "POST", parameters);
+                response = Encoding.ASCII.GetString(responseBytes);
+            }
+            return response;
         }
 
 
         public string ApiGetCurrentImporting()
         {
+            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
+            string response;
+            //Console.WriteLine("Upload FIle: " + UploadFile);
+            using (WebClient client = new WebClient())
+            {
+                NameValueCollection parameters = new NameValueCollection();
+                parameters.Add("func", "importing");
+                parameters.Add("output", "xml");
 
-            return "";
+                var responseBytes = client.UploadValues(address, "POST", parameters);
+                response = Encoding.ASCII.GetString(responseBytes);
+            }
+            return response;
         }
 
 
         public string ApiImportFile(string[] Query, string UploadFile, bool CheckHash = false)
         {
+            string address = "http://dev.randomintervals.com//wifidb/api/import.php";
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -104,16 +152,37 @@ namespace WDBAPI
                     //Debug.WriteLine("The FIle is being imported: " +   .Value.ToString());
                     break;
 
-                case "imported":
-                    Debug.WriteLine("Imported: " + xmlTree.Value.ToString());
+                case "importing":
+                    foreach (var item in xmlTree.Elements())
+                    {
+                        Debug.WriteLine("Type: " + item.GetType().ToString());
+                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                    }
+
+                    break;
+
+                case "finished":
+                    foreach (var item in xmlTree.Elements())
+                    {
+                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                    }
+
                     break;
 
                 case "waiting":
-                    Debug.WriteLine("Waiting to Import: " + xmlTree.Value.ToString());
+                    foreach (var item in xmlTree.Elements())
+                    {
+                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                    }
+
                     break;
 
                 case "bad":
-                    Debug.WriteLine("Bad Import: " + xmlTree.Value.ToString());
+                    foreach (var item in xmlTree.Elements())
+                    {
+                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                    }
+
                     break;
 
                 default:
@@ -125,16 +194,19 @@ namespace WDBAPI
             return ret;
         }
 
-        public void ApiPostStrings(string Query)
+        public void ApiPostStrings(string QueryURI, NameValueCollection QueryParams)
         {
+            string response;
+            string address = "http://dev.randomintervals.com//wifidb/api/";
+            address = address + QueryURI;
+
             using (WebClient client = new WebClient())
             {
-                NameValueCollection parameters = new NameValueCollection();
-                parameters.Add("value1", "123");
-                parameters.Add("value2", "xyz");
-                var responseBytes = client.UploadValues(address, parameters);
-                string response = Encoding.ASCII.GetString(responseBytes);
+                QueryParams.Add("output", "xml");
+                var responseBytes = client.UploadValues(address, QueryParams);
+                response = Encoding.ASCII.GetString(responseBytes);
             }
+            ParseApiResponse(response);
         }
     }
 }
