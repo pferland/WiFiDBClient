@@ -1,3 +1,5 @@
-WiFiDB Client/bin/
-WiFiDB Client/obj/
+bin/
+obj/
+*.pdb
+*.manifest
 .vs/
