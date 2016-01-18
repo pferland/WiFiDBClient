@@ -139,6 +139,7 @@ namespace WiFiDBUploader
             string message = "";
             string ImportID = "";
             string filehash = "";
+            Debug.WriteLine(split[0]);
             if (split[0] == "newrow")
             {
                 Debug.WriteLine(split[1]);
@@ -148,14 +149,31 @@ namespace WiFiDBUploader
                 var listViewItemNew = new ListViewItem(row);
                 listView1.Items.Add(listViewItemNew);
             }
+            else if(split[0] == "error")
+            {
+                Debug.WriteLine(split[0]);
+                string[] stringSep = new string[] { "-~-" };
+                string[] items = split[1].Split(stringSep, StringSplitOptions.None);
+
+                string[] stringSep1 = new string[] { ":" };
+                string[] SplitData = items[1].Split(stringSep1, StringSplitOptions.None);
+
+                Debug.WriteLine(items[0]);
+                Debug.WriteLine(SplitData[0]);
+                Debug.WriteLine(SplitData[1]);
+
+                ListViewItem listViewItem = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
+
+                Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                listViewItem.SubItems[8].Text = SplitData[0];
+            }
             else
             {
-
                 foreach (string part in split)
                 {
                     Debug.WriteLine(part + " \n--------------------\n");
                     string[] items_pre = part.Split('|');
-
+                    
                     foreach (var item in items_pre)
                     {
                         string[] stringSep = new string[] { "-~-" };

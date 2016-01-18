@@ -156,7 +156,7 @@ namespace WDBAPI
             switch(xmlTree.Name.ToString())
             {
                 case "error":
-                    ret = "error|There was An error during Import: " + xmlTree.Value.ToString();
+                    ret = "error|~|There was An error during Import-~-" + xmlTree.Value.ToString();
                     //Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
                     break;
 
@@ -164,7 +164,7 @@ namespace WDBAPI
                     foreach(var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|import|"+ item.Name.ToString() + "-~-" + item.Value.ToString();
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + "|-~-|" + item.Value.ToString());
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + "-~-" + item.Value.ToString());
                     }
                     break;
 
