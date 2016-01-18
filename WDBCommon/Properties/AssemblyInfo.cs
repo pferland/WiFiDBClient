@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("WDBCommon")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CA, Inc.")]
+[assembly: AssemblyCompany("Random Intervals")]
 [assembly: AssemblyProduct("WDBCommon")]
-[assembly: AssemblyCopyright("Copyright © CA, Inc. 2016")]
+[assembly: AssemblyCopyright("2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

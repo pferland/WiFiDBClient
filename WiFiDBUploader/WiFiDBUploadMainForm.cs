@@ -30,9 +30,7 @@ namespace WiFiDBUploader
             WDBAPIObj = new WDBAPI.WDBAPI();
             WDBCommonObj = new WDBCommon.WDBCommon();
 
-            /*string[] row = { "1", "Pferland", "Test Import", "2016-01-05", "248.02kb", "WDB_Upload_20160105.vs1", "DUMMYHASHSUM", "N/A", "Not Importing" };
-            var listViewItem = new ListViewItem(row);
-            listView1.Items.Add(listViewItem);*/
+            InitTimer();
         }
 
         private struct QueryArguments
@@ -49,38 +47,53 @@ namespace WiFiDBUploader
             public List<KeyValuePair<int, string>> Result { get; set; }
         }
 
-        private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private Timer timer1;
+        public void InitTimer()
         {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
-            openFileDialog1.InitialDirectory = "c:\\";
-            openFileDialog1.Filter = "VS1 files (*.VS1)|*.VS1|All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 2;
-            openFileDialog1.RestoreDirectory = true;
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
-                    WDBAPIObj.ParseApiResponse(response);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-            }
+            timer1 = new Timer();
+            timer1.Tick += new EventHandler(CheckForUpdates);
+            timer1.Interval = 10000; // in miliseconds
+            timer1.Start();
         }
 
-        private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CheckForUpdates(object sender, EventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            Debug.WriteLine("--------BackGround Update Check Begin--------");
+            //BW.ReportProgress(0, "newrow|~|" + vs1 + "|~|" + hashish);
+
+            foreach (ListViewItem item in listView1.Items)
             {
-                Debug.WriteLine(folderBrowserDialog1.SelectedPath);
-                StartFolderImport(folderBrowserDialog1.SelectedPath);
+                Debug.WriteLine(item.SubItems[9].Text);
+                switch(item.SubItems[9].Text)
+                {
+                    case "Waiting":
+                        
+                        break;
+                    case "Importing":
+
+                        break;
+                    case "Finished":
+
+                        break;
+                }
             }
+            Debug.WriteLine("--------BackGround Update Check End--------");
+
+            //string response = WDBAPIObj.ApiGetWaitingImports();
+            //WDBAPIObj.ParseApiResponse(response);
+
         }
+
+        public void StartUpdateWiaitng()
+        {
+            
+        }
+
+        public void StartUpdateImporting()
+        {
+
+        }
+        
 
         public void StartFileImport(string query)
         {
@@ -145,7 +158,7 @@ namespace WiFiDBUploader
                 Debug.WriteLine(split[1]);
                 FileInfo f2 = new FileInfo(split[1]);
 
-                string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "" , ""};
+                string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "" , "", "Waiting"};
                 var listViewItemNew = new ListViewItem(row);
                 listView1.Items.Add(listViewItemNew);
             }
@@ -198,29 +211,6 @@ namespace WiFiDBUploader
                         }
                     }
                     Debug.WriteLine(" \n--------------------\n");
-                    /*Debug.WriteLine(items_pre[1] + "\n--------------------\n" +items_pre.Length);
-
-                    string[] stringSep = new string[] { "-~-" };
-                    string[] items = items_pre[1].Split(stringSep, StringSplitOptions.None);
-                    Debug.WriteLine(items[0]);
-                    switch(items[0])
-                    {
-                        case "title":
-                            title = items[1];
-                            break;
-                        case "user":
-                            user = items[1];
-                            break;
-                        case "importnum":
-                            ImportID = items[1];
-                            break;
-                        case "message":
-                            message = items[1];
-                            break;
-                        case "filehash":
-                            filehash = items[1];
-                            break;
-                    }*/
                 }
                 Debug.WriteLine(filehash);
 
@@ -253,7 +243,41 @@ namespace WiFiDBUploader
                 var listViewItem = new ListViewItem(row);
                 listView1.Items.Add(listViewItem);
             }*/
-            }
-
         }
+
+        private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            openFileDialog1.InitialDirectory = "c:\\";
+            openFileDialog1.Filter = "VS1 files (*.VS1)|*.VS1|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
+                    WDBAPIObj.ParseApiResponse(response);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Debug.WriteLine(folderBrowserDialog1.SelectedPath);
+                StartFolderImport(folderBrowserDialog1.SelectedPath);
+            }
+        }
+
+
+    }
 }

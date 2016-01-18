@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("WiFiDBUploader")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CA, Inc.")]
+[assembly: AssemblyCompany("Random Intervals")]
 [assembly: AssemblyProduct("WiFiDBUploader")]
-[assembly: AssemblyCopyright("Copyright © CA, Inc. 2016")]
+[assembly: AssemblyCopyright("2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

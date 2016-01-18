@@ -1,5 +1,0 @@
-C:\GitHub\WifFiDBClient\WDBAPI\bin\Debug\WDBAPI.dll
-C:\GitHub\WifFiDBClient\WDBAPI\bin\Debug\WDBAPI.pdb
-C:\GitHub\WifFiDBClient\WDBAPI\obj\Debug\WDBAPI.csprojResolveAssemblyReference.cache
-C:\GitHub\WifFiDBClient\WDBAPI\obj\Debug\WDBAPI.dll
-C:\GitHub\WifFiDBClient\WDBAPI\obj\Debug\WDBAPI.pdb

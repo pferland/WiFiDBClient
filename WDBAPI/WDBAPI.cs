@@ -26,12 +26,13 @@ namespace WDBAPI
 
                 var responseBytes = client.UploadValues(address, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
+                Debug.WriteLine(response);
             }
            return response;
         }
 
 
-        public string ApiGetFinishedIports()
+        public string ApiGetFinishedImports()
         {
             string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
             string response;

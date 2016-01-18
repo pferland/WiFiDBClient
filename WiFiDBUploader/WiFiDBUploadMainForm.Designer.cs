@@ -59,6 +59,7 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listView2 = new System.Windows.Forms.ListView();
+            this.Message = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -171,6 +172,7 @@
             this.FileName,
             this.FileHash,
             this.CurrentSSID,
+            this.Message,
             this.Status});
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.FullRowSelect = true;
@@ -222,6 +224,7 @@
             // 
             // Status
             // 
+            this.Status.DisplayIndex = 8;
             this.Status.Text = "Status";
             // 
             // statusStrip1
@@ -288,6 +291,11 @@
             this.listView2.TabIndex = 0;
             this.listView2.UseCompatibleStateImageBehavior = false;
             // 
+            // Message
+            // 
+            this.Message.DisplayIndex = 9;
+            this.Message.Text = "Message";
+            // 
             // WiFiDBUploadMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -344,6 +352,7 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ListView listView2;
+        private System.Windows.Forms.ColumnHeader Message;
     }
 }
 

@@ -74,14 +74,12 @@ namespace WiFiDB_Uploader
 
         private void getWaitingListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string response = WDBAPIObj.ApiGetWaitingImports();
-
-            WDBAPIObj.ParseApiResponse(response);
+            
         }
 
         private void getFinishedListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string response = WDBAPIObj.ApiGetFinishedIports();
+            string response = WDBAPIObj.ApiGetFinishedImports();
 
             WDBAPIObj.ParseApiResponse(response);
         }
