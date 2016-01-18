@@ -323,7 +323,7 @@ namespace WiFiDB_Uploader
         private System.Windows.Forms.ColumnHeader User;
         private System.Windows.Forms.ColumnHeader ImportTitle;
         private System.Windows.Forms.ColumnHeader Date;
-        private System.Windows.Forms.ColumnHeader Size;
+        private new System.Windows.Forms.ColumnHeader Size;
         private System.Windows.Forms.ColumnHeader FileName;
         private System.Windows.Forms.ColumnHeader HashSum;
         private System.Windows.Forms.ColumnHeader CurrentImportingSSID;

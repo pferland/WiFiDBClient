@@ -1,0 +1,13 @@
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WiFiDBUploader.exe.config
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WiFiDBUploader.exe
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WiFiDBUploader.pdb
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WDBAPI.dll
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WDBAPI.pdb
+C:\GitHub\WifFiDBClient\WiFiDBUploader\obj\Debug\WiFiDBUploader.csprojResolveAssemblyReference.cache
+C:\GitHub\WifFiDBClient\WiFiDBUploader\obj\Debug\WiFiDBUploader.WiFiDBUploadMainForm.resources
+C:\GitHub\WifFiDBClient\WiFiDBUploader\obj\Debug\WiFiDBUploader.Properties.Resources.resources
+C:\GitHub\WifFiDBClient\WiFiDBUploader\obj\Debug\WiFiDBUploader.csproj.GenerateResource.Cache
+C:\GitHub\WifFiDBClient\WiFiDBUploader\obj\Debug\WiFiDBUploader.exe
+C:\GitHub\WifFiDBClient\WiFiDBUploader\obj\Debug\WiFiDBUploader.pdb
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WDBCommon.dll
+C:\GitHub\WifFiDBClient\WiFiDBUploader\bin\Debug\WDBCommon.pdb

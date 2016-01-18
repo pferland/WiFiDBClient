@@ -49,7 +49,6 @@ namespace WiFiDB_Uploader
 
         private void uploadSelectionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string[] ParamsArray = { };
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
             openFileDialog1.InitialDirectory = "c:\\";
@@ -61,7 +60,7 @@ namespace WiFiDB_Uploader
             {
                 try
                 {
-                    string response = WDBAPIObj.ApiImportFile(ParamsArray, openFileDialog1.FileName);
+                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
                     WDBAPIObj.ParseApiResponse(response);
                 }
                 catch (Exception ex)

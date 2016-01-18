@@ -12,6 +12,8 @@ namespace WDBAPI
 {
     public class WDBAPI
     {
+        public NameValueCollection parameters = null;
+
         public string ApiGetWaitingImports()
         {
             string address = "http://dev.randomintervals.com/wifidb/api/v2/schedule.php";
@@ -19,11 +21,10 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                NameValueCollection parameters = new NameValueCollection();
-                parameters.Add("func", "waiting");
-                parameters.Add("output", "xml");
+                InitParameters();
+                this.parameters.Add("func", "waiting");
 
-                var responseBytes = client.UploadValues(address, "POST", parameters);
+                var responseBytes = client.UploadValues(address, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
            return response;
@@ -37,11 +38,10 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                NameValueCollection parameters = new NameValueCollection();
-                parameters.Add("func", "finished");
-                parameters.Add("output", "xml");
+                InitParameters();
+                this.parameters.Add("func", "finished");
 
-                var responseBytes = client.UploadValues(address, "POST", parameters);
+                var responseBytes = client.UploadValues(address, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -55,11 +55,10 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                NameValueCollection parameters = new NameValueCollection();
-                parameters.Add("func", "bad");
-                parameters.Add("output", "xml");
+                InitParameters();
+                this.parameters.Add("func", "bad");
 
-                var responseBytes = client.UploadValues(address, "POST", parameters);
+                var responseBytes = client.UploadValues(address, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -73,26 +72,24 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                NameValueCollection parameters = new NameValueCollection();
-                parameters.Add("func", "importing");
-                parameters.Add("output", "xml");
+                InitParameters();
+                this.parameters.Add("func", "importing");
 
-                var responseBytes = client.UploadValues(address, "POST", parameters);
+                var responseBytes = client.UploadValues(address, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
         }
 
 
-        public string ApiImportFile(string[] Query, string UploadFile, bool CheckHash = false)
+        public string ApiImportFile(string UploadFile, bool CheckHash = false)
         {
             string address = "http://dev.randomintervals.com//wifidb/api/import.php";
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                NameValueCollection parameters = new NameValueCollection();
-                parameters.Add("output", "xml");
+                InitParameters();
                 byte[] hashBytes;
                 string hashish;
                 using (var inputFileStream = File.Open(UploadFile, FileMode.Open))
@@ -101,112 +98,116 @@ namespace WDBAPI
                     hashBytes = md5.ComputeHash(inputFileStream);
                     hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                 }
+                this.parameters.Add("title", "C%23 upload Test");
 
-                if (CheckHash)
-                {
-                    parameters.Add("func", "check_hash");
-                    parameters.Add("hash", hashish);
-                    var responseBytes = client.UploadValues(address, "POST", parameters);
-                    response = Encoding.ASCII.GetString(responseBytes);
-                }
-                else
-                {
-                    parameters.Add("username", "pferland");
-                    parameters.Add("apikey", "GSn8NQeYzY8gq5Y8NFpf5gZZqH33kdBctEOwWzsOTmxCnrs4BYk32rgeNLNhLkzj");
-                    parameters.Add("title", "C%23 upload Test");
-
-                    //parameters.Add("otherusers", "");
-                    parameters.Add("notes", "C# upload Test");
-                    parameters.Add("hash", hashish);
-                    client.QueryString = parameters;
-                    var responseBytes = client.UploadFile(address, UploadFile);
-                    response = Encoding.ASCII.GetString(responseBytes);
-                }
+                //parameters.Add("otherusers", "");
+                this.parameters.Add("notes", "C# upload Test");
+                this.parameters.Add("hash", hashish);
+                client.QueryString = this.parameters;
+                var responseBytes = client.UploadFile(address, UploadFile);
+                response = Encoding.ASCII.GetString(responseBytes);
                 return response;
             }
         }
 
-        public int ParseApiResponse( string response )
+        private void InitParameters()
         {
-            int ret = 0;
+            if (this.parameters == null)
+            {
+                this.parameters = new NameValueCollection();
+                this.parameters.Add("output", "xml");
+                this.parameters.Add("username", "pferland");
+                this.parameters.Add("apikey", "GSn8NQeYzY8gq5Y8NFpf5gZZqH33kdBctEOwWzsOTmxCnrs4BYk32rgeNLNhLkzj");
+            }
+            else
+            {
+                this.parameters.Remove("title");
+                this.parameters.Remove("notes");
+                this.parameters.Remove("hash");
+                this.parameters.Remove("func");
+            }
+        }
 
-            Debug.WriteLine(" RESPONSE: -------------------------- ");
+        public string CheckFileHash(string FileHash)
+        {
+            string address = "http://dev.randomintervals.com//wifidb/api/import.php";
+            string response;
+            using (WebClient client = new WebClient())
+            {
+                InitParameters();
+                this.parameters.Add("func", "check_hash");
+                this.parameters.Add("hash", FileHash);
+                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                response = Encoding.ASCII.GetString(responseBytes);
+            }
+            return response;
+        }
+
+        public string ParseApiResponse( string response )
+        {
+            string ret = "";
+
+            Debug.WriteLine("RESPONSE: -------------------------- ");
             Debug.WriteLine(response);
             Debug.WriteLine(" -------------------------- ");
 
             XElement xmlTree = XElement.Parse(response);
-            //Console.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
-
+            //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
             {
                 case "error":
-                    Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
+                    ret = "error|There was An error during Import: " + xmlTree.Value.ToString();
+                    //Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
                     break;
 
                 case "import":
                     foreach(var item in xmlTree.Elements())
                     {
-                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ret = ret + "|~|import|"+ item.Name.ToString() + "-~-" + item.Value.ToString();
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + "|-~-|" + item.Value.ToString());
                     }
-                    
-                    //Debug.WriteLine("The FIle is being imported: " +   .Value.ToString());
                     break;
 
                 case "importing":
                     foreach (var item in xmlTree.Elements())
                     {
                         Debug.WriteLine("Type: " + item.GetType().ToString());
-                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ret = ret+ "|~|importing|" + item.Name.ToString() + "-~-" + item.Value.ToString();
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
-
                     break;
 
                 case "finished":
                     foreach (var item in xmlTree.Elements())
                     {
-                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ret = ret + "|~|finished|" + item.Name.ToString() + "-~-" + item.Value.ToString();
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
-
                     break;
 
                 case "waiting":
                     foreach (var item in xmlTree.Elements())
                     {
-                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ret = ret + "|~|waiting|" + item.Name.ToString() + "-~-" + item.Value.ToString();
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
-
                     break;
 
                 case "bad":
                     foreach (var item in xmlTree.Elements())
                     {
-                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ret = ret + "|~|bad|" + item.Name.ToString() + "-~-" + item.Value.ToString();
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
-
                     break;
 
                 default:
-                    Debug.WriteLine("Unknown return: " + xmlTree.Value.ToString());
+                    ret = "unknown|Unknown return: " + xmlTree.Value.ToString();
+                    //Debug.WriteLine("Unknown return: " + xmlTree.Value.ToString());
                     break;
             }
-
-
+            //Debug.WriteLine(ret);
             return ret;
-        }
-
-        public void ApiPostStrings(string QueryURI, NameValueCollection QueryParams)
-        {
-            string response;
-            string address = "http://dev.randomintervals.com//wifidb/api/";
-            address = address + QueryURI;
-
-            using (WebClient client = new WebClient())
-            {
-                QueryParams.Add("output", "xml");
-                var responseBytes = client.UploadValues(address, QueryParams);
-                response = Encoding.ASCII.GetString(responseBytes);
-            }
-            ParseApiResponse(response);
         }
     }
 }

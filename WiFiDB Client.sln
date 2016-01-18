@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiFiDB Client", "WiFiDB Cli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBAPI", "WDBAPI\WDBAPI.csproj", "{61F6AC56-A30E-4F9B-971F-647A8A9C8584}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiFiDBUploader", "WiFiDBUploader\WiFiDBUploader.csproj", "{A057B4AC-F0DF-40A0-B033-B4F38EBDA2D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBCommon", "WDBCommon\WDBCommon.csproj", "{F4741EBC-A256-4924-B760-D990EF40E825}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{61F6AC56-A30E-4F9B-971F-647A8A9C8584}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61F6AC56-A30E-4F9B-971F-647A8A9C8584}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61F6AC56-A30E-4F9B-971F-647A8A9C8584}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A057B4AC-F0DF-40A0-B033-B4F38EBDA2D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A057B4AC-F0DF-40A0-B033-B4F38EBDA2D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A057B4AC-F0DF-40A0-B033-B4F38EBDA2D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A057B4AC-F0DF-40A0-B033-B4F38EBDA2D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4741EBC-A256-4924-B760-D990EF40E825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4741EBC-A256-4924-B760-D990EF40E825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4741EBC-A256-4924-B760-D990EF40E825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4741EBC-A256-4924-B760-D990EF40E825}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
