@@ -131,7 +131,7 @@ namespace WDBAPI
 
         public string CheckFileHash(string FileHash)
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/import.php";
+            string address = "http://dev.randomintervals.com//wifidb/api/v2/import.php";
             string response;
             using (WebClient client = new WebClient())
             {

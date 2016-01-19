@@ -16,9 +16,9 @@ namespace WDBCommon
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
         public int InternalImportID = 0;
 
-        public void GetWaiting(BackgroundWorker BgWk)
+        public void GetWaiting(string query, BackgroundWorker BgWk)
         {
-            WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetWaitingImports());
+            WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query));
             BgWk.ReportProgress(0, "");
         }
 

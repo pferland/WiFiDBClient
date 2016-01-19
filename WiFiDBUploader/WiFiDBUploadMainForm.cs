@@ -67,10 +67,10 @@ namespace WiFiDBUploader
                 switch(item.SubItems[9].Text)
                 {
                     case "Waiting":
-                        StartUpdateWiaitng();
+                        StartUpdateWiaitng(item.SubItems[6].Text);
                         break;
                     case "Importing":
-                        StartUpdateImporting();
+                        StartUpdateImporting(item.SubItems[6].Text);
                         break;
                 }
             }
@@ -81,9 +81,9 @@ namespace WiFiDBUploader
 
         }
 
-        public void StartUpdateWiaitng()
+        public void StartUpdateWiaitng(string query)
         {
-            QueryArguments args = new QueryArguments(NextID++, "");
+            QueryArguments args = new QueryArguments(NextID++, query);
 
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateWaitingDoWork);
@@ -93,7 +93,7 @@ namespace WiFiDBUploader
             backgroundWorker1.RunWorkerAsync(args);
         }
 
-        public void StartUpdateImporting()
+        public void StartUpdateImporting(string query)
         {
 
         }
@@ -128,7 +128,7 @@ namespace WiFiDBUploader
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
             Debug.WriteLine(args.Query);
-            WDBCommonObj.GetWaiting(backgroundWorker);
+            WDBCommonObj.GetWaiting(args.Query, backgroundWorker);
             //Debug.WriteLine(ImportIDs.ToString());
             e.Result = "Waiting Done";
         }
