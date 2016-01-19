@@ -15,6 +15,13 @@ namespace WDBCommon
     {
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
         public int InternalImportID = 0;
+
+        public void GetWaiting(BackgroundWorker BgWk)
+        {
+            WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetWaitingImports());
+            BgWk.ReportProgress(0, "");
+        }
+
         public List<KeyValuePair<int, string>> ImportFolder(string Path, BackgroundWorker BW)
         {
             var responses = new List<KeyValuePair<int, string>>();

@@ -67,13 +67,10 @@ namespace WiFiDBUploader
                 switch(item.SubItems[9].Text)
                 {
                     case "Waiting":
-                        
+                        StartUpdateWiaitng();
                         break;
                     case "Importing":
-
-                        break;
-                    case "Finished":
-
+                        StartUpdateImporting();
                         break;
                 }
             }
@@ -86,14 +83,20 @@ namespace WiFiDBUploader
 
         public void StartUpdateWiaitng()
         {
-            
+            QueryArguments args = new QueryArguments(NextID++, "");
+
+            BackgroundWorker backgroundWorker1 = new BackgroundWorker();
+            backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateWaitingDoWork);
+            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_UpdateListViewProgressChanged);
+            backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
+            backgroundWorker1.RunWorkerAsync(args);
         }
 
         public void StartUpdateImporting()
         {
 
         }
-        
 
         public void StartFileImport(string query)
         {
@@ -101,7 +104,7 @@ namespace WiFiDBUploader
             
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_FileImportDoWork);
-            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ImportProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
@@ -114,10 +117,20 @@ namespace WiFiDBUploader
 
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_FolderImportDoWork);
-            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ImportProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
+        }
+
+        private void backgroundWorker_UpdateWaitingDoWork(object sender, DoWorkEventArgs e)
+        {
+            var backgroundWorker = sender as BackgroundWorker;
+            QueryArguments args = (QueryArguments)e.Argument;
+            Debug.WriteLine(args.Query);
+            WDBCommonObj.GetWaiting(backgroundWorker);
+            //Debug.WriteLine(ImportIDs.ToString());
+            e.Result = "Waiting Done";
         }
 
         private void backgroundWorker_FolderImportDoWork(object sender, DoWorkEventArgs e)
@@ -140,7 +153,7 @@ namespace WiFiDBUploader
             e.Result = args.Result;
         }
 
-        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void backgroundWorker_ImportProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
 
@@ -152,97 +165,173 @@ namespace WiFiDBUploader
             string message = "";
             string ImportID = "";
             string filehash = "";
+
             Debug.WriteLine(split[0]);
-            if (split[0] == "newrow")
+
+            string[] stringSep1 = new string[] { ":" };
+            string[] stringSep2 = new string[] { "-~-" };
+
+            switch (split[0])
             {
-                Debug.WriteLine(split[1]);
-                FileInfo f2 = new FileInfo(split[1]);
+                case "newrow":
+                    Debug.WriteLine(split[1]);
+                    FileInfo f2 = new FileInfo(split[1]);
 
-                string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "" , "", "Waiting"};
-                var listViewItemNew = new ListViewItem(row);
-                listView1.Items.Add(listViewItemNew);
-            }
-            else if(split[0] == "error")
-            {
-                Debug.WriteLine(split[0]);
-                string[] stringSep = new string[] { "-~-" };
-                string[] items = split[1].Split(stringSep, StringSplitOptions.None);
+                    string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "", "", "Waiting" };
+                    var listViewItemNew = new ListViewItem(row);
+                    listView1.Items.Add(listViewItemNew);
+                    break;
+                case "error":
+                    Debug.WriteLine(split[0]);
+                    string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
 
-                string[] stringSep1 = new string[] { ":" };
-                string[] SplitData = items[1].Split(stringSep1, StringSplitOptions.None);
 
-                Debug.WriteLine(items[0]);
-                Debug.WriteLine(SplitData[0]);
-                Debug.WriteLine(SplitData[1]);
+                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
 
-                ListViewItem listViewItem = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
+                    Debug.WriteLine(items_err[0]);
+                    Debug.WriteLine(SplitData[0]);
+                    Debug.WriteLine(SplitData[1]);
 
-                Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
-                listViewItem.SubItems[8].Text = SplitData[0];
-            }
-            else
-            {
-                foreach (string part in split)
-                {
-                    Debug.WriteLine(part + " \n--------------------\n");
-                    string[] items_pre = part.Split('|');
-                    
-                    foreach (var item in items_pre)
+                    ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
+
+                    Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                    listViewItem1.SubItems[8].Text = SplitData[0];
+                    break;
+                default:
+                    foreach (string part in split)
                     {
-                        string[] stringSep = new string[] { "-~-" };
-                        string[] items = item.Split(stringSep, StringSplitOptions.None);
-                        switch (items[0])
-                        {
-                            case "title":
-                                title = items[1];
-                                break;
-                            case "user":
-                                user = items[1];
-                                break;
-                            case "importnum":
-                                ImportID = items[1];
-                                break;
-                            case "message":
-                                message = items[1];
-                                break;
-                            case "filehash":
-                                filehash = items[1];
-                                break;
-                        }
-                    }
-                    Debug.WriteLine(" \n--------------------\n");
-                }
-                Debug.WriteLine(filehash);
+                        Debug.WriteLine(part + " \n--------------------\n");
+                        string[] items_pre = part.Split('|');
 
-                ListViewItem listViewItem = listView1.FindItemWithText(filehash);
-                
-                Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
-                listViewItem.SubItems[0].Text = ImportID;
-                listViewItem.SubItems[1].Text = user;
-                listViewItem.SubItems[2].Text = title;
-                listViewItem.SubItems[8].Text = message;
+                        foreach (var item in items_pre)
+                        {
+                            string[] items = item.Split(stringSep2, StringSplitOptions.None);
+                            switch (items[0])
+                            {
+                                case "title":
+                                    title = items[1];
+                                    break;
+                                case "user":
+                                    user = items[1];
+                                    break;
+                                case "importnum":
+                                    ImportID = items[1];
+                                    break;
+                                case "message":
+                                    message = items[1];
+                                    break;
+                                case "filehash":
+                                    filehash = items[1];
+                                    break;
+                            }
+                        }
+                        Debug.WriteLine(" \n--------------------\n");
+                    }
+                    Debug.WriteLine(filehash);
+
+                    ListViewItem listViewItem = listView1.FindItemWithText(filehash);
+
+                    Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                    listViewItem.SubItems[0].Text = ImportID;
+                    listViewItem.SubItems[1].Text = user;
+                    listViewItem.SubItems[2].Text = title;
+                    listViewItem.SubItems[8].Text = message;
+                    break;
+            }
+            //Debug.WriteLine(e.ProgressPercentage.ToString());
+        }
+
+        private void backgroundWorker_UpdateListViewProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
+
+            string[] stringSeparators = new string[] { "|~|" };
+            string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
+
+            string title = "";
+            string user = "";
+            string message = "";
+            string status = "";
+            string ImportID = "";
+            string filehash = "";
+            Debug.WriteLine(split[0]);
+
+            string[] stringSep1 = new string[] { ":" };
+            string[] stringSep2 = new string[] { "-~-" };
+
+            switch (split[0])
+            {
+                case "newrow":
+                    Debug.WriteLine(split[1]);
+                    FileInfo f2 = new FileInfo(split[1]);
+
+                    string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "", "", "Waiting" };
+                    var listViewItemNew = new ListViewItem(row);
+                    listView1.Items.Add(listViewItemNew);
+                    break;
+                case "error":
+                    Debug.WriteLine(split[0]);
+                    string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
+
+                    
+                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+
+                    Debug.WriteLine(items_err[0]);
+                    Debug.WriteLine(SplitData[0]);
+                    Debug.WriteLine(SplitData[1]);
+
+                    ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
+
+                    Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                    listViewItem1.SubItems[8].Text = SplitData[0];
+                    break;
+                default:
+                    foreach (string part in split)
+                    {
+                        Debug.WriteLine(part + " \n--------------------\n");
+                        string[] items_pre = part.Split('|');
+
+                        foreach (var item in items_pre)
+                        {
+                            string[] items = item.Split(stringSep2, StringSplitOptions.None);
+                            switch (items[0])
+                            {
+                                case "title":
+                                    title = items[1];
+                                    break;
+                                case "user":
+                                    user = items[1];
+                                    break;
+                                case "importnum":
+                                    ImportID = items[1];
+                                    break;
+                                case "message":
+                                    message = items[1];
+                                    break;
+                                case "filehash":
+                                    filehash = items[1];
+                                    break;
+                            }
+                        }
+                        Debug.WriteLine(" \n--------------------\n");
+                    }
+                    Debug.WriteLine(filehash);
+
+                    ListViewItem listViewItem = listView1.FindItemWithText(filehash);
+
+                    Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                    listViewItem.SubItems[0].Text = ImportID;
+                    listViewItem.SubItems[1].Text = user;
+                    listViewItem.SubItems[2].Text = title;
+                    listViewItem.SubItems[8].Text = message;
+                    break;
             }
             //Debug.WriteLine(e.ProgressPercentage.ToString());
         }
 
         private void backgroundWorker_ImportWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //List<KeyValuePair<int, string>> args = e.Result as List<KeyValuePair<int, string>>;
-            //Debug.WriteLine("List of Imports:");
-
-            /*foreach (KeyValuePair<int, string> item in args)
-            {
-                //Debug.WriteLine(item.Value.ToString());
-                string[] stringSeparators = new string[] { "|-~-|" };
-                string[] split = item.Value.ToString().Split(stringSeparators, StringSplitOptions.None);
-                foreach(string part in split)
-                {
-                    Debug.WriteLine(part);
-                }
-                string[] row = { "1", "Pferland", "Test Import", "2016-01-05", "248.02kb", "WDB_Upload_20160105.vs1", "DUMMYHASHSUM", "N/A", "Not Importing" };
-                var listViewItem = new ListViewItem(row);
-                listView1.Items.Add(listViewItem);
-            }*/
+            // maybe do something?
         }
 
         private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
