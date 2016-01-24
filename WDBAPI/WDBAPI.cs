@@ -147,18 +147,50 @@ namespace WDBAPI
         public string ParseApiResponse( string response )
         {
             string ret = "";
-
+            if(response == "")
+            {
+                return "errorParsing";
+            }
             Debug.WriteLine("RESPONSE: -------------------------- ");
             Debug.WriteLine(response);
             Debug.WriteLine(" -------------------------- ");
 
             XElement xmlTree = XElement.Parse(response);
-            //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
+            Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
             {
                 case "error":
                     ret = "error|~|There was An error during Import-~-" + xmlTree.Value.ToString();
                     //Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
+                    break;
+
+                case "scheduling":
+                    //case "waiting":
+                    foreach (var item in xmlTree.Elements())
+                    {
+                        switch(item.Name.ToString())
+                        {
+                            case "waiting":
+                                ret = ret + "|~|waiting|";
+                                break;
+                            case "importing":
+                                ret = ret + "|~|importing|";
+                                break;
+                            case "finished":
+                                ret = ret + "|~|finished|";
+                                break;
+                        }
+                        
+                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        foreach (var subitem in item.Elements())
+                        {
+                            ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
+                            Debug.WriteLine("Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
+                        }
+                    }
+                    Debug.WriteLine("Parse Return: "+ret);
+                    //    break;
+
                     break;
 
                 case "import":
@@ -186,13 +218,6 @@ namespace WDBAPI
                     }
                     break;
 
-                case "waiting":
-                    foreach (var item in xmlTree.Elements())
-                    {
-                        ret = ret + "|~|waiting|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
-                    }
-                    break;
 
                 case "bad":
                     foreach (var item in xmlTree.Elements())

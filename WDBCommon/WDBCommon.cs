@@ -16,10 +16,14 @@ namespace WDBCommon
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
         public int InternalImportID = 0;
 
+        public void GetHashStatus(string query, BackgroundWorker BgWk)
+        {
+            BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query)));
+        }
+
         public void GetWaiting(string query, BackgroundWorker BgWk)
         {
-            WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query));
-            BgWk.ReportProgress(0, "");
+            
         }
 
         public List<KeyValuePair<int, string>> ImportFolder(string Path, BackgroundWorker BW)
