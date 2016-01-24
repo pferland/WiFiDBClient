@@ -154,7 +154,7 @@ namespace WDBAPI
             Debug.WriteLine("RESPONSE: -------------------------- ");
             Debug.WriteLine(response);
             Debug.WriteLine(" -------------------------- ");
-
+            System.Threading.Thread.Sleep(2000);
             XElement xmlTree = XElement.Parse(response);
             Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
