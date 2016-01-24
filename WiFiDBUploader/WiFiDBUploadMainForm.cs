@@ -111,7 +111,7 @@ namespace WiFiDBUploader
             Debug.WriteLine("Start Call: StartGetDaemonStats");
             QueryArguments args = new QueryArguments(NextID++, "");
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateDaemonStatsDoWork);
+            backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_GetDaemonStatsDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_GetDaemonListViewProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
@@ -202,10 +202,17 @@ namespace WiFiDBUploader
             e.Result = args.Result;
         }
 
-        
-        
-        
-        
+        private void backgroundWorker_GetDaemonStatsDoWork(object sender, DoWorkEventArgs e)
+        {
+            var backgroundWorker = sender as BackgroundWorker;
+            QueryArguments args = (QueryArguments)e.Argument;
+            Debug.WriteLine(args.Query);
+            WDBCommonObj.GetHashStatus(args.Query, backgroundWorker);
+        }
+
+
+
+
         //
         // Progress Changed Functions
         //
