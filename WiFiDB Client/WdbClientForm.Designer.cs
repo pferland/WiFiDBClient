@@ -40,10 +40,12 @@ namespace WiFiDB_Uploader
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.schedulingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getWaitingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getFinishedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.getImportingListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getBadImportsListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listView1 = new System.Windows.Forms.ListView();
             this.ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.User = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -58,9 +60,6 @@ namespace WiFiDB_Uploader
             this.openSchedulePageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.getBadImportsListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip2.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -135,9 +134,16 @@ namespace WiFiDB_Uploader
             // uploadSelectionToolStripMenuItem
             // 
             this.uploadSelectionToolStripMenuItem.Name = "uploadSelectionToolStripMenuItem";
-            this.uploadSelectionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.uploadSelectionToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.uploadSelectionToolStripMenuItem.Text = "Select File";
             this.uploadSelectionToolStripMenuItem.Click += new System.EventHandler(this.uploadSelectionToolStripMenuItem_Click);
+            // 
+            // selectFolderToolStripMenuItem
+            // 
+            this.selectFolderToolStripMenuItem.Name = "selectFolderToolStripMenuItem";
+            this.selectFolderToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.selectFolderToolStripMenuItem.Text = "Select Folder";
+            this.selectFolderToolStripMenuItem.Click += new System.EventHandler(this.selectFolderToolStripMenuItem_Click);
             // 
             // schedulingToolStripMenuItem
             // 
@@ -170,6 +176,13 @@ namespace WiFiDB_Uploader
             this.getImportingListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.getImportingListToolStripMenuItem.Text = "Get Importing List";
             this.getImportingListToolStripMenuItem.Click += new System.EventHandler(this.getImportingListToolStripMenuItem_Click);
+            // 
+            // getBadImportsListToolStripMenuItem
+            // 
+            this.getBadImportsListToolStripMenuItem.Name = "getBadImportsListToolStripMenuItem";
+            this.getBadImportsListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.getBadImportsListToolStripMenuItem.Text = "Get Bad Imports List";
+            this.getBadImportsListToolStripMenuItem.Click += new System.EventHandler(this.getBadImportsListToolStripMenuItem_Click);
             // 
             // listView1
             // 
@@ -241,12 +254,16 @@ namespace WiFiDB_Uploader
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openSchedulePageToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(184, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(68, 26);
+            // 
+            // openSchedulePageToolStripMenuItem
+            // 
+            this.openSchedulePageToolStripMenuItem.Name = "openSchedulePageToolStripMenuItem";
+            this.openSchedulePageToolStripMenuItem.Size = new System.Drawing.Size(67, 22);
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
@@ -264,30 +281,6 @@ namespace WiFiDB_Uploader
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1272, 440);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // getBadImportsListToolStripMenuItem
-            // 
-            this.getBadImportsListToolStripMenuItem.Name = "getBadImportsListToolStripMenuItem";
-            this.getBadImportsListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.getBadImportsListToolStripMenuItem.Text = "Get Bad Imports List";
-            this.getBadImportsListToolStripMenuItem.Click += new System.EventHandler(this.getBadImportsListToolStripMenuItem_Click);
-            // 
-            // selectFolderToolStripMenuItem
-            // 
-            this.selectFolderToolStripMenuItem.Name = "selectFolderToolStripMenuItem";
-            this.selectFolderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.selectFolderToolStripMenuItem.Text = "Select Folder";
-            this.selectFolderToolStripMenuItem.Click += new System.EventHandler(this.selectFolderToolStripMenuItem_Click);
             // 
             // WdbClientForm
             // 
@@ -335,7 +328,6 @@ namespace WiFiDB_Uploader
         private ToolStripMenuItem uploadSelectionToolStripMenuItem;
         private TabControl tabControl1;
         private TabPage tabPage1;
-        private TabPage tabPage2;
         private ToolStripMenuItem schedulingToolStripMenuItem;
         private ToolStripMenuItem getWaitingListToolStripMenuItem;
         private ToolStripMenuItem getFinishedListToolStripMenuItem;

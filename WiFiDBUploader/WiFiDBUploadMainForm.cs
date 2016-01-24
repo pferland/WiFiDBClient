@@ -64,8 +64,8 @@ namespace WiFiDBUploader
 
             foreach (ListViewItem item in listView1.Items)
             {
-                Debug.WriteLine(item.SubItems[9].Text);
-                //switch(item.SubItems[9].Text)
+                Debug.WriteLine(item.SubItems[8].Text);
+                //switch(item.SubItems[8].Text)
                 //{
                  //   case "Waiting":
                         StartUpdateWiaitng(item.SubItems[6].Text);
@@ -237,8 +237,8 @@ namespace WiFiDBUploader
                     listViewItem.SubItems[0].Text = ImportID;
                     listViewItem.SubItems[1].Text = user;
                     listViewItem.SubItems[2].Text = title;
-                    listViewItem.SubItems[8].Text = message;
-                    listViewItem.SubItems[9].Text = "Waiting";
+                    listViewItem.SubItems[7].Text = message;
+                    listViewItem.SubItems[8].Text = "Waiting";
                     break;
             }
             //Debug.WriteLine(e.ProgressPercentage.ToString());
@@ -351,8 +351,8 @@ namespace WiFiDBUploader
                         listViewItem.SubItems[0].Text = ImportID;
                         listViewItem.SubItems[1].Text = user;
                         listViewItem.SubItems[2].Text = title;
-                        listViewItem.SubItems[8].Text = message;
-                        listViewItem.SubItems[9].Text = status;
+                        listViewItem.SubItems[7].Text = message;
+                        listViewItem.SubItems[8].Text = status;
                     }
                     Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
                     break;
@@ -397,7 +397,5 @@ namespace WiFiDBUploader
                 StartFolderImport(folderBrowserDialog1.SelectedPath);
             }
         }
-
-
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace WiFiDBUploader
+﻿using System.Windows.Forms;
+
+namespace WiFiDBUploader
 {
     partial class WiFiDBUploadMainForm
     {
@@ -50,7 +52,7 @@
             this.Size = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.FileName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.FileHash = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.CurrentSSID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Message = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
@@ -59,7 +61,13 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listView2 = new System.Windows.Forms.ListView();
-            this.Message = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.NodeName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.PidFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.PID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.RunTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.PidMem = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.CMD = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.DateTimeCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -74,7 +82,7 @@
             this.settingsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1202, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1445, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -171,16 +179,16 @@
             this.Size,
             this.FileName,
             this.FileHash,
-            this.CurrentSSID,
             this.Message,
             this.Status});
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.FullRowSelect = true;
             this.listView1.Location = new System.Drawing.Point(3, 3);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1188, 536);
+            this.listView1.Size = new System.Drawing.Size(1431, 533);
             this.listView1.TabIndex = 3;
             this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
             // 
             // ID
             // 
@@ -190,17 +198,17 @@
             // User
             // 
             this.User.Text = "User";
-            this.User.Width = 200;
+            this.User.Width = 110;
             // 
             // ImportTitle
             // 
             this.ImportTitle.Text = "Import Title";
-            this.ImportTitle.Width = 200;
+            this.ImportTitle.Width = 190;
             // 
             // Date
             // 
             this.Date.Text = "Date";
-            this.Date.Width = 100;
+            this.Date.Width = 150;
             // 
             // Size
             // 
@@ -210,31 +218,33 @@
             // FileName
             // 
             this.FileName.Text = "File Name";
-            this.FileName.Width = 220;
+            this.FileName.Width = 270;
             // 
             // FileHash
             // 
             this.FileHash.Text = "File Hash Sum";
-            this.FileHash.Width = 150;
+            this.FileHash.Width = 256;
             // 
-            // CurrentSSID
+            // Message
             // 
-            this.CurrentSSID.Text = "Current SSID";
-            this.CurrentSSID.Width = 150;
+            this.Message.DisplayIndex = 8;
+            this.Message.Text = "Message";
+            this.Message.Width = 210;
             // 
             // Status
             // 
-            this.Status.DisplayIndex = 8;
+            this.Status.DisplayIndex = 7;
             this.Status.Text = "Status";
+            this.Status.Width = 90;
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar1,
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 592);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 589);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1202, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1445, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -257,7 +267,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1202, 568);
+            this.tabControl1.Size = new System.Drawing.Size(1445, 565);
             this.tabControl1.TabIndex = 5;
             // 
             // tabPage1
@@ -266,9 +276,9 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1194, 542);
+            this.tabPage1.Size = new System.Drawing.Size(1437, 539);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.Text = "Uploaded Files";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
@@ -277,30 +287,70 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1194, 542);
+            this.tabPage2.Size = new System.Drawing.Size(1432, 542);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.Text = "Daemon Statuses";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // listView2
             // 
+            this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.NodeName,
+            this.PidFile,
+            this.PID,
+            this.RunTime,
+            this.PidMem,
+            this.CMD,
+            this.DateTimeCol});
             this.listView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView2.HideSelection = false;
             this.listView2.Location = new System.Drawing.Point(3, 3);
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(1188, 536);
+            this.listView2.Size = new System.Drawing.Size(1426, 536);
             this.listView2.TabIndex = 0;
             this.listView2.UseCompatibleStateImageBehavior = false;
+            this.listView2.View = System.Windows.Forms.View.Details;
             // 
-            // Message
+            // NodeName
             // 
-            this.Message.DisplayIndex = 9;
-            this.Message.Text = "Message";
+            this.NodeName.Text = "Node Name";
+            this.NodeName.Width = 80;
+            // 
+            // PidFile
+            // 
+            this.PidFile.Text = "Pid File";
+            this.PidFile.Width = 210;
+            // 
+            // PID
+            // 
+            this.PID.Text = "PID";
+            this.PID.Width = 90;
+            // 
+            // RunTime
+            // 
+            this.RunTime.Text = "Run Time";
+            this.RunTime.Width = 80;
+            // 
+            // PidMem
+            // 
+            this.PidMem.Text = "Mem Usage";
+            this.PidMem.Width = 90;
+            // 
+            // CMD
+            // 
+            this.CMD.Text = "CMD";
+            this.CMD.Width = 300;
+            // 
+            // DateTimeCol
+            // 
+            this.DateTimeCol.Text = "Date Time";
+            this.DateTimeCol.Width = 150;
             // 
             // WiFiDBUploadMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1202, 614);
+            this.ClientSize = new System.Drawing.Size(1445, 611);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.button2);
@@ -346,13 +396,19 @@
         private System.Windows.Forms.ColumnHeader Size;
         private System.Windows.Forms.ColumnHeader FileName;
         private System.Windows.Forms.ColumnHeader FileHash;
-        private System.Windows.Forms.ColumnHeader CurrentSSID;
         private System.Windows.Forms.ColumnHeader Status;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ListView listView2;
         private System.Windows.Forms.ColumnHeader Message;
+        private System.Windows.Forms.ColumnHeader NodeName;
+        private System.Windows.Forms.ColumnHeader PidFile;
+        private System.Windows.Forms.ColumnHeader PID;
+        private System.Windows.Forms.ColumnHeader RunTime;
+        private System.Windows.Forms.ColumnHeader PidMem;
+        private System.Windows.Forms.ColumnHeader CMD;
+        private System.Windows.Forms.ColumnHeader DateTimeCol;
     }
 }
 
