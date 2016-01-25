@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WiFiDB Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WiFiDB Settings.Designer.cs">
+      <DependentUpon>WiFiDB Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="WiFiDBUploadMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -54,6 +60,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="WiFiDB Settings.resx">
+      <DependentUpon>WiFiDB Settings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="WiFiDBUploadMainForm.resx">
       <DependentUpon>WiFiDBUploadMainForm.cs</DependentUpon>
     </EmbeddedResource>

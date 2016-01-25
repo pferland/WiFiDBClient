@@ -57,6 +57,8 @@ namespace WiFiDBUploader
             timer1.Interval = 10000; // in miliseconds
             timer1.Start();
 
+            StartGetDaemonStats(); //prep the tables.
+
             timer2 = new System.Windows.Forms.Timer();
             timer2.Tick += new EventHandler(CheckForDaemonUpdates);
             timer2.Interval = 5000; // in miliseconds
@@ -65,50 +67,36 @@ namespace WiFiDBUploader
 
         private void CheckForDaemonUpdates(object sender, EventArgs e)
         {
-            Debug.WriteLine("-------- BackGround Update Check Begin --------");
-            if (listView2.Items.Count < 1)
-            {
-                //Debug.WriteLine("Daemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nDaemon ListView is less than 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-                StartGetDaemonStats();
-            }
-            else
-            {
-                foreach(ListViewItem item in listView2.Items)
-                {
-                    StartUpdateDaemonStats();
-                }
-                //Debug.WriteLine("Daemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\nDaemon ListView is MORE than 1 !!!!!!!!!!!\n");
-            }
-            Debug.WriteLine("-------- BackGround Update Check End --------");
+            StartGetDaemonStats();
         }
 
         private void CheckForUpdates(object sender, EventArgs e)
         {
-            Debug.WriteLine("-------- BackGround Update Check Begin --------");
+            //Debug.WriteLine("-------- BackGround Update Check Begin --------");
             foreach (ListViewItem item in listView1.Items)
             {
-                Debug.WriteLine(item.SubItems[8].Text);
+                //Debug.WriteLine(item.SubItems[8].Text);
                 StartUpdateWiaitng(item.SubItems[6].Text);
             }
-            Debug.WriteLine("-------- BackGround Update Check End --------");
+            //Debug.WriteLine("-------- BackGround Update Check End --------");
         }
         
         public void StartUpdateDaemonStats()
         {
-            Debug.WriteLine("Start Call: StartUpdateDaemonStats");
+            //Debug.WriteLine("Start Call: StartUpdateDaemonStats");
             QueryArguments args = new QueryArguments(NextID++, "");
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateDaemonStatsDoWork);
-            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_UpdateDaemonListViewProgressChanged);
+            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_GetDaemonListViewProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
-            Debug.WriteLine("End Call: StartUpdateDaemonStats");
+            //Debug.WriteLine("End Call: StartUpdateDaemonStats");
         }
 
         public void StartGetDaemonStats()
         {
-            Debug.WriteLine("Start Call: StartGetDaemonStats");
+            //Debug.WriteLine("Start Call: StartGetDaemonStats");
             QueryArguments args = new QueryArguments(NextID++, "");
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_GetDaemonStatsDoWork);
@@ -116,12 +104,12 @@ namespace WiFiDBUploader
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
-            Debug.WriteLine("End Call: StartGetDaemonStats");
+            //Debug.WriteLine("End Call: StartGetDaemonStats");
         }
 
         public void StartUpdateWiaitng(string query)
         {
-            Debug.WriteLine("Start Call: StartUpdateWaiting");
+            //Debug.WriteLine("Start Call: StartUpdateWaiting");
             QueryArguments args = new QueryArguments(NextID++, query);
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateWaitingDoWork);
@@ -129,7 +117,7 @@ namespace WiFiDBUploader
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
-            Debug.WriteLine("End Call: StartUpdateWaiting");
+            //Debug.WriteLine("End Call: StartUpdateWaiting");
         }
 
         public void StartFileImport(string query)
@@ -166,19 +154,27 @@ namespace WiFiDBUploader
         {
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
-            Debug.WriteLine(args.Query);
-            WDBCommonObj.GetHashStatus(args.Query, backgroundWorker);
-            //Debug.WriteLine(ImportIDs.ToString());
+            //Debug.WriteLine(args.Query);
+            WDBCommonObj.GetDaemonStatuses(args.Query, backgroundWorker);
+            ////Debug.WriteLine(ImportIDs.ToString());
             //e.Result = "Waiting Done";
+        }
+
+        private void backgroundWorker_GetDaemonStatsDoWork(object sender, DoWorkEventArgs e)
+        {
+            var backgroundWorker = sender as BackgroundWorker;
+            QueryArguments args = (QueryArguments)e.Argument;
+            //Debug.WriteLine(args.Query);
+            WDBCommonObj.GetDaemonStatuses(args.Query, backgroundWorker);
         }
 
         private void backgroundWorker_UpdateWaitingDoWork(object sender, DoWorkEventArgs e)
         {
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
-            Debug.WriteLine(args.Query);
+            //Debug.WriteLine(args.Query);
             WDBCommonObj.GetHashStatus(args.Query, backgroundWorker);
-            //Debug.WriteLine(ImportIDs.ToString());
+            ////Debug.WriteLine(ImportIDs.ToString());
             //e.Result = "Waiting Done";
         }
 
@@ -186,9 +182,9 @@ namespace WiFiDBUploader
         {
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
-            Debug.WriteLine(args.Query);
+            //Debug.WriteLine(args.Query);
             ImportIDs = WDBCommonObj.ImportFolder(args.Query, backgroundWorker);
-            Debug.WriteLine(ImportIDs.ToString());
+            //Debug.WriteLine(ImportIDs.ToString());
             args.Result = ImportIDs;
             e.Result = args.Result;
         }
@@ -197,18 +193,11 @@ namespace WiFiDBUploader
         {
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
-            Debug.WriteLine(args.Query);
+            //Debug.WriteLine(args.Query);
             ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(args.Query) ) ) ;
             e.Result = args.Result;
         }
 
-        private void backgroundWorker_GetDaemonStatsDoWork(object sender, DoWorkEventArgs e)
-        {
-            var backgroundWorker = sender as BackgroundWorker;
-            QueryArguments args = (QueryArguments)e.Argument;
-            Debug.WriteLine(args.Query);
-            WDBCommonObj.GetHashStatus(args.Query, backgroundWorker);
-        }
 
 
 
@@ -232,37 +221,37 @@ namespace WiFiDBUploader
             string filehash = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            Debug.WriteLine("========== Update Listview Start ==========");
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine("========== Update Listview Start ==========");
+            //Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
-                    Debug.WriteLine(split[0]);
+                    //Debug.WriteLine(split[0]);
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
 
 
                     string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
 
-                    Debug.WriteLine(items_err[0]);
-                    Debug.WriteLine(SplitData[0]);
-                    Debug.WriteLine(SplitData[1]);
+                    //Debug.WriteLine(items_err[0]);
+                    //Debug.WriteLine(SplitData[0]);
+                    //Debug.WriteLine(SplitData[1]);
 
                     ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
 
-                    Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                    //Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
                     listViewItem1.SubItems[8].Text = SplitData[0];
                     break;
                 default:
-                    Debug.WriteLine(" \n--------- Start Parse ListView Update Return String -----------\n");
+                    //Debug.WriteLine(" \n--------- Start Parse ListView Update Return String -----------\n");
 
                     foreach (string part in split)
                     {
-                        Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
+                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
                         string[] items_pre = part.Split('|');
 
                         foreach (var item in items_pre)
                         {
-                            Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
+                            //Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
                             if (!item.Contains("-~-"))
                             {
                                 switch (item.ToString())
@@ -277,60 +266,60 @@ namespace WiFiDBUploader
                                         status = item;
                                         break;
                                 }
-                                Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
+                                //Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
                                 continue;
                             }
                             string[] items = item.Split(stringSep2, StringSplitOptions.None);
-                            Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
+                            //Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
                             switch (items[0].ToString())
                             {
                                 case "title":
-                                    Debug.WriteLine("Title? " + items[1]);
+                                    //Debug.WriteLine("Title? " + items[1]);
                                     title = items[1];
                                     break;
                                 case "user":
-                                    Debug.WriteLine("user? " + items[1]);
+                                    //Debug.WriteLine("user? " + items[1]);
                                     user = items[1];
                                     break;
                                 case "id":
-                                    Debug.WriteLine("importnum? " + items[1]);
+                                    //Debug.WriteLine("importnum? " + items[1]);
                                     ImportID = items[1];
                                     break;
                                 case "message":
-                                    Debug.WriteLine("message? " + items[1]);
+                                    //Debug.WriteLine("message? " + items[1]);
                                     message = items[1];
                                     break;
                                 case "hash":
-                                    Debug.WriteLine("filehash? " + items[1]);
+                                    //Debug.WriteLine("filehash? " + items[1]);
                                     filehash = items[1];
                                     break;
                                 case "ap":
-                                    Debug.WriteLine("AP? " + items[1]);
+                                    //Debug.WriteLine("AP? " + items[1]);
                                     message = message + " - " + items[1];
                                     break;
                                 case "tot":
-                                    Debug.WriteLine("This Of This? " + items[1]);
+                                    //Debug.WriteLine("This Of This? " + items[1]);
                                     message = message + " - " + items[1];
                                     break;
                             }
                         }
                     }
-                    Debug.WriteLine(filehash);
-                    Debug.WriteLine("End Parse Loop Message: " + message);
+                    //Debug.WriteLine(filehash);
+                    //Debug.WriteLine("End Parse Loop Message: " + message);
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
                     if ((status == "finished") || ((ImportID != "") && (message != "")))
                     {
-                        Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                        //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
                         listViewItem.SubItems[0].Text = ImportID;
                         listViewItem.SubItems[1].Text = user;
                         listViewItem.SubItems[2].Text = title;
                         listViewItem.SubItems[7].Text = message;
                         listViewItem.SubItems[8].Text = status;
                     }
-                    Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
+                    //Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
                     break;
             }
-            Debug.WriteLine("========== Update Listview End ==========");
+            //Debug.WriteLine("========== Update Listview End ==========");
         }
 
         private void backgroundWorker_ImportProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -346,7 +335,7 @@ namespace WiFiDBUploader
             string ImportID = "";
             string filehash = "";
 
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine(split[0]);
 
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
@@ -354,7 +343,7 @@ namespace WiFiDBUploader
             switch (split[0])
             {
                 case "newrow":
-                    Debug.WriteLine(split[1]);
+                    //Debug.WriteLine(split[1]);
                     FileInfo f2 = new FileInfo(split[1]);
 
                     string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "", "Uploading File to WiFiDB...", "Uploading" };
@@ -362,25 +351,25 @@ namespace WiFiDBUploader
                     listView1.Items.Add(listViewItemNew);
                     break;
                 case "error":
-                    Debug.WriteLine(split[0]);
+                    //Debug.WriteLine(split[0]);
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
 
 
                     string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
 
-                    Debug.WriteLine(items_err[0]);
-                    Debug.WriteLine(SplitData[0]);
-                    Debug.WriteLine(SplitData[1]);
+                    //Debug.WriteLine(items_err[0]);
+                    //Debug.WriteLine(SplitData[0]);
+                    //Debug.WriteLine(SplitData[1]);
 
                     ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
 
-                    Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                    //Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
                     listViewItem1.SubItems[8].Text = SplitData[0];
                     break;
                 default:
                     foreach (string part in split)
                     {
-                        Debug.WriteLine(part + " \n--------------------\n");
+                        //Debug.WriteLine(part + " \n--------------------\n");
                         string[] items_pre = part.Split('|');
 
                         foreach (var item in items_pre)
@@ -405,13 +394,13 @@ namespace WiFiDBUploader
                                     break;
                             }
                         }
-                        Debug.WriteLine(" \n--------------------\n");
+                        //Debug.WriteLine(" \n--------------------\n");
                     }
-                    Debug.WriteLine(filehash);
+                    //Debug.WriteLine(filehash);
 
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
 
-                    Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                    //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
                     listViewItem.SubItems[0].Text = ImportID;
                     listViewItem.SubItems[1].Text = user;
                     listViewItem.SubItems[2].Text = title;
@@ -419,7 +408,7 @@ namespace WiFiDBUploader
                     listViewItem.SubItems[8].Text = "Waiting";
                     break;
             }
-            //Debug.WriteLine(e.ProgressPercentage.ToString());
+            ////Debug.WriteLine(e.ProgressPercentage.ToString());
         }
 
         private void backgroundWorker_UpdateListViewProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -437,37 +426,37 @@ namespace WiFiDBUploader
             string filehash = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            Debug.WriteLine("========== Update Listview Start ==========");
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine("========== Update Listview Start ==========");
+            //Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
-                    Debug.WriteLine(split[0]);
+                    //Debug.WriteLine(split[0]);
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
 
                     
                     string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
 
-                    Debug.WriteLine(items_err[0]);
-                    Debug.WriteLine(SplitData[0]);
-                    Debug.WriteLine(SplitData[1]);
+                    //Debug.WriteLine(items_err[0]);
+                    //Debug.WriteLine(SplitData[0]);
+                    //Debug.WriteLine(SplitData[1]);
 
                     ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
 
-                    Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                    //Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
                     listViewItem1.SubItems[8].Text = SplitData[0];
                     break;
                 default:
-                    Debug.WriteLine(" \n--------- Start Parse ListView Update Return String -----------\n");
+                    //Debug.WriteLine(" \n--------- Start Parse ListView Update Return String -----------\n");
 
                     foreach (string part in split)
                     {
-                        Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
+                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
                         string[] items_pre = part.Split('|');
 
                         foreach (var item in items_pre)
                         {
-                            Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
+                            //Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
                             if(!item.Contains("-~-"))
                             {
                                 switch (item.ToString())
@@ -482,178 +471,171 @@ namespace WiFiDBUploader
                                         status = item;
                                         break;
                                 }
-                                Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
+                                //Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
                                 continue;
                             }
                             string[] items = item.Split(stringSep2, StringSplitOptions.None);
-                            Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
+                            //Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
                             switch (items[0].ToString())
                             {
                                 case "title":
-                                    Debug.WriteLine("Title? " + items[1]);
+                                    //Debug.WriteLine("Title? " + items[1]);
                                     title = items[1];
                                     break;
                                 case "user":
-                                    Debug.WriteLine("user? " + items[1]);
+                                    //Debug.WriteLine("user? " + items[1]);
                                     user = items[1];
                                     break;
                                 case "id":
-                                    Debug.WriteLine("importnum? " + items[1]);
+                                    //Debug.WriteLine("importnum? " + items[1]);
                                     ImportID = items[1];
                                     break;
                                 case "message":
-                                    Debug.WriteLine("message? " + items[1]);
+                                    //Debug.WriteLine("message? " + items[1]);
                                     message = items[1];
                                     break;
                                 case "hash":
-                                    Debug.WriteLine("filehash? " + items[1]);
+                                    //Debug.WriteLine("filehash? " + items[1]);
                                     filehash = items[1];
                                     break;
                                 case "ap":
-                                    Debug.WriteLine("AP? " + items[1]);
+                                    //Debug.WriteLine("AP? " + items[1]);
                                     message = message + " - " + items[1];
                                     break;
                                 case "tot":
-                                    Debug.WriteLine("This Of This? " + items[1]);
+                                    //Debug.WriteLine("This Of This? " + items[1]);
                                     message = message + " - " + items[1];
                                     break;
                             }
                         }
                     }
-                    Debug.WriteLine(filehash);
-                    Debug.WriteLine("End Parse Loop Message: " + message);
+                    //Debug.WriteLine(filehash);
+                    //Debug.WriteLine("End Parse Loop Message: " + message);
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
                     if( (status == "finished") || ( (ImportID != "") && (message != "") ) )
                     {
-                        Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                        //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
                         listViewItem.SubItems[0].Text = ImportID;
                         listViewItem.SubItems[1].Text = user;
                         listViewItem.SubItems[2].Text = title;
                         listViewItem.SubItems[7].Text = message;
                         listViewItem.SubItems[8].Text = status;
                     }
-                    Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
+                    //Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
                     break;
             }
-            Debug.WriteLine("========== Update Listview End ==========");
+            //Debug.WriteLine("========== Update Listview End ==========");
         }
-
-
-
+        
         private void backgroundWorker_GetDaemonListViewProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
 
+            //Debug.WriteLine(e.UserState.ToString());
             string[] stringSeparators = new string[] { "|~|" };
             string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
 
-            string title = "";
-            string user = "";
-            string message = "";
-            string status = "";
-            string ImportID = "";
-            string filehash = "";
+            string nodename = "";
+            string pidfile = "";
+            string pid = "";
+            string pidmem = "";
+            string pidtime = "";
+            string cmd = "";
+            string datetime_col = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            Debug.WriteLine("========== Update Daemon Listview Start ==========");
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine("========== Update Daemon ListView Start ==========");
+            //Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
-                    Debug.WriteLine(split[0]);
+                    //Debug.WriteLine(split[0]);
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-
-
                     string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
 
-                    Debug.WriteLine(items_err[0]);
-                    Debug.WriteLine(SplitData[0]);
-                    Debug.WriteLine(SplitData[1]);
+                    //Debug.WriteLine(items_err[0]);
+                    //Debug.WriteLine(SplitData[0]);
+                    //Debug.WriteLine(SplitData[1]);
 
-                    ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
-
-                    Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
-                    listViewItem1.SubItems[8].Text = SplitData[0];
+                    MessageBox.Show(SplitData[1] + " -- " + SplitData[0]);
                     break;
                 default:
-                    Debug.WriteLine(" \n--------- Start Parse Daemon ListView Update Return String -----------\n");
+                    //Debug.WriteLine(" \n--------- Start Parse Daemon ListView Update Return String -----------\n");
 
                     foreach (string part in split)
                     {
-                        Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
+                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
                         string[] items_pre = part.Split('|');
 
                         foreach (var item in items_pre)
                         {
-                            Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
+                            //Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
                             if (!item.Contains("-~-"))
                             {
-                                switch (item.ToString())
-                                {
-                                    case "waiting":
-                                        status = item;
-                                        break;
-                                    case "importing":
-                                        status = item;
-                                        break;
-                                    case "finished":
-                                        status = item;
-                                        break;
-                                }
-                                Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
+                                //Debug.WriteLine("Bad Message: " + item + " Part: " + part);
                                 continue;
                             }
                             string[] items = item.Split(stringSep2, StringSplitOptions.None);
-                            Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
+                            //Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
                             switch (items[0].ToString())
                             {
-                                case "title":
-                                    Debug.WriteLine("Title? " + items[1]);
-                                    title = items[1];
+                                case "nodename":
+                                    //Debug.WriteLine("nodename? " + items[1]);
+                                    nodename = items[1];
                                     break;
-                                case "user":
-                                    Debug.WriteLine("user? " + items[1]);
-                                    user = items[1];
+                                case "pidfile":
+                                    //Debug.WriteLine("pidfile? " + items[1]);
+                                    pidfile = items[1];
                                     break;
-                                case "id":
-                                    Debug.WriteLine("importnum? " + items[1]);
-                                    ImportID = items[1];
+                                case "pid":
+                                    //Debug.WriteLine("pid? " + items[1]);
+                                    pid = items[1];
                                     break;
-                                case "message":
-                                    Debug.WriteLine("message? " + items[1]);
-                                    message = items[1];
+                                case "pidtime":
+                                    //Debug.WriteLine("runtime? " + items[1]);
+                                    pidtime = items[1];
                                     break;
-                                case "hash":
-                                    Debug.WriteLine("filehash? " + items[1]);
-                                    filehash = items[1];
+                                case "pidmem":
+                                    //Debug.WriteLine("mem? " + items[1]);
+                                    pidmem = items[1];
                                     break;
-                                case "ap":
-                                    Debug.WriteLine("AP? " + items[1]);
-                                    message = message + " - " + items[1];
+                                case "pidcmd":
+                                    //Debug.WriteLine("cmd? " + items[1]);
+                                    cmd = items[1];
                                     break;
-                                case "tot":
-                                    Debug.WriteLine("This Of This? " + items[1]);
-                                    message = message + " - " + items[1];
+                                case "date":
+                                    //Debug.WriteLine("date anad time? " + items[1]);
+                                    datetime_col = items[1];
                                     break;
                             }
                         }
+                        if ((nodename != "") && (pid != "") && (pidfile != ""))
+                        {
+                            ListViewItem listViewItem = listView2.FindItemWithText(pidfile);
+                            if ( listViewItem != null)
+                            {
+                                //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                                listViewItem.SubItems[0].Text = nodename;
+                                listViewItem.SubItems[1].Text = pidfile;
+                                listViewItem.SubItems[2].Text = pid;
+                                listViewItem.SubItems[3].Text = pidtime;
+                                listViewItem.SubItems[4].Text = pidmem;
+                                listViewItem.SubItems[5].Text = cmd;
+                                listViewItem.SubItems[6].Text = datetime_col;
+                            }
+                            else
+                            {
+                                string[] row = { nodename, pidfile, pid, pidtime.ToString(), pidmem.ToString(), cmd.ToString(), datetime_col.ToString() };
+                                var listViewItemNew = new ListViewItem(row);
+                                listView2.Items.Add(listViewItemNew);
+                            }
+                        }
                     }
-                    Debug.WriteLine(filehash);
-                    Debug.WriteLine("End Parse Loop Message: " + message);
-                    ListViewItem listViewItem = listView2.FindItemWithText(filehash);
-                    if ((status == "finished") || ((ImportID != "") && (message != "")))
-                    {
-                        Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
-                        listViewItem.SubItems[0].Text = ImportID;
-                        listViewItem.SubItems[1].Text = user;
-                        listViewItem.SubItems[2].Text = title;
-                        listViewItem.SubItems[7].Text = message;
-                        listViewItem.SubItems[8].Text = status;
-                    }
-                    Debug.WriteLine(" \n--------- End Parse Daemon ListView Update Return String -----------\n");
+                    
+                    //Debug.WriteLine(" \n--------- End Parse Daemon ListView Update Return String -----------\n");
                     break;
             }
-            Debug.WriteLine("========== Update Daemon Listview End ==========");
+            //Debug.WriteLine("========== Update Daemon Listview End ==========");
         }
 
 
@@ -700,9 +682,24 @@ namespace WiFiDBUploader
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                Debug.WriteLine(folderBrowserDialog1.SelectedPath);
+                //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
                 StartFolderImport(folderBrowserDialog1.SelectedPath);
             }
+        }
+
+        private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void autoSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -18,7 +18,14 @@ namespace WDBCommon
 
         public void GetHashStatus(string query, BackgroundWorker BgWk)
         {
+            BgWk.ReportProgress(0, "");
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query)));
+        }
+
+        public void GetDaemonStatuses(string query, BackgroundWorker BgWk)
+        {
+            BgWk.ReportProgress(0, "");
+            BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetDaemonStatuses(query)));
         }
 
         public void GetWaiting(string query, BackgroundWorker BgWk)
@@ -38,13 +45,13 @@ namespace WDBCommon
 
                 // IMPORT ALL VS1 FILES.
                 string[] vs1s = Directory.GetFiles(Path, "*.vs1");
-                Debug.WriteLine("The number of VS1 files: {0}.", vs1s.Length);
+                //Debug.WriteLine("The number of VS1 files: {0}.", vs1s.Length);
                 if(vs1s.Length > 0)
                 {
                     foreach (string vs1 in vs1s)
                     {
                         InternalImportID++;
-                        Debug.WriteLine(vs1);
+                        //Debug.WriteLine(vs1);
                         using (var inputFileStream = File.Open(vs1, FileMode.Open))
                         {
                             hashBytes = md5.ComputeHash(inputFileStream);
@@ -53,19 +60,19 @@ namespace WDBCommon
                         BW.ReportProgress(0, "newrow|~|" + vs1 + "|~|" + hashish);
                         responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(vs1) ) ) );
                         BW.ReportProgress(0, responses.Last().Value.ToString());
-                        Debug.WriteLine(responses.Last().Value.ToString());
+                        //Debug.WriteLine(responses.Last().Value.ToString());
                     }
                 }
 
                 // IMPORT ALL VSZ FILES.
                 string[] vszs = Directory.GetFiles(Path, "*.vsz");
-                Debug.WriteLine("The number of VSZ files: {0}.", vszs.Length);
+                //Debug.WriteLine("The number of VSZ files: {0}.", vszs.Length);
                 if (vszs.Length > 0)
                 {
                     foreach (string vsz in vszs)
                     {
                         InternalImportID++;
-                        Debug.WriteLine(vsz);
+                        //Debug.WriteLine(vsz);
                         using (var inputFileStream = File.Open(vsz, FileMode.Open))
                         {
                             hashBytes = md5.ComputeHash(inputFileStream);
@@ -75,19 +82,19 @@ namespace WDBCommon
                         BW.ReportProgress(0, "newrow|~|" + vsz + "|~|" + hashish);
                         responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ApiImportFile(vsz)));
                         BW.ReportProgress(0, responses.Last().Value.ToString());
-                        Debug.WriteLine(responses.Last().Value.ToString());
+                        //Debug.WriteLine(responses.Last().Value.ToString());
                     }
                 }
                 
                 // IMPORT ALL CSV FILES.
                 string[] csvs = Directory.GetFiles(Path, "*.csv");
-                Debug.WriteLine("The number of CSV files: {0}.", csvs.Length);
+                //Debug.WriteLine("The number of CSV files: {0}.", csvs.Length);
                 if (csvs.Length > 0)
                 {
                     foreach (string csv in csvs)
                     {
                         InternalImportID++;
-                        Debug.WriteLine(csv);
+                        //Debug.WriteLine(csv);
                         using (var inputFileStream = File.Open(csv, FileMode.Open))
                         {
                             hashBytes = md5.ComputeHash(inputFileStream);
@@ -96,19 +103,19 @@ namespace WDBCommon
                         BW.ReportProgress(0, "newrow|~|" + csv + "|~|" + hashish);
                         responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ApiImportFile(csv)));
                         BW.ReportProgress(0, responses.Last().Value.ToString());
-                        Debug.WriteLine(responses.Last().Value.ToString());
+                        //Debug.WriteLine(responses.Last().Value.ToString());
                     }
                 }
                 
                 // IMPORT ALL WarDrive 4 Android db3 FILES.
                 string[] db3s = Directory.GetFiles(Path, "*.db3");
-                Debug.WriteLine("The number of db3 files: {0}.", db3s.Length);
+                //Debug.WriteLine("The number of db3 files: {0}.", db3s.Length);
                 if (db3s.Length > 0)
                 {
                     foreach (string db3 in db3s)
                     {
                         InternalImportID++;
-                        Debug.WriteLine(db3);
+                        //Debug.WriteLine(db3);
                         using (var inputFileStream = File.Open(db3, FileMode.Open))
                         {
                             hashBytes = md5.ComputeHash(inputFileStream);
@@ -117,13 +124,13 @@ namespace WDBCommon
                         BW.ReportProgress(0, "newrow|~|" + db3 + "|~|" + hashish);
                         responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ApiImportFile(db3)));
                         BW.ReportProgress(0, responses.Last().Value.ToString());
-                        Debug.WriteLine(responses.Last().Value.ToString());
+                        //Debug.WriteLine(responses.Last().Value.ToString());
                     }
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine("The process failed: {0}", e.ToString());
+                //Debug.WriteLine("The process failed: {0}", e.ToString());
             }
             return responses;
         }

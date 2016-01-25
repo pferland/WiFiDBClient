@@ -26,7 +26,7 @@ namespace WDBAPI
 
                 var responseBytes = client.UploadValues(address, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
-                Debug.WriteLine(response);
+                //Debug.WriteLine(response);
             }
            return response;
         }
@@ -70,7 +70,7 @@ namespace WDBAPI
         {
             string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
             string response;
-            //Console.WriteLine("Upload FIle: " + UploadFile);
+            //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
@@ -81,7 +81,27 @@ namespace WDBAPI
             }
             return response;
         }
+        
 
+        public string ApiGetDaemonStatuses(string query)
+        {
+            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
+            string response;
+            //Console.WriteLine("Upload File: " + UploadFile);
+            using (WebClient client = new WebClient())
+            {
+                InitParameters();
+                this.parameters.Add("func", "daemonstatuses");
+                if(query != "")
+                {
+                    this.parameters.Add("pidfile", query);
+                }
+
+                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                response = Encoding.ASCII.GetString(responseBytes);
+            }
+            return response;
+        }
 
         public string ApiImportFile(string UploadFile, bool CheckHash = false)
         {
@@ -151,17 +171,17 @@ namespace WDBAPI
             {
                 return "errorParsing";
             }
-            Debug.WriteLine("RESPONSE: -------------------------- ");
-            Debug.WriteLine(response);
-            Debug.WriteLine(" -------------------------- ");
+            //Debug.WriteLine("RESPONSE: -------------------------- ");
+            //Debug.WriteLine(response);
+            //Debug.WriteLine(" -------------------------- ");
             System.Threading.Thread.Sleep(2000);
             XElement xmlTree = XElement.Parse(response);
-            Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
+            //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
             {
                 case "error":
                     ret = "error|~|There was An error during Import-~-" + xmlTree.Value.ToString();
-                    //Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
+                    ////Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
                     break;
 
                 case "scheduling":
@@ -181,32 +201,43 @@ namespace WDBAPI
                                 break;
                         }
                         
-                        Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                         foreach (var subitem in item.Elements())
                         {
                             ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
-                            Debug.WriteLine("Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
+                            //Debug.WriteLine("Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
                         }
                     }
-                    Debug.WriteLine("Parse Return: "+ret);
+                    //Debug.WriteLine("Parse Return: "+ret);
                     //    break;
 
                     break;
-
+                case "daemons":
+                    foreach(var item in xmlTree.Elements())
+                    {
+                        //Debug.WriteLine("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ret = ret + "|~|" + item.Name.ToString() + "|";
+                        foreach (var subitem in item.Elements())
+                        {
+                            //Debug.WriteLine("------Child Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
+                            ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
+                        }
+                    }
+                    break;
                 case "import":
                     foreach(var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|import|"+ item.Name.ToString() + "-~-" + item.Value.ToString();
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + "-~-" + item.Value.ToString());
+                        ////Debug.WriteLine("Name: " + item.Name.ToString() + "-~-" + item.Value.ToString());
                     }
                     break;
 
                 case "importing":
                     foreach (var item in xmlTree.Elements())
                     {
-                        Debug.WriteLine("Type: " + item.GetType().ToString());
+                        //Debug.WriteLine("Type: " + item.GetType().ToString());
                         ret = ret+ "|~|importing|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ////Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
                     break;
 
@@ -214,7 +245,7 @@ namespace WDBAPI
                     foreach (var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|finished|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ////Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
                     break;
 
@@ -223,16 +254,16 @@ namespace WDBAPI
                     foreach (var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|bad|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ////Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
                     break;
 
                 default:
                     ret = "unknown|Unknown return: " + xmlTree.Value.ToString();
-                    //Debug.WriteLine("Unknown return: " + xmlTree.Value.ToString());
+                    ////Debug.WriteLine("Unknown return: " + xmlTree.Value.ToString());
                     break;
             }
-            //Debug.WriteLine(ret);
+            ////Debug.WriteLine(ret);
             return ret;
         }
     }
