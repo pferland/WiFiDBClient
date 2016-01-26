@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Import Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Import Settings.Designer.cs">
+      <DependentUpon>Import Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="WiFiDB Settings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -60,6 +66,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Import Settings.resx">
+      <DependentUpon>Import Settings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="WiFiDB Settings.resx">
       <DependentUpon>WiFiDB Settings.cs</DependentUpon>
     </EmbeddedResource>
