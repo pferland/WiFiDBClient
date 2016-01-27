@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auto Upload Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Auto Upload Settings.Designer.cs">
+      <DependentUpon>Auto Upload Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Import Settings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +72,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Auto Upload Settings.resx">
+      <DependentUpon>Auto Upload Settings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Import Settings.resx">
       <DependentUpon>Import Settings.cs</DependentUpon>
     </EmbeddedResource>

@@ -29,12 +29,12 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.ImportCancelButton = new System.Windows.Forms.Button();
+            this.ImportOKButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,21 +51,14 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Default Import Values";
             // 
-            // label1
+            // richTextBox1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 32);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(27, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Title";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(50, 32);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(583, 20);
-            this.textBox1.TabIndex = 1;
+            this.richTextBox1.Location = new System.Drawing.Point(51, 74);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.richTextBox1.Size = new System.Drawing.Size(582, 210);
+            this.richTextBox1.TabIndex = 3;
+            this.richTextBox1.Text = "";
             // 
             // label2
             // 
@@ -76,40 +69,47 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Notes";
             // 
-            // richTextBox1
+            // textBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(51, 74);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.richTextBox1.Size = new System.Drawing.Size(582, 210);
-            this.richTextBox1.TabIndex = 3;
-            this.richTextBox1.Text = "";
+            this.textBox1.Location = new System.Drawing.Point(50, 32);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(583, 20);
+            this.textBox1.TabIndex = 1;
             // 
-            // button1
+            // label1
             // 
-            this.button1.Location = new System.Drawing.Point(572, 350);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Cancel";
-            this.button1.UseVisualStyleBackColor = true;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 32);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(27, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Title";
             // 
-            // button2
+            // ImportCancelButton
             // 
-            this.button2.Location = new System.Drawing.Point(491, 350);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "OK";
-            this.button2.UseVisualStyleBackColor = true;
+            this.ImportCancelButton.Location = new System.Drawing.Point(572, 350);
+            this.ImportCancelButton.Name = "ImportCancelButton";
+            this.ImportCancelButton.Size = new System.Drawing.Size(75, 23);
+            this.ImportCancelButton.TabIndex = 1;
+            this.ImportCancelButton.Text = "Cancel";
+            this.ImportCancelButton.UseVisualStyleBackColor = true;
+            // 
+            // ImportOKButton
+            // 
+            this.ImportOKButton.Location = new System.Drawing.Point(491, 350);
+            this.ImportOKButton.Name = "ImportOKButton";
+            this.ImportOKButton.Size = new System.Drawing.Size(75, 23);
+            this.ImportOKButton.TabIndex = 2;
+            this.ImportOKButton.Text = "OK";
+            this.ImportOKButton.UseVisualStyleBackColor = true;
             // 
             // Import_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(663, 385);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.ImportOKButton);
+            this.Controls.Add(this.ImportCancelButton);
             this.Controls.Add(this.groupBox1);
             this.Name = "Import_Settings";
             this.Text = "Import_Settings";
@@ -126,7 +126,7 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button ImportCancelButton;
+        private System.Windows.Forms.Button ImportOKButton;
     }
 }
