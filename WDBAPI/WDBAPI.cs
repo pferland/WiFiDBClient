@@ -12,12 +12,22 @@ namespace WDBAPI
     public class WDBAPI
     {
         public NameValueCollection parameters = null;
+
+        public bool AutoUploadFolder;
+        public string AutoUploadFolderPath;
+        public bool ArchiveImports;
+        public string ArchiveImportsFolderPath;
+
+        public string DefaultImportNotes;
+        public string DefaultImportTitle;
+        public bool UseDefaultImportValues;
+
         public string ServerAddress;
-        public string ApiKey;
+        public string ApiPath;
         public string Username;
-        public string Title;
-        public string Notes;
-        
+        public string ApiKey;
+        public string ApiCompiledPath;
+
         public string ApiGetWaitingImports()
         {
             string response;
@@ -27,7 +37,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "waiting");
 
-                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
                 //Debug.WriteLine(response);
             }
@@ -44,7 +54,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "finished");
 
-                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -60,7 +70,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "bad");
 
-                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -76,7 +86,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "importing");
 
-                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -96,7 +106,7 @@ namespace WDBAPI
                     this.parameters.Add("pidfile", query);
                 }
 
-                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ApiCompiledPath+"schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -117,13 +127,13 @@ namespace WDBAPI
                     hashBytes = md5.ComputeHash(inputFileStream);
                     hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                 }
-                this.parameters.Add("title", Title);
+                this.parameters.Add("title", DefaultImportTitle);
 
                 //parameters.Add("otherusers", "");
-                this.parameters.Add("notes", Notes);
+                this.parameters.Add("notes", DefaultImportNotes);
                 this.parameters.Add("hash", hashish);
                 client.QueryString = this.parameters;
-                var responseBytes = client.UploadFile(ServerAddress, UploadFile);
+                var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);
                 response = Encoding.ASCII.GetString(responseBytes);
                 return response;
             }
@@ -155,7 +165,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
-                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -172,6 +182,7 @@ namespace WDBAPI
             //Debug.WriteLine(response);
             //Debug.WriteLine(" -------------------------- ");
             System.Threading.Thread.Sleep(2000);
+            Debug.WriteLine(response);
             XElement xmlTree = XElement.Parse(response);
             //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())

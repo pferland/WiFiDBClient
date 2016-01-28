@@ -15,19 +15,29 @@ namespace WDBCommon
     {
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
         public int InternalImportID = 0;
-        public string Title;
-        public string Notes;
+
+        public bool AutoUploadFolder;
+        public string AutoUploadFolderPath;
+        public bool ArchiveImports;
+        public string ArchiveImportsFolderPath;
+
+        public string DefaultImportNotes;
+        public string DefaultImportTitle;
+        public bool UseDefaultImportValues;
+
         public string ServerAddress;
-        public string ApiKey;
+        public string ApiPath;
         public string Username;
-        
+        public string ApiKey;
+        public string ApiCompiledPath;
+
         public void initApi()
         {
-            WDBAPIObj.ServerAddress = ServerAddress;
+            WDBAPIObj.ApiCompiledPath = ApiCompiledPath;
             WDBAPIObj.ApiKey = ApiKey;
             WDBAPIObj.Username = Username;
-            WDBAPIObj.Title = Title;
-            WDBAPIObj.Notes = Notes;
+            WDBAPIObj.DefaultImportTitle = DefaultImportTitle;
+            WDBAPIObj.DefaultImportNotes = DefaultImportNotes;
         }
 
         public void GetHashStatus(string query, BackgroundWorker BgWk)

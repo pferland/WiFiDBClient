@@ -26,14 +26,14 @@ namespace WiFiDBUploader
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
 
-        private string AutoUploadFolder;
+        private bool   AutoUploadFolder;
         private string AutoUploadFolderPath;
-        private string ArchiveImports;
+        private bool   ArchiveImports;
         private string ArchiveImportsFolderPath;
 
         private string DefaultImportNotes;
         private string DefaultImportTitle;
-        private bool UseDefaultImportValues;
+        private bool   UseDefaultImportValues;
 
         private string ServerAddress;
         private string ApiPath;
@@ -46,6 +46,8 @@ namespace WiFiDBUploader
             Debug.WriteLine("Start of Call: LoadSettings()");
             LoadSettings();
             Debug.WriteLine("End of Call: LoadSettings()");
+
+            Debug.WriteLine(ServerAddress);
 
             Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
@@ -60,10 +62,26 @@ namespace WiFiDBUploader
             Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
             WDBCommonObj = new WDBCommon.WDBCommon();
             Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+            WDBCommonObj.AutoUploadFolder = AutoUploadFolder;
+            WDBCommonObj.AutoUploadFolderPath = AutoUploadFolderPath;
+            WDBCommonObj.ArchiveImports = ArchiveImports;
+            WDBCommonObj.ArchiveImportsFolderPath = ArchiveImportsFolderPath;
+
+            WDBCommonObj.DefaultImportNotes = DefaultImportNotes;
+            WDBCommonObj.DefaultImportTitle = DefaultImportTitle;
+            WDBCommonObj.UseDefaultImportValues = UseDefaultImportValues;
+
+            WDBCommonObj.ServerAddress = ServerAddress;
+            WDBCommonObj.ApiPath = ApiPath;
+            WDBCommonObj.Username = Username;
+            WDBCommonObj.ApiKey = ApiKey;
+            WDBCommonObj.ApiCompiledPath = ApiCompiledPath;
 
             Debug.WriteLine("Start of Call: WDBCommonObj.initApi();");
             WDBCommonObj.initApi();
             Debug.WriteLine("End of Call: WDBCommonObj.initApi();");
+
+            Debug.WriteLine("After initApi() - WDBCommonObj.ApiCompiledPath: " + WDBCommonObj.ApiCompiledPath);
 
             Debug.WriteLine("Start of Call: InitTimer();");
             InitTimer();
@@ -79,7 +97,6 @@ namespace WiFiDBUploader
                 this.QueryID = QueryID;
                 this.Query = Query;
             }
-
             public int QueryID { get; set; }
             public string Query { get; set; }
             public List<KeyValuePair<int, string>> Result { get; set; }
@@ -119,13 +136,14 @@ namespace WiFiDBUploader
                         ApiKey = ConfigurationSettings.AppSettings[key];
                         break;
                     case "AutoUploadFolder":
-                        AutoUploadFolder = ConfigurationSettings.AppSettings[key];
+
+                        AutoUploadFolder = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                     case "AutoUploadFolderPath":
                         AutoUploadFolderPath = ConfigurationSettings.AppSettings[key];
                         break;
                     case "ArchiveImports":
-                        ArchiveImports = ConfigurationSettings.AppSettings[key];
+                        ArchiveImports = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                     case "ArchiveImportsFolderPath":
                         ArchiveImportsFolderPath = ConfigurationSettings.AppSettings[key];
@@ -137,13 +155,7 @@ namespace WiFiDBUploader
                         DefaultImportTitle = ConfigurationSettings.AppSettings[key];
                         break;
                     case "UseDefaultImportValues":
-                        if(ConfigurationSettings.AppSettings[key] == "true")
-                        {
-                            UseDefaultImportValues = true;
-                        }else
-                        {
-                            UseDefaultImportValues = false;
-                        }
+                        UseDefaultImportValues = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                 }
             }
@@ -252,6 +264,7 @@ namespace WiFiDBUploader
 
         private void backgroundWorker_GetDaemonStatsDoWork(object sender, DoWorkEventArgs e)
         {
+            Debug.WriteLine(ServerAddress);
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
@@ -647,7 +660,7 @@ namespace WiFiDBUploader
                     //Debug.WriteLine(SplitData[0]);
                     //Debug.WriteLine(SplitData[1]);
 
-                    MessageBox.Show(SplitData[1] + " -- " + SplitData[0]);
+                    MessageBox.Show(e.UserState.ToString());
                     break;
                 default:
                     //Debug.WriteLine(" \n--------- Start Parse Daemon ListView Update Return String -----------\n");
@@ -806,9 +819,14 @@ namespace WiFiDBUploader
             Auto_Upload_Settings AutoForm = new Auto_Upload_Settings();
             if (AutoForm.ShowDialog() == DialogResult.OK)
             {
-                this.AutoUploadFolder = AutoForm.AutoUploadFolder;
+                Debug.WriteLine("AutoForm.AutoUploadFolder: " + AutoForm.AutoUploadFolder);
+                Debug.WriteLine("AutoForm.AutoUploadFolderPath: " + AutoForm.AutoUploadFolderPath);
+                Debug.WriteLine("AutoForm.ArchiveImports: " + AutoForm.ArchiveImports);
+                Debug.WriteLine("AutoForm.ArchiveImportsFolderPath: " + AutoForm.ArchiveImportsFolderPath);
+
+                this.AutoUploadFolder = Convert.ToBoolean(AutoForm.AutoUploadFolder);
                 this.AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
-                this.ArchiveImports = AutoForm.ArchiveImports;
+                this.ArchiveImports = Convert.ToBoolean(AutoForm.ArchiveImports);
                 this.ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
             }
 
