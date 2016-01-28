@@ -19,6 +19,24 @@
             }
             base.Dispose(disposing);
         }
+        
+        public string ImportTitle
+        {
+            get { return textBox1.Text; }
+        }
+        
+        public string ImportNotes
+        {
+            get { return richTextBox1.Text; }
+        }
+
+        public bool UseImportDefaultValues
+        {
+            get
+            {
+                return checkBox1.Checked ;
+            }
+        }
 
         #region Windows Form Designer generated code
 
@@ -35,18 +53,20 @@
             this.label1 = new System.Windows.Forms.Label();
             this.ImportCancelButton = new System.Windows.Forms.Button();
             this.ImportOKButton = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Controls.Add(this.richTextBox1);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(9, 15);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(639, 290);
+            this.groupBox1.Size = new System.Drawing.Size(639, 316);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Default Import Values";
@@ -87,7 +107,8 @@
             // 
             // ImportCancelButton
             // 
-            this.ImportCancelButton.Location = new System.Drawing.Point(572, 350);
+            this.ImportCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.ImportCancelButton.Location = new System.Drawing.Point(573, 337);
             this.ImportCancelButton.Name = "ImportCancelButton";
             this.ImportCancelButton.Size = new System.Drawing.Size(75, 23);
             this.ImportCancelButton.TabIndex = 1;
@@ -96,18 +117,30 @@
             // 
             // ImportOKButton
             // 
-            this.ImportOKButton.Location = new System.Drawing.Point(491, 350);
+            this.ImportOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.ImportOKButton.Location = new System.Drawing.Point(492, 337);
             this.ImportOKButton.Name = "ImportOKButton";
             this.ImportOKButton.Size = new System.Drawing.Size(75, 23);
             this.ImportOKButton.TabIndex = 2;
             this.ImportOKButton.Text = "OK";
             this.ImportOKButton.UseVisualStyleBackColor = true;
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(12, 290);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(231, 17);
+            this.checkBox1.TabIndex = 3;
+            this.checkBox1.Text = "Use Default Import Values for Auto Uploads";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // Import_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(663, 385);
+            this.ControlBox = false;
             this.Controls.Add(this.ImportOKButton);
             this.Controls.Add(this.ImportCancelButton);
             this.Controls.Add(this.groupBox1);
@@ -128,5 +161,6 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button ImportCancelButton;
         private System.Windows.Forms.Button ImportOKButton;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

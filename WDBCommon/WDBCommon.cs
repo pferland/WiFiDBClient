@@ -15,6 +15,20 @@ namespace WDBCommon
     {
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
         public int InternalImportID = 0;
+        public string Title;
+        public string Notes;
+        public string ServerAddress;
+        public string ApiKey;
+        public string Username;
+        
+        public void initApi()
+        {
+            WDBAPIObj.ServerAddress = ServerAddress;
+            WDBAPIObj.ApiKey = ApiKey;
+            WDBAPIObj.Username = Username;
+            WDBAPIObj.Title = Title;
+            WDBAPIObj.Notes = Notes;
+        }
 
         public void GetHashStatus(string query, BackgroundWorker BgWk)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -25,15 +26,49 @@ namespace WiFiDBUploader
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
 
+        private string AutoUploadFolder;
+        private string AutoUploadFolderPath;
+        private string ArchiveImports;
+        private string ArchiveImportsFolderPath;
+
+        private string DefaultImportNotes;
+        private string DefaultImportTitle;
+        private bool UseDefaultImportValues;
+
+        private string ServerAddress;
+        private string ApiPath;
+        private string Username;
+        private string ApiKey;
+        private string ApiCompiledPath;
+
         public WiFiDBUploadMainForm()
         {
+            Debug.WriteLine("Start of Call: LoadSettings()");
+            LoadSettings();
+            Debug.WriteLine("End of Call: LoadSettings()");
+
+            Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
+            Debug.WriteLine("End of Call: InitializeComponent()");
+
             listView1.View = View.Details;
 
+            Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
             WDBAPIObj = new WDBAPI.WDBAPI();
-            WDBCommonObj = new WDBCommon.WDBCommon();
+            Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
 
+            Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
+            WDBCommonObj = new WDBCommon.WDBCommon();
+            Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+
+            Debug.WriteLine("Start of Call: WDBCommonObj.initApi();");
+            WDBCommonObj.initApi();
+            Debug.WriteLine("End of Call: WDBCommonObj.initApi();");
+
+            Debug.WriteLine("Start of Call: InitTimer();");
             InitTimer();
+            Debug.WriteLine("End of Call: InitTimer();");
+
         }
 
         private struct QueryArguments
@@ -63,6 +98,61 @@ namespace WiFiDBUploader
             timer2.Tick += new EventHandler(CheckForDaemonUpdates);
             timer2.Interval = 5000; // in miliseconds
             timer2.Start();
+        }
+
+        private void LoadSettings()
+        {
+            foreach (string key in ConfigurationSettings.AppSettings)
+            {
+                switch(key)
+                {
+                    case "ServerAddress":
+                        ServerAddress = ConfigurationSettings.AppSettings[key];
+                    break;
+                    case "ApiPath":
+                        ApiPath = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "Username":
+                        Username = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "ApiKey":
+                        ApiKey = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "AutoUploadFolder":
+                        AutoUploadFolder = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "AutoUploadFolderPath":
+                        AutoUploadFolderPath = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "ArchiveImports":
+                        ArchiveImports = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "ArchiveImportsFolderPath":
+                        ArchiveImportsFolderPath = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "DefaultImportNotes":
+                        DefaultImportNotes = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "DefaultImportTitle":
+                        DefaultImportTitle = ConfigurationSettings.AppSettings[key];
+                        break;
+                    case "UseDefaultImportValues":
+                        if(ConfigurationSettings.AppSettings[key] == "true")
+                        {
+                            UseDefaultImportValues = true;
+                        }else
+                        {
+                            UseDefaultImportValues = false;
+                        }
+                        break;
+                }
+            }
+            ApiCompiledPath = ServerAddress + ApiPath;
+        }
+
+        private void WriteSettings()
+        {
+
         }
 
         private void CheckForDaemonUpdates(object sender, EventArgs e)
@@ -689,16 +779,38 @@ namespace WiFiDBUploader
 
         private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            WiFiDB_Settings SettingsForm = new WiFiDB_Settings();
+            if(SettingsForm.ShowDialog() == DialogResult.OK)
+            {
+                this.ServerAddress = SettingsForm.ServerAddress;
+                this.ApiPath = SettingsForm.ApiPath;
+                this.Username = SettingsForm.Username;
+                this.ApiKey = SettingsForm.ApiKey;
+                this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
+            }
         }
 
         private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            Import_Settings ImportSettingsForm = new Import_Settings();
+            if(ImportSettingsForm.ShowDialog() == DialogResult.OK)
+            {
+                this.DefaultImportTitle = ImportSettingsForm.ImportTitle;
+                this.DefaultImportNotes = ImportSettingsForm.ImportNotes;
+                this.UseDefaultImportValues = ImportSettingsForm.UseImportDefaultValues;
+            }
         }
 
         private void autoSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Auto_Upload_Settings AutoForm = new Auto_Upload_Settings();
+            if (AutoForm.ShowDialog() == DialogResult.OK)
+            {
+                this.AutoUploadFolder = AutoForm.AutoUploadFolder;
+                this.AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
+                this.ArchiveImports = AutoForm.ArchiveImports;
+                this.ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
+            }
 
         }
     }

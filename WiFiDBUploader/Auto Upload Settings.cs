@@ -17,22 +17,22 @@ namespace WiFiDBUploader
             InitializeComponent();
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void AutoOKButton_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void AutoCancelButton_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void AutoBrowse2Button_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void AutoBrowseButton_Click(object sender, EventArgs e)
         {
 
         }

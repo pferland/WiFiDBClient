@@ -19,6 +19,27 @@
             }
             base.Dispose(disposing);
         }
+        
+        public string ServerAddress
+        {
+            get { return textBox1.Text; }
+        }
+
+        public string ApiPath
+        {
+            get { return textBox2.Text; }
+        }
+        
+        public string Username
+        {
+            get { return textBox3.Text; }
+        }
+
+        public string ApiKey
+        {
+            get { return textBox4.Text; }
+        }
+
 
         #region Windows Form Designer generated code
 
@@ -115,6 +136,7 @@
             this.ServerSettingsOKButton.Size = new System.Drawing.Size(75, 23);
             this.ServerSettingsOKButton.TabIndex = 8;
             this.ServerSettingsOKButton.Text = "OK";
+            this.ServerSettingsOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.ServerSettingsOKButton.UseVisualStyleBackColor = true;
             // 
             // ServerSettingsCancelButton
@@ -124,6 +146,7 @@
             this.ServerSettingsCancelButton.Size = new System.Drawing.Size(75, 23);
             this.ServerSettingsCancelButton.TabIndex = 9;
             this.ServerSettingsCancelButton.Text = "Cancel";
+            this.ServerSettingsCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ServerSettingsCancelButton.UseVisualStyleBackColor = true;
             // 
             // WiFiDB_Settings
@@ -131,6 +154,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(594, 196);
+            this.ControlBox = false;
             this.Controls.Add(this.ServerSettingsCancelButton);
             this.Controls.Add(this.ServerSettingsOKButton);
             this.Controls.Add(this.textBox4);

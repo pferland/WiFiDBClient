@@ -22,6 +22,27 @@
 
         #region Windows Form Designer generated code
 
+
+        public string AutoUploadFolder
+        {
+            get { return checkBox1.Text; }
+        }
+
+        public string AutoUploadFolderPath
+        {
+            get { return textBox1.Text; }
+        }
+
+        public string ArchiveImports
+        {
+            get { return checkBox2.Text; }
+        }
+
+        public string ArchiveImportsFolderPath
+        {
+            get { return textBox2.Text; }
+        }
+
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -33,9 +54,9 @@
             this.AutoBrowseButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.AutoBrowse2Button = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.AutoCancelButton = new System.Windows.Forms.Button();
             this.AutoOKButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
@@ -67,7 +88,7 @@
             this.AutoBrowseButton.TabIndex = 3;
             this.AutoBrowseButton.Text = "Browse";
             this.AutoBrowseButton.UseVisualStyleBackColor = true;
-            this.AutoBrowseButton.Click += new System.EventHandler(this.button1_Click);
+            this.AutoBrowseButton.Click += new System.EventHandler(this.AutoBrowseButton_Click);
             // 
             // groupBox1
             // 
@@ -93,6 +114,23 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Archive Imports";
             // 
+            // AutoBrowse2Button
+            // 
+            this.AutoBrowse2Button.Location = new System.Drawing.Point(379, 38);
+            this.AutoBrowse2Button.Name = "AutoBrowse2Button";
+            this.AutoBrowse2Button.Size = new System.Drawing.Size(75, 23);
+            this.AutoBrowse2Button.TabIndex = 5;
+            this.AutoBrowse2Button.Text = "Browse";
+            this.AutoBrowse2Button.UseVisualStyleBackColor = true;
+            this.AutoBrowse2Button.Click += new System.EventHandler(this.AutoBrowse2Button_Click);
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(87, 40);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(285, 20);
+            this.textBox2.TabIndex = 4;
+            // 
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
@@ -103,23 +141,6 @@
             this.checkBox2.Text = "Automatically Archive Uploaded Files to:";
             this.checkBox2.UseVisualStyleBackColor = true;
             // 
-            // AutoBrowse2Button
-            // 
-            this.AutoBrowse2Button.Location = new System.Drawing.Point(379, 38);
-            this.AutoBrowse2Button.Name = "AutoBrowse2Button";
-            this.AutoBrowse2Button.Size = new System.Drawing.Size(75, 23);
-            this.AutoBrowse2Button.TabIndex = 5;
-            this.AutoBrowse2Button.Text = "Browse";
-            this.AutoBrowse2Button.UseVisualStyleBackColor = true;
-            this.AutoBrowse2Button.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(87, 40);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(285, 20);
-            this.textBox2.TabIndex = 4;
-            // 
             // AutoCancelButton
             // 
             this.AutoCancelButton.Location = new System.Drawing.Point(411, 251);
@@ -127,8 +148,8 @@
             this.AutoCancelButton.Size = new System.Drawing.Size(75, 23);
             this.AutoCancelButton.TabIndex = 6;
             this.AutoCancelButton.Text = "Cancel";
+            this.AutoCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.AutoCancelButton.UseVisualStyleBackColor = true;
-            this.AutoCancelButton.Click += new System.EventHandler(this.button3_Click);
             // 
             // AutoOKButton
             // 
@@ -137,14 +158,15 @@
             this.AutoOKButton.Size = new System.Drawing.Size(75, 23);
             this.AutoOKButton.TabIndex = 7;
             this.AutoOKButton.Text = "OK";
+            this.AutoOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.AutoOKButton.UseVisualStyleBackColor = true;
-            this.AutoOKButton.Click += new System.EventHandler(this.button4_Click);
             // 
             // Auto_Upload_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(551, 286);
+            this.ControlBox = false;
             this.Controls.Add(this.AutoOKButton);
             this.Controls.Add(this.AutoCancelButton);
             this.Controls.Add(this.groupBox2);

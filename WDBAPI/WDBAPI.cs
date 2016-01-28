@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
-using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace WDBAPI
@@ -13,10 +12,14 @@ namespace WDBAPI
     public class WDBAPI
     {
         public NameValueCollection parameters = null;
-
+        public string ServerAddress;
+        public string ApiKey;
+        public string Username;
+        public string Title;
+        public string Notes;
+        
         public string ApiGetWaitingImports()
         {
-            string address = "http://dev.randomintervals.com/wifidb/api/v2/schedule.php";
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -24,7 +27,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "waiting");
 
-                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
                 //Debug.WriteLine(response);
             }
@@ -34,7 +37,6 @@ namespace WDBAPI
 
         public string ApiGetFinishedImports()
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -42,7 +44,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "finished");
 
-                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -51,7 +53,6 @@ namespace WDBAPI
 
         public string ApiGetBadIports()
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -59,7 +60,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "bad");
 
-                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -68,7 +69,6 @@ namespace WDBAPI
 
         public string ApiGetCurrentImporting()
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -76,7 +76,7 @@ namespace WDBAPI
                 InitParameters();
                 this.parameters.Add("func", "importing");
 
-                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -85,7 +85,6 @@ namespace WDBAPI
 
         public string ApiGetDaemonStatuses(string query)
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/v2/schedule.php";
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -97,7 +96,7 @@ namespace WDBAPI
                     this.parameters.Add("pidfile", query);
                 }
 
-                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
@@ -105,7 +104,6 @@ namespace WDBAPI
 
         public string ApiImportFile(string UploadFile, bool CheckHash = false)
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/import.php";
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -119,13 +117,13 @@ namespace WDBAPI
                     hashBytes = md5.ComputeHash(inputFileStream);
                     hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                 }
-                this.parameters.Add("title", "C%23 upload Test");
+                this.parameters.Add("title", Title);
 
                 //parameters.Add("otherusers", "");
-                this.parameters.Add("notes", "C# upload Test");
+                this.parameters.Add("notes", Notes);
                 this.parameters.Add("hash", hashish);
                 client.QueryString = this.parameters;
-                var responseBytes = client.UploadFile(address, UploadFile);
+                var responseBytes = client.UploadFile(ServerAddress, UploadFile);
                 response = Encoding.ASCII.GetString(responseBytes);
                 return response;
             }
@@ -137,8 +135,8 @@ namespace WDBAPI
             {
                 this.parameters = new NameValueCollection();
                 this.parameters.Add("output", "xml");
-                this.parameters.Add("username", "pferland");
-                this.parameters.Add("apikey", "GSn8NQeYzY8gq5Y8NFpf5gZZqH33kdBctEOwWzsOTmxCnrs4BYk32rgeNLNhLkzj");
+                this.parameters.Add("username", Username);
+                this.parameters.Add("apikey", ApiKey);
             }
             else
             {
@@ -151,14 +149,13 @@ namespace WDBAPI
 
         public string CheckFileHash(string FileHash)
         {
-            string address = "http://dev.randomintervals.com//wifidb/api/v2/import.php";
             string response;
             using (WebClient client = new WebClient())
             {
                 InitParameters();
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
-                var responseBytes = client.UploadValues(address, "POST", this.parameters);
+                var responseBytes = client.UploadValues(ServerAddress, "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
             return response;
