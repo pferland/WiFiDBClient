@@ -30,6 +30,7 @@ namespace WDBAPI
 
         public string ApiGetWaitingImports()
         {
+            Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -47,6 +48,7 @@ namespace WDBAPI
 
         public string ApiGetFinishedImports()
         {
+            Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -63,6 +65,7 @@ namespace WDBAPI
 
         public string ApiGetBadIports()
         {
+            Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -79,6 +82,7 @@ namespace WDBAPI
 
         public string ApiGetCurrentImporting()
         {
+            Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -95,6 +99,7 @@ namespace WDBAPI
 
         public string ApiGetDaemonStatuses(string query)
         {
+            Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -114,6 +119,7 @@ namespace WDBAPI
 
         public string ApiImportFile(string UploadFile, bool CheckHash = false)
         {
+            Debug.WriteLine(ApiCompiledPath + "import.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
