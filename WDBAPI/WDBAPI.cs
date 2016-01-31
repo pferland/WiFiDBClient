@@ -36,6 +36,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "waiting");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -54,6 +56,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "finished");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -71,6 +75,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "bad");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -88,6 +94,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "importing");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -105,6 +113,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "daemonstatuses");
                 if(query != "")
                 {
@@ -125,6 +135,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 byte[] hashBytes;
                 string hashish;
                 using (var inputFileStream = File.Open(UploadFile, FileMode.Open))
@@ -169,6 +181,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
+                Debug.WriteLine(this.parameters.Get("username"));
+                Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
                 var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
@@ -187,10 +201,10 @@ namespace WDBAPI
             //Debug.WriteLine("RESPONSE: -------------------------- ");
             //Debug.WriteLine(response);
             //Debug.WriteLine(" -------------------------- ");
-            System.Threading.Thread.Sleep(2000);
+            //System.Threading.Thread.Sleep(2000);
             Debug.WriteLine(response);
             XElement xmlTree = XElement.Parse(response);
-            //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
+            Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
             {
                 case "error":
@@ -227,16 +241,24 @@ namespace WDBAPI
 
                     break;
                 case "daemons":
-                    foreach(var item in xmlTree.Elements())
+                    
+                    if(xmlTree.Value.ToString() != "No Daemons running.")
                     {
-                        //Debug.WriteLine("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
-                        ret = ret + "|~|" + item.Name.ToString() + "|";
-                        foreach (var subitem in item.Elements())
+                        foreach (var item in xmlTree.Elements())
                         {
-                            //Debug.WriteLine("------Child Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
-                            ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
+                            Debug.WriteLine("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                            ret = ret + "|~|" + item.Name.ToString() + "|";
+                            foreach (var subitem in item.Elements())
+                            {
+                                //Debug.WriteLine("------Child Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
+                                ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
+                            }
                         }
+                    }else
+                    {
+                        ret = "error|~|No_Daemons_Running";
                     }
+                    Debug.WriteLine("Ret: " + ret);
                     break;
                 case "import":
                     foreach(var item in xmlTree.Elements())

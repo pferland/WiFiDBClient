@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WDBAPI;
 using WDBCommon;
+using System.Collections.Specialized;
 
 namespace WiFiDBUploader
 {
@@ -25,7 +26,7 @@ namespace WiFiDBUploader
         public List<KeyValuePair<int, string>> ImportIDs;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
-
+        private NameValueCollection AppConfig;
         private bool   AutoUploadFolder;
         private string AutoUploadFolderPath;
         private bool   ArchiveImports;
@@ -104,22 +105,36 @@ namespace WiFiDBUploader
 
         public void InitTimer()
         {
+
+            /*
+            if(timer1 != null)
+            {
+                timer1.Dispose();
+                timer1 = null;
+            }
             timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(CheckForUpdates);
             timer1.Interval = 10000; // in miliseconds
             timer1.Start();
-
+            */
             StartGetDaemonStats(); //prep the tables.
+
+            if (timer2 != null)
+            {
+                timer2.Dispose();
+                timer2 = null;
+            }
 
             timer2 = new System.Windows.Forms.Timer();
             timer2.Tick += new EventHandler(CheckForDaemonUpdates);
-            timer2.Interval = 5000; // in miliseconds
+            timer2.Interval = 4000; // in miliseconds
             timer2.Start();
         }
 
         private void LoadSettings()
         {
-            foreach (string key in ConfigurationSettings.AppSettings)
+            NameValueCollection AppConfig = ConfigurationSettings.AppSettings;
+            foreach (string key in AppConfig)
             {
                 switch(key)
                 {
@@ -136,7 +151,6 @@ namespace WiFiDBUploader
                         ApiKey = ConfigurationSettings.AppSettings[key];
                         break;
                     case "AutoUploadFolder":
-
                         AutoUploadFolder = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                     case "AutoUploadFolderPath":
@@ -164,9 +178,15 @@ namespace WiFiDBUploader
 
         private void WriteSettings()
         {
-
+            ///Warning, If you have any comments in the %App%.config file they will be lost.
+            ///Good Idea to keep a copy of your app.config if you have made comments in it and then change a setting inside the program.
+            Debug.WriteLine(Properties.Settings.Default.Properties.Count);
         }
 
+
+        /*
+            Background init Funtions.
+        */
         private void CheckForDaemonUpdates(object sender, EventArgs e)
         {
             StartGetDaemonStats();
@@ -247,6 +267,95 @@ namespace WiFiDBUploader
             backgroundWorker1.RunWorkerAsync(args);
         }
 
+        
+        //
+        // Menu Click Function Items
+        //
+
+        private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            openFileDialog1.InitialDirectory = "c:\\";
+            openFileDialog1.Filter = "VS1 files (*.VS1)|*.VS1|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
+                    WDBAPIObj.ParseApiResponse(response);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
+                StartFolderImport(folderBrowserDialog1.SelectedPath);
+            }
+        }
+
+        private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WiFiDB_Settings SettingsForm = new WiFiDB_Settings();
+            if (SettingsForm.ShowDialog() == DialogResult.OK)
+            {
+                this.ServerAddress = SettingsForm.ServerAddress;
+                this.ApiPath = SettingsForm.ApiPath;
+                this.Username = SettingsForm.Username;
+                this.ApiKey = SettingsForm.ApiKey;
+                this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
+            }
+        }
+
+        private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Import_Settings ImportSettingsForm = new Import_Settings();
+            if (ImportSettingsForm.ShowDialog() == DialogResult.OK)
+            {
+                this.DefaultImportTitle = ImportSettingsForm.ImportTitle;
+                this.DefaultImportNotes = ImportSettingsForm.ImportNotes;
+                this.UseDefaultImportValues = ImportSettingsForm.UseImportDefaultValues;
+            }
+        }
+
+        private void autoSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Auto_Upload_Settings AutoForm = new Auto_Upload_Settings();
+            AutoForm.AutoUploadFolder = AutoUploadFolder;
+            if (AutoForm.ShowDialog() == DialogResult.OK)
+            {
+                Debug.WriteLine("AutoForm.AutoUploadFolder: " + AutoForm.AutoUploadFolder);
+                Debug.WriteLine("AutoForm.AutoUploadFolderPath: " + AutoForm.AutoUploadFolderPath);
+                Debug.WriteLine("AutoForm.ArchiveImports: " + AutoForm.ArchiveImports);
+                Debug.WriteLine("AutoForm.ArchiveImportsFolderPath: " + AutoForm.ArchiveImportsFolderPath);
+
+                this.AutoUploadFolder = Convert.ToBoolean(AutoForm.AutoUploadFolder);
+                this.AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
+                this.ArchiveImports = Convert.ToBoolean(AutoForm.ArchiveImports);
+                this.ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
+
+                Debug.WriteLine("this.AutoUploadFolder: " + this.AutoUploadFolder);
+                Debug.WriteLine("this.AutoUploadFolderPath: " + this.AutoUploadFolderPath);
+                Debug.WriteLine("this.ArchiveImports: " + this.ArchiveImports);
+                Debug.WriteLine("this.ArchiveImportsFolderPath: " + this.ArchiveImportsFolderPath);
+
+                WriteSettings();
+            }
+        }
+
+
+
 
         //
         // Do Work Functions
@@ -308,123 +417,6 @@ namespace WiFiDBUploader
         //
         // Progress Changed Functions
         //
-
-        private void backgroundWorker_UpdateDaemonListViewProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
-
-            string[] stringSeparators = new string[] { "|~|" };
-            string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
-
-            string title = "";
-            string user = "";
-            string message = "";
-            string status = "";
-            string ImportID = "";
-            string filehash = "";
-            string[] stringSep1 = new string[] { ":" };
-            string[] stringSep2 = new string[] { "-~-" };
-            //Debug.WriteLine("========== Update Listview Start ==========");
-            //Debug.WriteLine(split[0]);
-            switch (split[0])
-            {
-                case "error":
-                    //Debug.WriteLine(split[0]);
-                    string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-
-
-                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
-
-                    //Debug.WriteLine(items_err[0]);
-                    //Debug.WriteLine(SplitData[0]);
-                    //Debug.WriteLine(SplitData[1]);
-
-                    ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
-
-                    //Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
-                    listViewItem1.SubItems[8].Text = SplitData[0];
-                    break;
-                default:
-                    //Debug.WriteLine(" \n--------- Start Parse ListView Update Return String -----------\n");
-
-                    foreach (string part in split)
-                    {
-                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
-                        string[] items_pre = part.Split('|');
-
-                        foreach (var item in items_pre)
-                        {
-                            //Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
-                            if (!item.Contains("-~-"))
-                            {
-                                switch (item.ToString())
-                                {
-                                    case "waiting":
-                                        status = item;
-                                        break;
-                                    case "importing":
-                                        status = item;
-                                        break;
-                                    case "finished":
-                                        status = item;
-                                        break;
-                                }
-                                //Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
-                                continue;
-                            }
-                            string[] items = item.Split(stringSep2, StringSplitOptions.None);
-                            //Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
-                            switch (items[0].ToString())
-                            {
-                                case "title":
-                                    //Debug.WriteLine("Title? " + items[1]);
-                                    title = items[1];
-                                    break;
-                                case "user":
-                                    //Debug.WriteLine("user? " + items[1]);
-                                    user = items[1];
-                                    break;
-                                case "id":
-                                    //Debug.WriteLine("importnum? " + items[1]);
-                                    ImportID = items[1];
-                                    break;
-                                case "message":
-                                    //Debug.WriteLine("message? " + items[1]);
-                                    message = items[1];
-                                    break;
-                                case "hash":
-                                    //Debug.WriteLine("filehash? " + items[1]);
-                                    filehash = items[1];
-                                    break;
-                                case "ap":
-                                    //Debug.WriteLine("AP? " + items[1]);
-                                    message = message + " - " + items[1];
-                                    break;
-                                case "tot":
-                                    //Debug.WriteLine("This Of This? " + items[1]);
-                                    message = message + " - " + items[1];
-                                    break;
-                            }
-                        }
-                    }
-                    //Debug.WriteLine(filehash);
-                    //Debug.WriteLine("End Parse Loop Message: " + message);
-                    ListViewItem listViewItem = listView1.FindItemWithText(filehash);
-                    if ((status == "finished") || ((ImportID != "") && (message != "")))
-                    {
-                        //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
-                        listViewItem.SubItems[0].Text = ImportID;
-                        listViewItem.SubItems[1].Text = user;
-                        listViewItem.SubItems[2].Text = title;
-                        listViewItem.SubItems[7].Text = message;
-                        listViewItem.SubItems[8].Text = status;
-                    }
-                    //Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
-                    break;
-            }
-            //Debug.WriteLine("========== Update Listview End ==========");
-        }
-
         private void backgroundWorker_ImportProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
@@ -529,8 +521,8 @@ namespace WiFiDBUploader
             string filehash = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            //Debug.WriteLine("========== Update Listview Start ==========");
-            //Debug.WriteLine(split[0]);
+            Debug.WriteLine("========== Update Listview Start ==========");
+            Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
@@ -634,9 +626,12 @@ namespace WiFiDBUploader
         {
             List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
 
-            //Debug.WriteLine(e.UserState.ToString());
             string[] stringSeparators = new string[] { "|~|" };
             string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
+
+            Debug.WriteLine("========== Update Daemon ListView Start ==========");
+            Debug.WriteLine(e.UserState.ToString());
+            Debug.WriteLine(split[0]);
 
             string nodename = "";
             string pidfile = "";
@@ -647,27 +642,46 @@ namespace WiFiDBUploader
             string datetime_col = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            //Debug.WriteLine("========== Update Daemon ListView Start ==========");
-            //Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
-                    //Debug.WriteLine(split[0]);
-                    string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
-
-                    //Debug.WriteLine(items_err[0]);
-                    //Debug.WriteLine(SplitData[0]);
-                    //Debug.WriteLine(SplitData[1]);
-
-                    MessageBox.Show(e.UserState.ToString());
+                    Debug.WriteLine(split[1]);
+                    if(split[1] == "No_Daemons_Running")
+                    {
+                        Debug.WriteLine("No Daemons running, do ListView CleanUp.");
+                        if (this.listView2.Items.Count > 0)
+                        {
+                            foreach (ListViewItem item in this.listView2.Items)
+                            {
+                                item.Remove();
+                            }
+                        }else
+                        {
+                            Debug.WriteLine("No rows, no need for cleanup...");
+                        }
+                    }
+                    else
+                    {
+                        string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
+                        string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+                        //Debug.WriteLine(items_err[0]);
+                        //Debug.WriteLine(SplitData[0]);
+                        //Debug.WriteLine(SplitData[1]);
+                        MessageBox.Show(e.UserState.ToString());
+                    }
                     break;
                 default:
+                    int i = 0;
                     //Debug.WriteLine(" \n--------- Start Parse Daemon ListView Update Return String -----------\n");
-
+                    int DaemonReturnCount = split.Count();
                     foreach (string part in split)
                     {
-                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
+                        if(part == "")
+                        {
+                            DaemonReturnCount--;
+                            continue;
+                        }
+                        Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
                         string[] items_pre = part.Split('|');
 
                         foreach (var item in items_pre)
@@ -734,7 +748,32 @@ namespace WiFiDBUploader
                             }
                         }
                     }
-                    
+
+                    //Check for rows that are not in the return, and remove them.
+                    Debug.WriteLine(DaemonReturnCount.ToString() + " --=--=-=-=-=-==-- " + listView2.Items.Count);
+                    if ((listView2.Items.Count != DaemonReturnCount) && DaemonReturnCount != 0)
+                    {
+                        foreach (ListViewItem item in listView2.Items)
+                        {
+                            Debug.WriteLine(e.UserState.ToString());
+                            Debug.WriteLine(item.SubItems[1].Text);
+
+                            if(e.UserState.ToString().Contains(item.SubItems[1].Text))
+                            {
+                                Debug.WriteLine(item.SubItems[1].Text + " Is in the return.");
+                            }else
+                            {
+                                Debug.WriteLine(item.SubItems[1].Text + " Is NOT in the return.");
+                                Debug.WriteLine("ListView CleanUp!");
+                                item.Remove();
+                            }
+                        }
+                    }
+                    if(DaemonReturnCount == 0)
+                    {
+                        Debug.WriteLine("DaemonReturnCount was 0...");
+                        Debug.WriteLine("UserStateString: " + e.UserState.ToString());
+                    }
                     //Debug.WriteLine(" \n--------- End Parse Daemon ListView Update Return String -----------\n");
                     break;
             }
@@ -742,94 +781,134 @@ namespace WiFiDBUploader
         }
 
 
+        /*
+        //May not even be needed any more...
+        private void backgroundWorker_UpvdateDaemonListViewProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
+
+            string[] stringSeparators = new string[] { "|~|" };
+            string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
+
+            string title = "";
+            string user = "";
+            string message = "";
+            string status = "";
+            string ImportID = "";
+            string filehash = "";
+            string[] stringSep1 = new string[] { ":" };
+            string[] stringSep2 = new string[] { "-~-" };
+            Debug.WriteLine("========== Update Listview Start ==========");
+            Debug.WriteLine(split[0]);
+            switch (split[0])
+            {
+                case "error":
+                    //Debug.WriteLine(split[0]);
+                    string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
+
+
+                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+
+                    //Debug.WriteLine(items_err[0]);
+                    //Debug.WriteLine(SplitData[0]);
+                    //Debug.WriteLine(SplitData[1]);
+
+                    ListViewItem listViewItem1 = listView1.FindItemWithText(SplitData[1].TrimStart(' '));
+
+                    //Debug.WriteLine(listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                    listViewItem1.SubItems[8].Text = SplitData[0];
+                    break;
+                default:
+                    //Debug.WriteLine(" \n--------- Start Parse ListView Update Return String -----------\n");
+
+                    foreach (string part in split)
+                    {
+                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
+                        string[] items_pre = part.Split('|');
+
+                        foreach (var item in items_pre)
+                        {
+                            //Debug.WriteLine(" \n--------- Item: " + item + "-----------\n");
+                            if (!item.Contains("-~-"))
+                            {
+                                switch (item.ToString())
+                                {
+                                    case "waiting":
+                                        status = item;
+                                        break;
+                                    case "importing":
+                                        status = item;
+                                        break;
+                                    case "finished":
+                                        status = item;
+                                        break;
+                                }
+                                //Debug.WriteLine("Message Loop Message: " + message + " ==== Item Value:" + item + " Part: " + part);
+                                continue;
+                            }
+                            string[] items = item.Split(stringSep2, StringSplitOptions.None);
+                            //Debug.WriteLine("---- Items and Values: " + items[0] + " :: Value: " + items[1]);
+                            switch (items[0].ToString())
+                            {
+                                case "title":
+                                    //Debug.WriteLine("Title? " + items[1]);
+                                    title = items[1];
+                                    break;
+                                case "user":
+                                    //Debug.WriteLine("user? " + items[1]);
+                                    user = items[1];
+                                    break;
+                                case "id":
+                                    //Debug.WriteLine("importnum? " + items[1]);
+                                    ImportID = items[1];
+                                    break;
+                                case "message":
+                                    //Debug.WriteLine("message? " + items[1]);
+                                    message = items[1];
+                                    break;
+                                case "hash":
+                                    //Debug.WriteLine("filehash? " + items[1]);
+                                    filehash = items[1];
+                                    break;
+                                case "ap":
+                                    //Debug.WriteLine("AP? " + items[1]);
+                                    message = message + " - " + items[1];
+                                    break;
+                                case "tot":
+                                    //Debug.WriteLine("This Of This? " + items[1]);
+                                    message = message + " - " + items[1];
+                                    break;
+                            }
+                        }
+                    }
+                    //Debug.WriteLine(filehash);
+                    //Debug.WriteLine("End Parse Loop Message: " + message);
+                    ListViewItem listViewItem = listView1.FindItemWithText(filehash);
+                    if ((status == "finished") || ((ImportID != "") && (message != "")))
+                    {
+                        //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                        listViewItem.SubItems[0].Text = ImportID;
+                        listViewItem.SubItems[1].Text = user;
+                        listViewItem.SubItems[2].Text = title;
+                        listViewItem.SubItems[7].Text = message;
+                        listViewItem.SubItems[8].Text = status;
+                    }
+                    //Debug.WriteLine(" \n--------- End Parse ListView Update Return String -----------\n");
+                    break;
+            }
+            //Debug.WriteLine("========== Update Listview End ==========");
+        }
+        */
+
         //
         // Process Completed Functions
         //
 
-        //private void backgroundWorker_ImportWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        //{
-        // maybe do something?
-        //}
-
-
-
-        //
-        // Menu Click Function Items
-        //
-
-        private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
+        /*
+        private void backgroundWorker_ImportWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
-            openFileDialog1.InitialDirectory = "c:\\";
-            openFileDialog1.Filter = "VS1 files (*.VS1)|*.VS1|All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 2;
-            openFileDialog1.RestoreDirectory = true;
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
-                    WDBAPIObj.ParseApiResponse(response);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-            }
+          //maybe do something?
         }
-
-        private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
-            {
-                //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
-                StartFolderImport(folderBrowserDialog1.SelectedPath);
-            }
-        }
-
-        private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            WiFiDB_Settings SettingsForm = new WiFiDB_Settings();
-            if(SettingsForm.ShowDialog() == DialogResult.OK)
-            {
-                this.ServerAddress = SettingsForm.ServerAddress;
-                this.ApiPath = SettingsForm.ApiPath;
-                this.Username = SettingsForm.Username;
-                this.ApiKey = SettingsForm.ApiKey;
-                this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
-            }
-        }
-
-        private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Import_Settings ImportSettingsForm = new Import_Settings();
-            if(ImportSettingsForm.ShowDialog() == DialogResult.OK)
-            {
-                this.DefaultImportTitle = ImportSettingsForm.ImportTitle;
-                this.DefaultImportNotes = ImportSettingsForm.ImportNotes;
-                this.UseDefaultImportValues = ImportSettingsForm.UseImportDefaultValues;
-            }
-        }
-
-        private void autoSettingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Auto_Upload_Settings AutoForm = new Auto_Upload_Settings();
-            if (AutoForm.ShowDialog() == DialogResult.OK)
-            {
-                Debug.WriteLine("AutoForm.AutoUploadFolder: " + AutoForm.AutoUploadFolder);
-                Debug.WriteLine("AutoForm.AutoUploadFolderPath: " + AutoForm.AutoUploadFolderPath);
-                Debug.WriteLine("AutoForm.ArchiveImports: " + AutoForm.ArchiveImports);
-                Debug.WriteLine("AutoForm.ArchiveImportsFolderPath: " + AutoForm.ArchiveImportsFolderPath);
-
-                this.AutoUploadFolder = Convert.ToBoolean(AutoForm.AutoUploadFolder);
-                this.AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
-                this.ArchiveImports = Convert.ToBoolean(AutoForm.ArchiveImports);
-                this.ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
-            }
-
-        }
+        */
     }
 }

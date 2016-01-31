@@ -44,6 +44,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
+        /// Pfftt thats for pussies, live on the edge.
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -57,7 +58,7 @@
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // groupBox1
+            // Default Import Values Group box ( The thing that goes around all of the import thingys )
             // 
             this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Controls.Add(this.richTextBox1);
@@ -71,7 +72,7 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Default Import Values";
             // 
-            // richTextBox1
+            // Notes text input field
             // 
             this.richTextBox1.Location = new System.Drawing.Point(51, 74);
             this.richTextBox1.Name = "richTextBox1";
@@ -80,7 +81,7 @@
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "";
             // 
-            // label2
+            // Notes label
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(9, 74);
@@ -89,14 +90,14 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Notes";
             // 
-            // textBox1
+            // Title input field
             // 
             this.textBox1.Location = new System.Drawing.Point(50, 32);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(583, 20);
             this.textBox1.TabIndex = 1;
             // 
-            // label1
+            // Title Label
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 32);
@@ -125,7 +126,7 @@
             this.ImportOKButton.Text = "OK";
             this.ImportOKButton.UseVisualStyleBackColor = true;
             // 
-            // checkBox1
+            // Use Deafult Values CheckBox
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(12, 290);

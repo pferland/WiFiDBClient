@@ -26,27 +26,32 @@
         public bool AutoUploadFolder
         {
             get { return checkBox1.Checked; }
+            set { }
         }
 
         public string AutoUploadFolderPath
         {
             get { return textBox1.Text; }
+            set { }
         }
 
         public bool ArchiveImports
         {
             get { return checkBox2.Checked; }
+            set { }
         }
 
         public string ArchiveImportsFolderPath
         {
             get { return textBox2.Text; }
+            set { }
         }
 
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
+        /// again, live on the egde
         private void InitializeComponent()
         {
             this.checkBox1 = new System.Windows.Forms.CheckBox();
@@ -62,8 +67,23 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
+
             // 
-            // checkBox1
+            // Auto Upload Group Box
+            // 
+            this.groupBox1.Controls.Add(this.AutoBrowseButton);
+            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.checkBox1);
+            this.groupBox1.Location = new System.Drawing.Point(28, 18);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Size = new System.Drawing.Size(700, 138);
+            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Auto Upload Folder";
+            // 
+            // Auto Upload Files CheckBox
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(130, 29);
@@ -75,7 +95,7 @@
             this.checkBox1.Text = "Automatically Upload Files in Folder:";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // Auto Upload Folder Path Visual
             // 
             this.textBox1.Location = new System.Drawing.Point(130, 77);
             this.textBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -94,22 +114,9 @@
             this.AutoBrowseButton.Text = "Browse";
             this.AutoBrowseButton.UseVisualStyleBackColor = true;
             this.AutoBrowseButton.Click += new System.EventHandler(this.AutoBrowseButton_Click);
+
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.AutoBrowseButton);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Controls.Add(this.checkBox1);
-            this.groupBox1.Location = new System.Drawing.Point(28, 18);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(700, 138);
-            this.groupBox1.TabIndex = 4;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Auto Upload Folder";
-            // 
-            // groupBox2
+            // Group Box for Auto Archive
             // 
             this.groupBox2.Controls.Add(this.AutoBrowse2Button);
             this.groupBox2.Controls.Add(this.textBox2);
@@ -123,7 +130,7 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Archive Imports";
             // 
-            // AutoBrowse2Button
+            // Auto Archive Uploaded Files Browser Button
             // 
             this.AutoBrowse2Button.Location = new System.Drawing.Point(568, 58);
             this.AutoBrowse2Button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -134,7 +141,7 @@
             this.AutoBrowse2Button.UseVisualStyleBackColor = true;
             this.AutoBrowse2Button.Click += new System.EventHandler(this.AutoBrowse2Button_Click);
             // 
-            // textBox2
+            // Auto Archive Uploads Folder Path Visual
             // 
             this.textBox2.Location = new System.Drawing.Point(130, 62);
             this.textBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -142,7 +149,7 @@
             this.textBox2.Size = new System.Drawing.Size(426, 26);
             this.textBox2.TabIndex = 4;
             // 
-            // checkBox2
+            // Auto Archive Uploads CheckBox
             // 
             this.checkBox2.AutoSize = true;
             this.checkBox2.Location = new System.Drawing.Point(130, 29);
@@ -175,7 +182,7 @@
             this.AutoOKButton.Text = "OK";
             this.AutoOKButton.UseVisualStyleBackColor = true;
             // 
-            // Auto_Upload_Settings
+            // Auto_Upload_Settings Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
