@@ -23,21 +23,25 @@
         public string ServerAddress
         {
             get { return textBox1.Text; }
+            set { textBox1.Text = value; }
         }
 
         public string ApiPath
         {
             get { return textBox2.Text; }
+            set { textBox2.Text = value; }
         }
         
         public string Username
         {
             get { return textBox3.Text; }
+            set { textBox3.Text = value; }
         }
 
         public string ApiKey
         {
             get { return textBox4.Text; }
+            set { textBox4.Text = value; }
         }
 
 

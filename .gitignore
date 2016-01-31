@@ -4,3 +4,4 @@ Build/
 *.pdb
 *.manifest
 .vs/
+WiFiDBUploader/App.config

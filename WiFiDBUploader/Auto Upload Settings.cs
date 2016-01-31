@@ -16,25 +16,25 @@ namespace WiFiDBUploader
         {
             InitializeComponent();
         }
-
-        private void AutoOKButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void AutoCancelButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        
         private void AutoBrowse2Button_Click(object sender, EventArgs e)
         {
-
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
+                this.ArchiveImportsFolderPath = folderBrowserDialog1.SelectedPath;
+            }
         }
 
         private void AutoBrowseButton_Click(object sender, EventArgs e)
         {
-
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
+                this.AutoUploadFolderPath = folderBrowserDialog1.SelectedPath;
+            }
         }
     }
 }

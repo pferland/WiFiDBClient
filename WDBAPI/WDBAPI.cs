@@ -30,14 +30,14 @@ namespace WDBAPI
 
         public string ApiGetWaitingImports()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "waiting");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -50,14 +50,14 @@ namespace WDBAPI
 
         public string ApiGetFinishedImports()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "finished");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -69,14 +69,14 @@ namespace WDBAPI
 
         public string ApiGetBadIports()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "bad");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -88,14 +88,14 @@ namespace WDBAPI
 
         public string ApiGetCurrentImporting()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "importing");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
@@ -107,14 +107,14 @@ namespace WDBAPI
 
         public string ApiGetDaemonStatuses(string query)
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "daemonstatuses");
                 if(query != "")
                 {
@@ -129,14 +129,14 @@ namespace WDBAPI
 
         public string ApiImportFile(string UploadFile, bool CheckHash = false)
         {
-            Debug.WriteLine(ApiCompiledPath + "import.php");
+            //Debug.WriteLine(ApiCompiledPath + "import.php");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 byte[] hashBytes;
                 string hashish;
                 using (var inputFileStream = File.Open(UploadFile, FileMode.Open))
@@ -181,8 +181,8 @@ namespace WDBAPI
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(this.parameters.Get("apikey"));
+                //Debug.WriteLine(this.parameters.Get("username"));
+                //Debug.WriteLine(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
                 var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
@@ -202,9 +202,9 @@ namespace WDBAPI
             //Debug.WriteLine(response);
             //Debug.WriteLine(" -------------------------- ");
             //System.Threading.Thread.Sleep(2000);
-            Debug.WriteLine(response);
+            //Debug.WriteLine(response);
             XElement xmlTree = XElement.Parse(response);
-            Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
+            //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
             {
                 case "error":
@@ -246,7 +246,7 @@ namespace WDBAPI
                     {
                         foreach (var item in xmlTree.Elements())
                         {
-                            Debug.WriteLine("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                            //Debug.WriteLine("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                             ret = ret + "|~|" + item.Name.ToString() + "|";
                             foreach (var subitem in item.Elements())
                             {
@@ -258,7 +258,7 @@ namespace WDBAPI
                     {
                         ret = "error|~|No_Daemons_Running";
                     }
-                    Debug.WriteLine("Ret: " + ret);
+                    //Debug.WriteLine("Ret: " + ret);
                     break;
                 case "import":
                     foreach(var item in xmlTree.Elements())

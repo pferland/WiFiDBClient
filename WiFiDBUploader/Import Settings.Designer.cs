@@ -23,19 +23,19 @@
         public string ImportTitle
         {
             get { return textBox1.Text; }
+            set { textBox1.Text = value; }
         }
         
         public string ImportNotes
         {
             get { return richTextBox1.Text; }
+            set { richTextBox1.Text = value; }
         }
 
         public bool UseImportDefaultValues
         {
-            get
-            {
-                return checkBox1.Checked ;
-            }
+            get { return checkBox1.Checked; }
+            set { checkBox1.Checked = value; }
         }
 
         #region Windows Form Designer generated code

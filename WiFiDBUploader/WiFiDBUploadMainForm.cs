@@ -44,25 +44,25 @@ namespace WiFiDBUploader
 
         public WiFiDBUploadMainForm()
         {
-            Debug.WriteLine("Start of Call: LoadSettings()");
+            //Debug.WriteLine("Start of Call: LoadSettings()");
             LoadSettings();
-            Debug.WriteLine("End of Call: LoadSettings()");
+            //Debug.WriteLine("End of Call: LoadSettings()");
 
-            Debug.WriteLine(ServerAddress);
+            //Debug.WriteLine(ServerAddress);
 
-            Debug.WriteLine("Start of Call: InitializeComponent()");
+            //Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
-            Debug.WriteLine("End of Call: InitializeComponent()");
+            //Debug.WriteLine("End of Call: InitializeComponent()");
 
             listView1.View = View.Details;
 
-            Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
+            //Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
             WDBAPIObj = new WDBAPI.WDBAPI();
-            Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
+            //Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
 
-            Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
+            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
             WDBCommonObj = new WDBCommon.WDBCommon();
-            Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
             WDBCommonObj.AutoUploadFolder = AutoUploadFolder;
             WDBCommonObj.AutoUploadFolderPath = AutoUploadFolderPath;
             WDBCommonObj.ArchiveImports = ArchiveImports;
@@ -78,15 +78,15 @@ namespace WiFiDBUploader
             WDBCommonObj.ApiKey = ApiKey;
             WDBCommonObj.ApiCompiledPath = ApiCompiledPath;
 
-            Debug.WriteLine("Start of Call: WDBCommonObj.initApi();");
+            //Debug.WriteLine("Start of Call: WDBCommonObj.initApi();");
             WDBCommonObj.initApi();
-            Debug.WriteLine("End of Call: WDBCommonObj.initApi();");
+            //Debug.WriteLine("End of Call: WDBCommonObj.initApi();");
 
-            Debug.WriteLine("After initApi() - WDBCommonObj.ApiCompiledPath: " + WDBCommonObj.ApiCompiledPath);
+            //Debug.WriteLine("After initApi() - WDBCommonObj.ApiCompiledPath: " + WDBCommonObj.ApiCompiledPath);
 
-            Debug.WriteLine("Start of Call: InitTimer();");
+            //Debug.WriteLine("Start of Call: InitTimer();");
             InitTimer();
-            Debug.WriteLine("End of Call: InitTimer();");
+            //Debug.WriteLine("End of Call: InitTimer();");
 
         }
 
@@ -136,6 +136,7 @@ namespace WiFiDBUploader
             NameValueCollection AppConfig = ConfigurationSettings.AppSettings;
             foreach (string key in AppConfig)
             {
+                //Debug.WriteLine(key + " : " + ConfigurationSettings.AppSettings[key]);
                 switch(key)
                 {
                     case "ServerAddress":
@@ -151,12 +152,14 @@ namespace WiFiDBUploader
                         ApiKey = ConfigurationSettings.AppSettings[key];
                         break;
                     case "AutoUploadFolder":
+                        //Debug.WriteLine(key + " : " + Convert.ToBoolean(ConfigurationSettings.AppSettings[key]).ToString());
                         AutoUploadFolder = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                     case "AutoUploadFolderPath":
                         AutoUploadFolderPath = ConfigurationSettings.AppSettings[key];
                         break;
                     case "ArchiveImports":
+                        //Debug.WriteLine(key + " : " + Convert.ToBoolean(ConfigurationSettings.AppSettings[key]).ToString());
                         ArchiveImports = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                     case "ArchiveImportsFolderPath":
@@ -169,6 +172,7 @@ namespace WiFiDBUploader
                         DefaultImportTitle = ConfigurationSettings.AppSettings[key];
                         break;
                     case "UseDefaultImportValues":
+                        //Debug.WriteLine(key + " : " + Convert.ToBoolean(ConfigurationSettings.AppSettings[key]).ToString());
                         UseDefaultImportValues = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
                         break;
                 }
@@ -180,7 +184,7 @@ namespace WiFiDBUploader
         {
             ///Warning, If you have any comments in the %App%.config file they will be lost.
             ///Good Idea to keep a copy of your app.config if you have made comments in it and then change a setting inside the program.
-            Debug.WriteLine(Properties.Settings.Default.Properties.Count);
+            //Debug.WriteLine(Properties.Settings.Default.Properties.Count);
         }
 
 
@@ -308,6 +312,8 @@ namespace WiFiDBUploader
         private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WiFiDB_Settings SettingsForm = new WiFiDB_Settings();
+
+
             if (SettingsForm.ShowDialog() == DialogResult.OK)
             {
                 this.ServerAddress = SettingsForm.ServerAddress;
@@ -315,40 +321,51 @@ namespace WiFiDBUploader
                 this.Username = SettingsForm.Username;
                 this.ApiKey = SettingsForm.ApiKey;
                 this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
+                WriteSettings();
             }
         }
 
         private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Import_Settings ImportSettingsForm = new Import_Settings();
+            ImportSettingsForm.ImportNotes = DefaultImportNotes;
+            ImportSettingsForm.ImportTitle = DefaultImportTitle;
+            ImportSettingsForm.UseImportDefaultValues = UseDefaultImportValues;
+
             if (ImportSettingsForm.ShowDialog() == DialogResult.OK)
             {
                 this.DefaultImportTitle = ImportSettingsForm.ImportTitle;
                 this.DefaultImportNotes = ImportSettingsForm.ImportNotes;
                 this.UseDefaultImportValues = ImportSettingsForm.UseImportDefaultValues;
+                WriteSettings();
             }
         }
 
         private void autoSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Auto_Upload_Settings AutoForm = new Auto_Upload_Settings();
+            Debug.WriteLine(AutoUploadFolder);
             AutoForm.AutoUploadFolder = AutoUploadFolder;
+            AutoForm.AutoUploadFolderPath = AutoUploadFolderPath;
+            AutoForm.ArchiveImports = ArchiveImports;
+            AutoForm.ArchiveImportsFolderPath = ArchiveImportsFolderPath;
+
             if (AutoForm.ShowDialog() == DialogResult.OK)
             {
-                Debug.WriteLine("AutoForm.AutoUploadFolder: " + AutoForm.AutoUploadFolder);
-                Debug.WriteLine("AutoForm.AutoUploadFolderPath: " + AutoForm.AutoUploadFolderPath);
-                Debug.WriteLine("AutoForm.ArchiveImports: " + AutoForm.ArchiveImports);
-                Debug.WriteLine("AutoForm.ArchiveImportsFolderPath: " + AutoForm.ArchiveImportsFolderPath);
+                //Debug.WriteLine("AutoForm.AutoUploadFolder: " + AutoForm.AutoUploadFolder);
+                //Debug.WriteLine("AutoForm.AutoUploadFolderPath: " + AutoForm.AutoUploadFolderPath);
+                //Debug.WriteLine("AutoForm.ArchiveImports: " + AutoForm.ArchiveImports);
+                //Debug.WriteLine("AutoForm.ArchiveImportsFolderPath: " + AutoForm.ArchiveImportsFolderPath);
 
                 this.AutoUploadFolder = Convert.ToBoolean(AutoForm.AutoUploadFolder);
                 this.AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
                 this.ArchiveImports = Convert.ToBoolean(AutoForm.ArchiveImports);
                 this.ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
 
-                Debug.WriteLine("this.AutoUploadFolder: " + this.AutoUploadFolder);
-                Debug.WriteLine("this.AutoUploadFolderPath: " + this.AutoUploadFolderPath);
-                Debug.WriteLine("this.ArchiveImports: " + this.ArchiveImports);
-                Debug.WriteLine("this.ArchiveImportsFolderPath: " + this.ArchiveImportsFolderPath);
+                //Debug.WriteLine("this.AutoUploadFolder: " + this.AutoUploadFolder);
+                //Debug.WriteLine("this.AutoUploadFolderPath: " + this.AutoUploadFolderPath);
+                //Debug.WriteLine("this.ArchiveImports: " + this.ArchiveImports);
+                //Debug.WriteLine("this.ArchiveImportsFolderPath: " + this.ArchiveImportsFolderPath);
 
                 WriteSettings();
             }
@@ -373,7 +390,7 @@ namespace WiFiDBUploader
 
         private void backgroundWorker_GetDaemonStatsDoWork(object sender, DoWorkEventArgs e)
         {
-            Debug.WriteLine(ServerAddress);
+            //Debug.WriteLine(ServerAddress);
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
@@ -521,8 +538,8 @@ namespace WiFiDBUploader
             string filehash = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            Debug.WriteLine("========== Update Listview Start ==========");
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine("========== Update Listview Start ==========");
+            //Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
@@ -629,9 +646,9 @@ namespace WiFiDBUploader
             string[] stringSeparators = new string[] { "|~|" };
             string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
 
-            Debug.WriteLine("========== Update Daemon ListView Start ==========");
-            Debug.WriteLine(e.UserState.ToString());
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine("========== Update Daemon ListView Start ==========");
+            //Debug.WriteLine(e.UserState.ToString());
+            //Debug.WriteLine(split[0]);
 
             string nodename = "";
             string pidfile = "";
@@ -645,10 +662,10 @@ namespace WiFiDBUploader
             switch (split[0])
             {
                 case "error":
-                    Debug.WriteLine(split[1]);
+                    //Debug.WriteLine(split[1]);
                     if(split[1] == "No_Daemons_Running")
                     {
-                        Debug.WriteLine("No Daemons running, do ListView CleanUp.");
+                        //Debug.WriteLine("No Daemons running, do ListView CleanUp.");
                         if (this.listView2.Items.Count > 0)
                         {
                             foreach (ListViewItem item in this.listView2.Items)
@@ -657,7 +674,7 @@ namespace WiFiDBUploader
                             }
                         }else
                         {
-                            Debug.WriteLine("No rows, no need for cleanup...");
+                            //Debug.WriteLine("No rows, no need for cleanup...");
                         }
                     }
                     else
@@ -681,7 +698,7 @@ namespace WiFiDBUploader
                             DaemonReturnCount--;
                             continue;
                         }
-                        Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
+                        //Debug.WriteLine(" \n---------Part: " + part + "-----------\n");
                         string[] items_pre = part.Split('|');
 
                         foreach (var item in items_pre)
@@ -750,29 +767,29 @@ namespace WiFiDBUploader
                     }
 
                     //Check for rows that are not in the return, and remove them.
-                    Debug.WriteLine(DaemonReturnCount.ToString() + " --=--=-=-=-=-==-- " + listView2.Items.Count);
+                    //Debug.WriteLine(DaemonReturnCount.ToString() + " --=--=-=-=-=-==-- " + listView2.Items.Count);
                     if ((listView2.Items.Count != DaemonReturnCount) && DaemonReturnCount != 0)
                     {
                         foreach (ListViewItem item in listView2.Items)
                         {
-                            Debug.WriteLine(e.UserState.ToString());
-                            Debug.WriteLine(item.SubItems[1].Text);
+                            //Debug.WriteLine(e.UserState.ToString());
+                            //Debug.WriteLine(item.SubItems[1].Text);
 
                             if(e.UserState.ToString().Contains(item.SubItems[1].Text))
                             {
-                                Debug.WriteLine(item.SubItems[1].Text + " Is in the return.");
+                                //Debug.WriteLine(item.SubItems[1].Text + " Is in the return.");
                             }else
                             {
-                                Debug.WriteLine(item.SubItems[1].Text + " Is NOT in the return.");
-                                Debug.WriteLine("ListView CleanUp!");
+                                //Debug.WriteLine(item.SubItems[1].Text + " Is NOT in the return.");
+                                //Debug.WriteLine("ListView CleanUp!");
                                 item.Remove();
                             }
                         }
                     }
                     if(DaemonReturnCount == 0)
                     {
-                        Debug.WriteLine("DaemonReturnCount was 0...");
-                        Debug.WriteLine("UserStateString: " + e.UserState.ToString());
+                        //Debug.WriteLine("DaemonReturnCount was 0...");
+                        //Debug.WriteLine("UserStateString: " + e.UserState.ToString());
                     }
                     //Debug.WriteLine(" \n--------- End Parse Daemon ListView Update Return String -----------\n");
                     break;
@@ -798,8 +815,8 @@ namespace WiFiDBUploader
             string filehash = "";
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
-            Debug.WriteLine("========== Update Listview Start ==========");
-            Debug.WriteLine(split[0]);
+            //Debug.WriteLine("========== Update Listview Start ==========");
+            //Debug.WriteLine(split[0]);
             switch (split[0])
             {
                 case "error":
