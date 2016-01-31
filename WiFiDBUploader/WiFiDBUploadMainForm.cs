@@ -312,7 +312,10 @@ namespace WiFiDBUploader
         private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WiFiDB_Settings SettingsForm = new WiFiDB_Settings();
-
+            SettingsForm.ServerAddress = ServerAddress;
+            SettingsForm.ApiPath = ApiPath;
+            SettingsForm.Username = Username;
+            SettingsForm.ApiKey = ApiKey;
 
             if (SettingsForm.ShowDialog() == DialogResult.OK)
             {

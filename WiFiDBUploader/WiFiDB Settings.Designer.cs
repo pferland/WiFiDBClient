@@ -80,7 +80,6 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(450, 20);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "http://dev.randomintervals.com";
             // 
             // label2
             // 
@@ -97,7 +96,6 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(450, 20);
             this.textBox2.TabIndex = 3;
-            this.textBox2.Text = "/wfiidb/api/v2/";
             // 
             // label3
             // 
@@ -114,7 +112,6 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(450, 20);
             this.textBox3.TabIndex = 5;
-            this.textBox3.Text = "pferland";
             // 
             // label4
             // 
@@ -131,7 +128,6 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(450, 20);
             this.textBox4.TabIndex = 7;
-            this.textBox4.Text = "GSn8NQeYzY8gq5Y8NFpf5gZZqH33kdBctEOwWzsOTmxCnrs4BYk32rgeNLNhLkzj";
             // 
             // ServerSettingsOKButton
             // 
