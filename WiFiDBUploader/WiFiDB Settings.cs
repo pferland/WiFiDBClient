@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,22 @@ namespace WiFiDBUploader
         public WiFiDB_Settings()
         {
             InitializeComponent();
+        }
+        
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Selected Item: " + comboBox1.SelectedItem.ToString());
+            _SelectedServer = comboBox1.SelectedItem.ToString();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AddServer AddServerForm = new AddServer();
+            ServerAddress = AddServerForm.ServerAddress;
+            ApiPath = AddServerForm.ApiPath;
+            Username = AddServerForm.Username;
+            ApiKey = AddServerForm.ApiKey;
+
         }
     }
 }

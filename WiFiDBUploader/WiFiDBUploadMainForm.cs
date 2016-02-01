@@ -27,6 +27,7 @@ namespace WiFiDBUploader
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
         private NameValueCollection AppConfig;
+
         private bool   AutoUploadFolder;
         private string AutoUploadFolderPath;
         private bool   ArchiveImports;
@@ -35,6 +36,8 @@ namespace WiFiDBUploader
         private string DefaultImportNotes;
         private string DefaultImportTitle;
         private bool   UseDefaultImportValues;
+
+        private List<ServerObj> ServerList;
 
         private string ServerAddress;
         private string ApiPath;
@@ -85,7 +88,9 @@ namespace WiFiDBUploader
             //Debug.WriteLine("After initApi() - WDBCommonObj.ApiCompiledPath: " + WDBCommonObj.ApiCompiledPath);
 
             //Debug.WriteLine("Start of Call: InitTimer();");
-            InitTimer();
+            
+            //InitTimer();
+            
             //Debug.WriteLine("End of Call: InitTimer();");
 
         }
@@ -105,8 +110,6 @@ namespace WiFiDBUploader
 
         public void InitTimer()
         {
-
-            /*
             if(timer1 != null)
             {
                 timer1.Dispose();
@@ -116,7 +119,7 @@ namespace WiFiDBUploader
             timer1.Tick += new EventHandler(CheckForUpdates);
             timer1.Interval = 10000; // in miliseconds
             timer1.Start();
-            */
+            
             StartGetDaemonStats(); //prep the tables.
 
             if (timer2 != null)
@@ -129,62 +132,104 @@ namespace WiFiDBUploader
             timer2.Tick += new EventHandler(CheckForDaemonUpdates);
             timer2.Interval = 4000; // in miliseconds
             timer2.Start();
+            
+        }
+
+        private void CreateRegistryKeys(Microsoft.Win32.RegistryKey rootKey)
+        {
+            Microsoft.Win32.RegistryKey ServersKey;
+            rootKey.SetValue("DefaultImportTitle", "Generic Import Title");
+            rootKey.SetValue("DefaultImportNotes", "Generic blable about the import, maybe some notes on where you drove or what you saw?");
+            rootKey.SetValue("UseDefaultImportValues", 1);
+            rootKey.SetValue("AutoUploadFolder", 1);
+            rootKey.SetValue("AutoUploadFolderPath", "");
+            rootKey.SetValue("ArchiveImports", 1);
+            rootKey.SetValue("ArchiveImportsFolderPath", "");
+
+            ServersKey = rootKey.CreateSubKey("Servers");
         }
 
         private void LoadSettings()
         {
-            NameValueCollection AppConfig = ConfigurationSettings.AppSettings;
-            foreach (string key in AppConfig)
+            Microsoft.Win32.RegistryKey rootKey;
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
+            string[] SubKeys = rootKey.GetSubKeyNames();
+            if (SubKeys.Count() == 0)
             {
-                //Debug.WriteLine(key + " : " + ConfigurationSettings.AppSettings[key]);
-                switch(key)
+                Debug.WriteLine("Servers SubKey not found, creating Default Structure.");
+                CreateRegistryKeys(rootKey);
+            }
+            Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
+
+            foreach (string value in rootKey.GetValueNames())
+            {
+                //Debug.WriteLine(value);
+
+                switch(value)
                 {
-                    case "ServerAddress":
-                        ServerAddress = ConfigurationSettings.AppSettings[key];
-                    break;
-                    case "ApiPath":
-                        ApiPath = ConfigurationSettings.AppSettings[key];
-                        break;
-                    case "Username":
-                        Username = ConfigurationSettings.AppSettings[key];
-                        break;
-                    case "ApiKey":
-                        ApiKey = ConfigurationSettings.AppSettings[key];
-                        break;
                     case "AutoUploadFolder":
-                        //Debug.WriteLine(key + " : " + Convert.ToBoolean(ConfigurationSettings.AppSettings[key]).ToString());
-                        AutoUploadFolder = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
+                        Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                        AutoUploadFolder = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                     case "AutoUploadFolderPath":
-                        AutoUploadFolderPath = ConfigurationSettings.AppSettings[key];
+                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        AutoUploadFolderPath = rootKey.GetValue(value).ToString();
                         break;
                     case "ArchiveImports":
-                        //Debug.WriteLine(key + " : " + Convert.ToBoolean(ConfigurationSettings.AppSettings[key]).ToString());
-                        ArchiveImports = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
+                        Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                        ArchiveImports = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                     case "ArchiveImportsFolderPath":
-                        ArchiveImportsFolderPath = ConfigurationSettings.AppSettings[key];
+                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        ArchiveImportsFolderPath = rootKey.GetValue(value).ToString();
                         break;
                     case "DefaultImportNotes":
-                        DefaultImportNotes = ConfigurationSettings.AppSettings[key];
+                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        DefaultImportNotes = rootKey.GetValue(value).ToString();
                         break;
                     case "DefaultImportTitle":
-                        DefaultImportTitle = ConfigurationSettings.AppSettings[key];
+                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        DefaultImportTitle = rootKey.GetValue(value).ToString();
                         break;
                     case "UseDefaultImportValues":
-                        //Debug.WriteLine(key + " : " + Convert.ToBoolean(ConfigurationSettings.AppSettings[key]).ToString());
-                        UseDefaultImportValues = Convert.ToBoolean(ConfigurationSettings.AppSettings[key]);
+                        Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                        UseDefaultImportValues = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                 }
+            }
+            ServerList = new List<ServerObj>();
+            int Increment = 0;
+            foreach (string subitem in ServerSubkeys.GetSubKeyNames())
+            {
+                Debug.WriteLine("-------------------\n"+subitem);
+                Microsoft.Win32.RegistryKey ServerKey = ServerSubkeys.CreateSubKey(subitem);
+
+                ServerObj Server = new ServerObj();
+                Debug.WriteLine("ServerAddress = "+ ServerKey.GetValue("ServerAddress").ToString());
+                Debug.WriteLine("ApiPath = " + ServerKey.GetValue("ApiPath").ToString());
+                Debug.WriteLine("Username = " + ServerKey.GetValue("Username").ToString());
+                Debug.WriteLine("ApiKey = " + ServerKey.GetValue("ApiKey").ToString());
+
+                Server.ID = Increment;
+                Server.ServerAddress = ServerKey.GetValue("ServerAddress").ToString();
+                Server.ApiPath = ServerKey.GetValue("ApiPath").ToString();
+                Server.Username = ServerKey.GetValue("Username").ToString();
+                Server.ApiKey = ServerKey.GetValue("ApiKey").ToString();
+                Server.Selected = Convert.ToBoolean(ServerKey.GetValue("Selected"));
+                ServerList.Add(Server);
+                Increment++;
             }
             ApiCompiledPath = ServerAddress + ApiPath;
         }
 
         private void WriteSettings()
         {
-            ///Warning, If you have any comments in the %App%.config file they will be lost.
-            ///Good Idea to keep a copy of your app.config if you have made comments in it and then change a setting inside the program.
-            //Debug.WriteLine(Properties.Settings.Default.Properties.Count);
+            /*
+                Screw the app.config file, registry is easier to manage.
+            */
+            Microsoft.Win32.RegistryKey rootKey;
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
+            string[] SubKeys = rootKey.GetSubKeyNames();
         }
 
 
@@ -312,10 +357,8 @@ namespace WiFiDBUploader
         private void wifidbSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WiFiDB_Settings SettingsForm = new WiFiDB_Settings();
-            SettingsForm.ServerAddress = ServerAddress;
-            SettingsForm.ApiPath = ApiPath;
-            SettingsForm.Username = Username;
-            SettingsForm.ApiKey = ApiKey;
+            SettingsForm.ServerList = ServerList;
+            SettingsForm.InitForm();
 
             if (SettingsForm.ShowDialog() == DialogResult.OK)
             {
@@ -930,5 +973,16 @@ namespace WiFiDBUploader
           //maybe do something?
         }
         */
+    }
+
+
+    public class ServerObj
+    {
+        public int ID { get; set; }
+        public string ServerAddress { get; set; }
+        public string ApiPath { get; set; }
+        public string Username { get; set; }
+        public string ApiKey { get; set; }
+        public bool Selected { get; set; }
     }
 }
