@@ -21,9 +21,9 @@ namespace WiFiDBUploader
     {
         WDBAPI.WDBAPI WDBAPIObj;
         WDBCommon.WDBCommon WDBCommonObj;
-        public int NextID = 0;
-        public int ImportInternalID = 0;
-        public List<KeyValuePair<int, string>> ImportIDs;
+        private int NextID = 0;
+        private int ImportInternalID = 0;
+        private List<KeyValuePair<int, string>> ImportIDs;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
         private NameValueCollection AppConfig;
@@ -38,6 +38,8 @@ namespace WiFiDBUploader
         private bool   UseDefaultImportValues;
 
         private List<ServerObj> ServerList;
+
+        private string SelectedServer;
 
         private string ServerAddress;
         private string ApiPath;
@@ -108,7 +110,7 @@ namespace WiFiDBUploader
             public List<KeyValuePair<int, string>> Result { get; set; }
         }
 
-        public void InitTimer()
+        private void InitTimer()
         {
             if(timer1 != null)
             {
@@ -252,7 +254,7 @@ namespace WiFiDBUploader
             //Debug.WriteLine("-------- BackGround Update Check End --------");
         }
         
-        public void StartUpdateDaemonStats()
+        private void StartUpdateDaemonStats()
         {
             //Debug.WriteLine("Start Call: StartUpdateDaemonStats");
             QueryArguments args = new QueryArguments(NextID++, "");
@@ -265,7 +267,7 @@ namespace WiFiDBUploader
             //Debug.WriteLine("End Call: StartUpdateDaemonStats");
         }
 
-        public void StartGetDaemonStats()
+        private void StartGetDaemonStats()
         {
             //Debug.WriteLine("Start Call: StartGetDaemonStats");
             QueryArguments args = new QueryArguments(NextID++, "");
@@ -278,7 +280,7 @@ namespace WiFiDBUploader
             //Debug.WriteLine("End Call: StartGetDaemonStats");
         }
 
-        public void StartUpdateWiaitng(string query)
+        private void StartUpdateWiaitng(string query)
         {
             //Debug.WriteLine("Start Call: StartUpdateWaiting");
             QueryArguments args = new QueryArguments(NextID++, query);
@@ -291,7 +293,7 @@ namespace WiFiDBUploader
             //Debug.WriteLine("End Call: StartUpdateWaiting");
         }
 
-        public void StartFileImport(string query)
+        private void StartFileImport(string query)
         {
             QueryArguments args = new QueryArguments(NextID++, query);
             
@@ -304,7 +306,7 @@ namespace WiFiDBUploader
 
         }
 
-        public void StartFolderImport(string query)
+        private void StartFolderImport(string query)
         {
             QueryArguments args = new QueryArguments(NextID++, query);
 

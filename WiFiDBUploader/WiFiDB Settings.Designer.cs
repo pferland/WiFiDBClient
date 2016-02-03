@@ -88,12 +88,13 @@ namespace WiFiDBUploader
             this.label5 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ServerSettingsOKButton
             // 
             this.ServerSettingsOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.ServerSettingsOKButton.Location = new System.Drawing.Point(279, 39);
+            this.ServerSettingsOKButton.Location = new System.Drawing.Point(321, 39);
             this.ServerSettingsOKButton.Name = "ServerSettingsOKButton";
             this.ServerSettingsOKButton.Size = new System.Drawing.Size(75, 23);
             this.ServerSettingsOKButton.TabIndex = 8;
@@ -103,7 +104,7 @@ namespace WiFiDBUploader
             // ServerSettingsCancelButton
             // 
             this.ServerSettingsCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ServerSettingsCancelButton.Location = new System.Drawing.Point(360, 39);
+            this.ServerSettingsCancelButton.Location = new System.Drawing.Point(402, 39);
             this.ServerSettingsCancelButton.Name = "ServerSettingsCancelButton";
             this.ServerSettingsCancelButton.Size = new System.Drawing.Size(75, 23);
             this.ServerSettingsCancelButton.TabIndex = 9;
@@ -147,12 +148,23 @@ namespace WiFiDBUploader
             this.button2.Text = "-";
             this.button2.UseVisualStyleBackColor = true;
             // 
+            // button3
+            // 
+            this.button3.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.button3.Location = new System.Drawing.Point(441, 10);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(36, 23);
+            this.button3.TabIndex = 14;
+            this.button3.Text = "Edit";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
             // WiFiDB_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(448, 79);
+            this.ClientSize = new System.Drawing.Size(484, 79);
             this.ControlBox = false;
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label5);
@@ -160,7 +172,7 @@ namespace WiFiDBUploader
             this.Controls.Add(this.ServerSettingsCancelButton);
             this.Controls.Add(this.ServerSettingsOKButton);
             this.Name = "WiFiDB_Settings";
-            this.Text = "WiFiDB_Settings";
+            this.Text = "z";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -173,5 +185,6 @@ namespace WiFiDBUploader
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
     }
 }
