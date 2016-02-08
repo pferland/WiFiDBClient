@@ -26,7 +26,6 @@ namespace WiFiDBUploader
         private List<KeyValuePair<int, string>> ImportIDs;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
-        private NameValueCollection AppConfig;
 
         private bool   AutoUploadFolder;
         private string AutoUploadFolderPath;
@@ -224,7 +223,52 @@ namespace WiFiDBUploader
             ApiCompiledPath = ServerAddress + ApiPath;
         }
 
-        private void WriteSettings()
+        private void WriteServerSettings()
+        {
+            /*
+                Screw the app.config file, registry is easier to manage.
+            */
+            Microsoft.Win32.RegistryKey rootKey;
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader").CreateSubKey("Servers");
+
+            List<ServerNameObj> VarNameList = new List<ServerNameObj>();
+            foreach (ServerObj server in ServerList)
+            {
+                Debug.WriteLine(server.ServerAddress);
+
+                Microsoft.Win32.RegistryKey ServerKey = rootKey.CreateSubKey( server.ServerAddress.ToString().Replace("https://", "").Replace("http://", "") );
+                ServerKey.SetValue("ServerAddress", server.ServerAddress);
+                ServerKey.SetValue("ApiPath", server.ApiPath);
+                ServerKey.SetValue("Username", server.Username);
+                ServerKey.SetValue("ApiKey", server.ApiKey);
+                ServerKey.SetValue("Selected", server.Selected);
+
+                ServerNameObj nameObj = new ServerNameObj();
+                nameObj.ServerName = server.ServerAddress.ToString().Replace("https://", "").Replace("http://", "");
+                VarNameList.Add(nameObj);
+
+            }
+
+            var RegName = rootKey.GetSubKeyNames();
+            List<ServerNameObj> RegNameList = new List<ServerNameObj>();
+
+            foreach ( string subkey in RegName)
+            {
+                ServerNameObj nameObj = new ServerNameObj();
+                nameObj.ServerName = subkey;
+                RegNameList.Add(nameObj);
+            }
+            
+            var list3 = RegNameList.Except(VarNameList, new IdComparer()).ToList();
+            Debug.WriteLine("Servers not in the list now:");
+            foreach(ServerNameObj ServerName in list3)
+            {
+                Debug.WriteLine(ServerName.ServerName);
+                rootKey.DeleteSubKeyTree(ServerName.ServerName);
+            }
+        }
+
+        private void WriteGlobalSettings()
         {
             /*
                 Screw the app.config file, registry is easier to manage.
@@ -232,8 +276,22 @@ namespace WiFiDBUploader
             Microsoft.Win32.RegistryKey rootKey;
             rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
             string[] SubKeys = rootKey.GetSubKeyNames();
-        }
+            if (SubKeys.Count() == 0)
+            {
+                Debug.WriteLine("Servers SubKey not found, creating Default Structure.");
+                CreateRegistryKeys(rootKey);
+            }
+            Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
 
+            foreach (string value in rootKey.GetValueNames())
+            {
+                //Debug.WriteLine(value);
+            }
+
+
+
+
+        }
 
         /*
             Background init Funtions.
@@ -374,11 +432,16 @@ namespace WiFiDBUploader
                         this.ApiPath = server.ApiPath;
                         this.Username = server.Username;
                         this.ApiKey = server.ApiKey;
+                        server.Selected = true;
+                    }
+                    else
+                    {
+                        server.Selected = false;
                     }
                 }
                 this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
-                WriteSettings();
             }
+            WriteServerSettings();
         }
 
         private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -393,7 +456,7 @@ namespace WiFiDBUploader
                 this.DefaultImportTitle = ImportSettingsForm.ImportTitle;
                 this.DefaultImportNotes = ImportSettingsForm.ImportNotes;
                 this.UseDefaultImportValues = ImportSettingsForm.UseImportDefaultValues;
-                WriteSettings();
+                WriteGlobalSettings();
             }
         }
 
@@ -423,7 +486,7 @@ namespace WiFiDBUploader
                 //Debug.WriteLine("this.ArchiveImports: " + this.ArchiveImports);
                 //Debug.WriteLine("this.ArchiveImportsFolderPath: " + this.ArchiveImportsFolderPath);
 
-                WriteSettings();
+                WriteGlobalSettings();
             }
         }
 
@@ -743,8 +806,9 @@ namespace WiFiDBUploader
                         MessageBox.Show(e.UserState.ToString());
                     }
                     break;
+
                 default:
-                    int i = 0;
+                    
                     //Debug.WriteLine(" \n--------- Start Parse Daemon ListView Update Return String -----------\n");
                     int DaemonReturnCount = split.Count();
                     foreach (string part in split)
@@ -986,6 +1050,12 @@ namespace WiFiDBUploader
     }
 
 
+
+    public class ServerNameObj
+    {
+        public string ServerName { get; set; }
+    }
+
     public class ServerObj
     {
         public int ID { get; set; }
@@ -994,5 +1064,31 @@ namespace WiFiDBUploader
         public string Username { get; set; }
         public string ApiKey { get; set; }
         public bool Selected { get; set; }
+    }
+
+    public class IdComparer : IEqualityComparer<ServerNameObj>
+    {
+        public int GetHashCode(ServerNameObj co)
+        {
+            if (co == null)
+            {
+                return 0;
+            }
+            return co.ServerName.GetHashCode();
+        }
+
+        public bool Equals(ServerNameObj x1, ServerNameObj x2)
+        {
+            if (object.ReferenceEquals(x1, x2))
+            {
+                return true;
+            }
+            if (object.ReferenceEquals(x1, null) ||
+                object.ReferenceEquals(x2, null))
+            {
+                return false;
+            }
+            return x1.ServerName == x2.ServerName;
+        }
     }
 }

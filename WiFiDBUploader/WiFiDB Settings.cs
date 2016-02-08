@@ -22,6 +22,7 @@ namespace WiFiDBUploader
         {
             //Debug.WriteLine("Selected Item: " + comboBox1.SelectedItem.ToString());
             _SelectedServer = comboBox1.SelectedItem.ToString();
+
             //Debug.WriteLine("Server Count List: " + ServerList.Count);
             //Debug.WriteLine("Server out: " + ServerList[0].ServerAddress.ToString());
         }
