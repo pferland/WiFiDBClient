@@ -275,22 +275,14 @@ namespace WiFiDBUploader
             */
             Microsoft.Win32.RegistryKey rootKey;
             rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
-            string[] SubKeys = rootKey.GetSubKeyNames();
-            if (SubKeys.Count() == 0)
-            {
-                Debug.WriteLine("Servers SubKey not found, creating Default Structure.");
-                CreateRegistryKeys(rootKey);
-            }
-            Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
 
-            foreach (string value in rootKey.GetValueNames())
-            {
-                //Debug.WriteLine(value);
-            }
-
-
-
-
+            rootKey.SetValue("AutoUploadFolder", AutoUploadFolder);
+            rootKey.SetValue("AutoUploadFolderPath", AutoUploadFolderPath);
+            rootKey.SetValue("ArchiveImports", ArchiveImports);
+            rootKey.SetValue("ArchiveImportsFolderPath", ArchiveImportsFolderPath);
+            rootKey.SetValue("DefaultImportNotes", DefaultImportNotes);
+            rootKey.SetValue("DefaultImportTitle", DefaultImportTitle);
+            rootKey.SetValue("UseDefaultImportValues", UseDefaultImportValues);
         }
 
         /*
