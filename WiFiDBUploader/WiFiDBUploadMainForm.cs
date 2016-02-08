@@ -170,31 +170,31 @@ namespace WiFiDBUploader
                 switch(value)
                 {
                     case "AutoUploadFolder":
-                        Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                    //    Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
                         AutoUploadFolder = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                     case "AutoUploadFolderPath":
-                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
                         AutoUploadFolderPath = rootKey.GetValue(value).ToString();
                         break;
                     case "ArchiveImports":
-                        Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                        //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
                         ArchiveImports = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                     case "ArchiveImportsFolderPath":
-                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
                         ArchiveImportsFolderPath = rootKey.GetValue(value).ToString();
                         break;
                     case "DefaultImportNotes":
-                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
                         DefaultImportNotes = rootKey.GetValue(value).ToString();
                         break;
                     case "DefaultImportTitle":
-                        Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
                         DefaultImportTitle = rootKey.GetValue(value).ToString();
                         break;
                     case "UseDefaultImportValues":
-                        Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                        //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
                         UseDefaultImportValues = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                 }
@@ -203,14 +203,14 @@ namespace WiFiDBUploader
             int Increment = 0;
             foreach (string subitem in ServerSubkeys.GetSubKeyNames())
             {
-                Debug.WriteLine("-------------------\n"+subitem);
+                //Debug.WriteLine("-------------------\n"+subitem);
                 Microsoft.Win32.RegistryKey ServerKey = ServerSubkeys.CreateSubKey(subitem);
 
                 ServerObj Server = new ServerObj();
-                Debug.WriteLine("ServerAddress = "+ ServerKey.GetValue("ServerAddress").ToString());
-                Debug.WriteLine("ApiPath = " + ServerKey.GetValue("ApiPath").ToString());
-                Debug.WriteLine("Username = " + ServerKey.GetValue("Username").ToString());
-                Debug.WriteLine("ApiKey = " + ServerKey.GetValue("ApiKey").ToString());
+                //Debug.WriteLine("ServerAddress = "+ ServerKey.GetValue("ServerAddress").ToString());
+                //Debug.WriteLine("ApiPath = " + ServerKey.GetValue("ApiPath").ToString());
+                //Debug.WriteLine("Username = " + ServerKey.GetValue("Username").ToString());
+                //Debug.WriteLine("ApiKey = " + ServerKey.GetValue("ApiKey").ToString());
 
                 Server.ID = Increment;
                 Server.ServerAddress = ServerKey.GetValue("ServerAddress").ToString();
@@ -364,10 +364,18 @@ namespace WiFiDBUploader
 
             if (SettingsForm.ShowDialog() == DialogResult.OK)
             {
-                this.ServerAddress = SettingsForm.ServerAddress;
-                this.ApiPath = SettingsForm.ApiPath;
-                this.Username = SettingsForm.Username;
-                this.ApiKey = SettingsForm.ApiKey;
+                ServerList = SettingsForm.ServerList;
+                this.SelectedServer = SettingsForm.SelectedServer;
+                foreach (ServerObj server in ServerList)
+                {
+                    if (server.ServerAddress.ToString().Replace("https://", "").Replace("http://", "") == SelectedServer)
+                    {
+                        this.ServerAddress = server.ServerAddress;
+                        this.ApiPath = server.ApiPath;
+                        this.Username = server.Username;
+                        this.ApiKey = server.ApiKey;
+                    }
+                }
                 this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
                 WriteSettings();
             }

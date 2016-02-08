@@ -22,14 +22,21 @@ namespace WiFiDBUploader
             }
             base.Dispose(disposing);
         }
+
         public void InitForm()
         {
             foreach (ServerObj Server in ServerList)
             {
                 Debug.WriteLine("Form Drop Down: " + Server.ServerAddress.ToString().Replace("https://", "").Replace("http://", ""));
                 this.comboBox1.Items.AddRange(new object[] { Server.ServerAddress.ToString().Replace("https://", "").Replace("http://", "") });
+                if (Server.Selected)
+                {
+                    comboBox1.SelectedIndex = comboBox1.FindStringExact(Server.ServerAddress.ToString().Replace("https://", "").Replace("http://", ""));
+                }
             }
         }
+        
+        private string _SelectedServer;
         private List<ServerObj> _ServerList;
 
         public List<ServerObj> ServerList
@@ -38,42 +45,12 @@ namespace WiFiDBUploader
             set { _ServerList = value; }
         }
 
-        private string _SelectedServer;
-        private string _ApiPath;
-        private string _Username;
-        private string _ApiKey;
-        private string _ServerAddress;
-
         public string SelectedServer
         {
             get { return _SelectedServer; }
             set { _SelectedServer = value; }
         }
-
-        public string ServerAddress
-        {
-            get { return _ServerAddress; }
-            set { _ServerAddress = value; }
-        }
-
-        public string ApiPath
-        {
-            get { return _ApiPath; }
-            set { _ApiPath = value; }
-        }
-
-        public string ApiKey
-        {
-            get { return _ApiKey; }
-            set { _ApiKey = value; }
-        }
-
-        public string Username
-        {
-            get { return _Username; }
-            set { _Username = value; }
-        }
-
+        
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -137,7 +114,7 @@ namespace WiFiDBUploader
             this.button1.TabIndex = 12;
             this.button1.Text = "+";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.AddServer_Click);
             // 
             // button2
             // 
@@ -147,6 +124,7 @@ namespace WiFiDBUploader
             this.button2.TabIndex = 13;
             this.button2.Text = "-";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.RemoveServer_Click);
             // 
             // button3
             // 
@@ -157,6 +135,7 @@ namespace WiFiDBUploader
             this.button3.TabIndex = 14;
             this.button3.Text = "Edit";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.EditServer_Click);
             // 
             // WiFiDB_Settings
             // 
@@ -172,7 +151,7 @@ namespace WiFiDBUploader
             this.Controls.Add(this.ServerSettingsCancelButton);
             this.Controls.Add(this.ServerSettingsOKButton);
             this.Name = "WiFiDB_Settings";
-            this.Text = "z";
+            this.Text = "Select Server";
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -1,6 +1,6 @@
 ﻿namespace WiFiDBUploader
 {
-    partial class AddServer
+    partial class EditServer
     {
         /// <summary>
         /// Required designer variable.
@@ -19,27 +19,43 @@
             }
             base.Dispose(disposing);
         }
-        
+
+        private string _ApiPath;
+        private string _Username;
+        private string _ApiKey;
+        private string _ServerAddress;
+
+        public void InitForm()
+        {
+            textBox1.Text = _ServerAddress;
+            textBox2.Text = _ApiPath;
+            textBox3.Text = _Username;
+            textBox4.Text = _ApiKey;
+        }
+
         public string ServerAddress
         {
             get { return textBox1.Text; }
+            set { _ServerAddress = value; }
         }
 
         public string ApiPath
         {
             get { return textBox2.Text; }
+            set { _ApiPath = value; }
         }
 
         public string ApiKey
         {
             get { return textBox4.Text; }
+            set { _ApiKey = value; }
         }
 
         public string Username
         {
             get { return textBox3.Text; }
+            set { _Username = value; }
         }
-        
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -57,8 +73,8 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.AddServerSettingsCancelButton = new System.Windows.Forms.Button();
-            this.AddServerSettingsOKButton = new System.Windows.Forms.Button();
+            this.EditSettingsCancelButton = new System.Windows.Forms.Button();
+            this.EditSettingsOKButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,7 +91,7 @@
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(607, 169);
-            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Server Details";
             // 
@@ -143,36 +159,36 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "Username";
             // 
-            // AddServerSettingsCancelButton
+            // EditSettingsCancelButton
             // 
-            this.AddServerSettingsCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.AddServerSettingsCancelButton.Location = new System.Drawing.Point(544, 187);
-            this.AddServerSettingsCancelButton.Name = "AddServerSettingsCancelButton";
-            this.AddServerSettingsCancelButton.Size = new System.Drawing.Size(75, 23);
-            this.AddServerSettingsCancelButton.TabIndex = 15;
-            this.AddServerSettingsCancelButton.Text = "Cancel";
-            this.AddServerSettingsCancelButton.UseVisualStyleBackColor = true;
+            this.EditSettingsCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.EditSettingsCancelButton.Location = new System.Drawing.Point(544, 187);
+            this.EditSettingsCancelButton.Name = "EditSettingsCancelButton";
+            this.EditSettingsCancelButton.Size = new System.Drawing.Size(75, 23);
+            this.EditSettingsCancelButton.TabIndex = 18;
+            this.EditSettingsCancelButton.Text = "Cancel";
+            this.EditSettingsCancelButton.UseVisualStyleBackColor = true;
             // 
-            // AddServerSettingsOKButton
+            // EditSettingsOKButton
             // 
-            this.AddServerSettingsOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.AddServerSettingsOKButton.Location = new System.Drawing.Point(463, 187);
-            this.AddServerSettingsOKButton.Name = "AddServerSettingsOKButton";
-            this.AddServerSettingsOKButton.Size = new System.Drawing.Size(75, 23);
-            this.AddServerSettingsOKButton.TabIndex = 14;
-            this.AddServerSettingsOKButton.Text = "OK";
-            this.AddServerSettingsOKButton.UseVisualStyleBackColor = true;
+            this.EditSettingsOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.EditSettingsOKButton.Location = new System.Drawing.Point(463, 187);
+            this.EditSettingsOKButton.Name = "EditSettingsOKButton";
+            this.EditSettingsOKButton.Size = new System.Drawing.Size(75, 23);
+            this.EditSettingsOKButton.TabIndex = 17;
+            this.EditSettingsOKButton.Text = "OK";
+            this.EditSettingsOKButton.UseVisualStyleBackColor = true;
             // 
-            // AddServer
+            // EditServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(630, 227);
+            this.ClientSize = new System.Drawing.Size(630, 225);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.AddServerSettingsCancelButton);
-            this.Controls.Add(this.AddServerSettingsOKButton);
-            this.Name = "AddServer";
-            this.Text = "AddServer";
+            this.Controls.Add(this.EditSettingsCancelButton);
+            this.Controls.Add(this.EditSettingsOKButton);
+            this.Name = "EditServer";
+            this.Text = "Edit Server";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -190,7 +206,7 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button AddServerSettingsCancelButton;
-        private System.Windows.Forms.Button AddServerSettingsOKButton;
+        private System.Windows.Forms.Button EditSettingsCancelButton;
+        private System.Windows.Forms.Button EditSettingsOKButton;
     }
 }
