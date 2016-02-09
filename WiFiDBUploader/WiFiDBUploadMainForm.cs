@@ -48,6 +48,16 @@ namespace WiFiDBUploader
 
         public WiFiDBUploadMainForm()
         {
+
+            //Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
+            WDBAPIObj = new WDBAPI.WDBAPI();
+            //Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
+
+            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
+            WDBCommonObj = new WDBCommon.WDBCommon();
+            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+
+
             //Debug.WriteLine("Start of Call: LoadSettings()");
             LoadSettings();
             //Debug.WriteLine("End of Call: LoadSettings()");
@@ -57,40 +67,13 @@ namespace WiFiDBUploader
             //Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
             //Debug.WriteLine("End of Call: InitializeComponent()");
-
-            listView1.View = View.Details;
-
-            //Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
-            WDBAPIObj = new WDBAPI.WDBAPI();
-            //Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
-
-            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
-            WDBCommonObj = new WDBCommon.WDBCommon();
-            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
-            WDBCommonObj.AutoUploadFolder = AutoUploadFolder;
-            WDBCommonObj.AutoUploadFolderPath = AutoUploadFolderPath;
-            WDBCommonObj.ArchiveImports = ArchiveImports;
-            WDBCommonObj.ArchiveImportsFolderPath = ArchiveImportsFolderPath;
-
-            WDBCommonObj.DefaultImportNotes = DefaultImportNotes;
-            WDBCommonObj.DefaultImportTitle = DefaultImportTitle;
-            WDBCommonObj.UseDefaultImportValues = UseDefaultImportValues;
-
-            WDBCommonObj.ServerAddress = ServerAddress;
-            WDBCommonObj.ApiPath = ApiPath;
-            WDBCommonObj.Username = Username;
-            WDBCommonObj.ApiKey = ApiKey;
-            WDBCommonObj.ApiCompiledPath = ApiCompiledPath;
-
-            //Debug.WriteLine("Start of Call: WDBCommonObj.initApi();");
-            WDBCommonObj.initApi();
-            //Debug.WriteLine("End of Call: WDBCommonObj.initApi();");
-
+        
+            
             //Debug.WriteLine("After initApi() - WDBCommonObj.ApiCompiledPath: " + WDBCommonObj.ApiCompiledPath);
 
             //Debug.WriteLine("Start of Call: InitTimer();");
             
-            //InitTimer();
+            InitTimer();
             
             //Debug.WriteLine("End of Call: InitTimer();");
 
@@ -109,10 +92,33 @@ namespace WiFiDBUploader
             public List<KeyValuePair<int, string>> Result { get; set; }
         }
 
+        private void InitClasses()
+        {
+            WDBCommonObj.AutoUploadFolder = AutoUploadFolder;
+            WDBCommonObj.AutoUploadFolderPath = AutoUploadFolderPath;
+            WDBCommonObj.ArchiveImports = ArchiveImports;
+            WDBCommonObj.ArchiveImportsFolderPath = ArchiveImportsFolderPath;
+
+            WDBCommonObj.DefaultImportNotes = DefaultImportNotes;
+            WDBCommonObj.DefaultImportTitle = DefaultImportTitle;
+            WDBCommonObj.UseDefaultImportValues = UseDefaultImportValues;
+
+            WDBCommonObj.ServerAddress = ServerAddress;
+            WDBCommonObj.ApiPath = ApiPath;
+            WDBCommonObj.Username = Username;
+            WDBCommonObj.ApiKey = ApiKey;
+            WDBCommonObj.ApiCompiledPath = ApiCompiledPath;
+
+            //Debug.WriteLine("Start of Call: WDBCommonObj.initApi();");
+            WDBCommonObj.initApi();
+        }
+
         private void InitTimer()
         {
             if(timer1 != null)
             {
+                Debug.WriteLine("Restart Timer 1");
+                timer1.Stop();
                 timer1.Dispose();
                 timer1 = null;
             }
@@ -125,10 +131,12 @@ namespace WiFiDBUploader
 
             if (timer2 != null)
             {
+                Debug.WriteLine("Restart Timer 2");
+                timer2.Stop();
                 timer2.Dispose();
                 timer2 = null;
             }
-
+            Debug.WriteLine(ApiKey);
             timer2 = new System.Windows.Forms.Timer();
             timer2.Tick += new EventHandler(CheckForDaemonUpdates);
             timer2.Interval = 4000; // in miliseconds
@@ -217,10 +225,28 @@ namespace WiFiDBUploader
                 Server.Username = ServerKey.GetValue("Username").ToString();
                 Server.ApiKey = ServerKey.GetValue("ApiKey").ToString();
                 Server.Selected = Convert.ToBoolean(ServerKey.GetValue("Selected"));
+
+                if(Server.Selected)
+                {
+                    ServerAddress = Server.ServerAddress;
+                    ApiPath = Server.ApiPath;
+                    Username = Server.Username;
+                    ApiKey = Server.ApiKey;
+                    ApiCompiledPath = Server.ServerAddress + Server.ApiPath;
+                }
+
                 ServerList.Add(Server);
                 Increment++;
             }
+
+            if(ServerAddress == "")
+            {
+                MessageBox.Show("There is no selected server. Go to Settings-> WiFiDB Server. Select a server from the drop down, if there is none, add one with the +");
+            }
+            //Debug.WriteLine(ServerAddress);
             ApiCompiledPath = ServerAddress + ApiPath;
+
+            InitClasses();
         }
 
         private void WriteServerSettings()
@@ -266,6 +292,8 @@ namespace WiFiDBUploader
                 Debug.WriteLine(ServerName.ServerName);
                 rootKey.DeleteSubKeyTree(ServerName.ServerName);
             }
+
+            LoadSettings();
         }
 
         private void WriteGlobalSettings()
@@ -283,6 +311,8 @@ namespace WiFiDBUploader
             rootKey.SetValue("DefaultImportNotes", DefaultImportNotes);
             rootKey.SetValue("DefaultImportTitle", DefaultImportTitle);
             rootKey.SetValue("UseDefaultImportValues", UseDefaultImportValues);
+
+            LoadSettings();
         }
 
         /*
@@ -434,6 +464,7 @@ namespace WiFiDBUploader
                 this.ApiCompiledPath = this.ServerAddress + this.ApiPath;
             }
             WriteServerSettings();
+            InitTimer();
         }
 
         private void importSettingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -795,7 +826,7 @@ namespace WiFiDBUploader
                         //Debug.WriteLine(items_err[0]);
                         //Debug.WriteLine(SplitData[0]);
                         //Debug.WriteLine(SplitData[1]);
-                        MessageBox.Show(e.UserState.ToString());
+                        Debug.WriteLine( e.UserState.ToString() );
                     }
                     break;
 

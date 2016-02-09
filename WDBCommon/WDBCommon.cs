@@ -38,6 +38,7 @@ namespace WDBCommon
             WDBAPIObj.Username = Username;
             WDBAPIObj.DefaultImportTitle = DefaultImportTitle;
             WDBAPIObj.DefaultImportNotes = DefaultImportNotes;
+            WDBAPIObj.UseDefaultImportValues = UseDefaultImportValues;
         }
 
         public void GetHashStatus(string query, BackgroundWorker BgWk)
@@ -48,6 +49,7 @@ namespace WDBCommon
 
         public void GetDaemonStatuses(string query, BackgroundWorker BgWk)
         {
+            Debug.WriteLine("Active Server: " + WDBAPIObj.ApiCompiledPath);
             BgWk.ReportProgress(0, "");
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetDaemonStatuses(query)));
         }
