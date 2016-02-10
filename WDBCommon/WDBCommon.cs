@@ -170,7 +170,7 @@ namespace WDBCommon
             if(IsFileImported(hashish) == 1)
             {
                 BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
-                response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes,));
+                response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes));
                 BW.ReportProgress(0, response);
                 //Debug.WriteLine(responses.Last().Value.ToString());
             }else
