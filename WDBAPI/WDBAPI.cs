@@ -132,7 +132,7 @@ namespace WDBAPI
             return response;
         }
 
-        public string ApiImportFile(string UploadFile)
+        public string ApiImportFile(string UploadFile, string ImportTitle, string ImportNotes)
         {
             //Debug.WriteLine(ApiCompiledPath + "import.php  ---- Import File.");
             string response;
@@ -150,10 +150,12 @@ namespace WDBAPI
                     hashBytes = md5.ComputeHash(inputFileStream);
                     hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                 }
-                this.parameters.Add("title", DefaultImportTitle);
+
+
+                this.parameters.Add("title", ImportTitle);
+                this.parameters.Add("notes", ImportNotes);
 
                 //parameters.Add("otherusers", "");
-                this.parameters.Add("notes", DefaultImportNotes);
                 this.parameters.Add("hash", hashish);
                 client.QueryString = this.parameters;
                 var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);

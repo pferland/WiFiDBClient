@@ -97,6 +97,14 @@ namespace WiFiDBUploader
             }
         }
 
+        public void WriteLog(string message)
+        {
+            string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" +"[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
+            System.IO.StreamWriter file = new System.IO.StreamWriter(".\\logs\\Trace.log", true);
+            file.WriteLine(line);
+            file.Close();
+        }
+
         private void InitClasses()
         {
             WDBCommonObj.AutoUploadFolder = AutoUploadFolder;
@@ -422,6 +430,8 @@ namespace WiFiDBUploader
 
         private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string ImportTitle;
+            string ImportNotes;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
             openFileDialog1.InitialDirectory = "c:\\";
@@ -433,7 +443,17 @@ namespace WiFiDBUploader
             {
                 try
                 {
-                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
+                    if(UseDefaultImportValues)
+                    {
+                        ImportTitle = DefaultImportTitle;
+                        ImportNotes = DefaultImportNotes;
+                    }else
+                    {
+                        //Ask For Import Title and Notes. They dont want to use the defaults.
+                        ImportTitle = "Temp Title";
+                        ImportNotes = "Temp Notes";
+                    }
+                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName, ImportTitle, ImportNotes);
                     WDBAPIObj.ParseApiResponse(response);
                 }
                 catch (Exception ex)
@@ -582,7 +602,7 @@ namespace WiFiDBUploader
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
-            ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(args.Query, backgroundWorker) ) ) ;
+            ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(args.Query, DefaultImportTitle, DefaultImportNotes, backgroundWorker) ) ) ;
             e.Result = args.Result;
         }
 

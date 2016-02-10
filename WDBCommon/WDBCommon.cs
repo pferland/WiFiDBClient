@@ -75,7 +75,7 @@ namespace WDBCommon
             
         }
 
-        public List<KeyValuePair<int, string>> ImportFolder(string Path, BackgroundWorker BW)
+        public List<KeyValuePair<int, string>> ImportFolder(string Path, string ImportTitle, string ImportNotes, BackgroundWorker BW)
         {
             var responses = new List<KeyValuePair<int, string>>();
             try
@@ -84,129 +84,77 @@ namespace WDBCommon
                 string hashish;
                 var md5 = MD5.Create();
 
-                // IMPORT ALL VS1 FILES.
-                string[] vs1s = Directory.GetFiles(Path, "*.vs1");
-                //Debug.WriteLine("The number of VS1 files: {0}.", vs1s.Length);
-                if(vs1s.Length > 0)
-                {
-                    foreach (string vs1 in vs1s)
-                    {
-                        InternalImportID++;
-                        //Debug.WriteLine(vs1);
-                        using (var inputFileStream = File.Open(vs1, FileMode.Open))
-                        {
-                            hashBytes = md5.ComputeHash(inputFileStream);
-                            hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
-                        }
-                        if(IsFileImported(hashish) == 1)
-                        {
-                            BW.ReportProgress(0, "newrow|~|" + vs1 + "|~|" + hashish);
-                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(vs1))));
-                            BW.ReportProgress(0, responses.Last().Value.ToString());
-                            //Debug.WriteLine(responses.Last().Value.ToString());
-                        }
-                        else
-                        {
-                            //Debug.WriteLine("-------------> File " + vs1 + " Already Imported.");
-                        }
-                    }
-                }
+                string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
 
-                // IMPORT ALL VSZ FILES.
-                string[] vszs = Directory.GetFiles(Path, "*.vsz");
-                //Debug.WriteLine("The number of VSZ files: {0}.", vszs.Length);
-                if (vszs.Length > 0)
+                // Loop through the file extension types, find them in the provided folder, then import it.
+                foreach (string ext in extensions)
                 {
-                    foreach (string vsz in vszs)
+                    Debug.WriteLine("Extension that will be used: " + ext);
+                    string[] files = Directory.GetFiles(Path, ext);
+                    //Debug.WriteLine("The number of VS1 files: {0}.", files.Length);
+                    if (files.Length > 0)
                     {
-                        InternalImportID++;
-                        //Debug.WriteLine(vsz);
-                        using (var inputFileStream = File.Open(vsz, FileMode.Open))
+                        foreach (string file in files)
                         {
-                            hashBytes = md5.ComputeHash(inputFileStream);
-                            hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
-                        }
-                        if (IsFileImported(hashish) == 1)
-                        {
+                            InternalImportID++;
+                            //Debug.WriteLine(file);
+                            using(var inputFileStream = File.Open(file, FileMode.Open))
+                            {
+                                hashBytes = md5.ComputeHash(inputFileStream);
+                                hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+                            }
 
-                            BW.ReportProgress(0, "newrow|~|" + vsz + "|~|" + hashish);
-                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(vsz))));
-                            BW.ReportProgress(0, responses.Last().Value.ToString());
-                            //Debug.WriteLine(responses.Last().Value.ToString());
-                        }else
-                        {
-                            //Debug.WriteLine("-------------> File " + vsz + " Already Imported.");
-                        }
-                    }
-                }
-                
-                // IMPORT ALL CSV FILES.
-                string[] csvs = Directory.GetFiles(Path, "*.csv");
-                //Debug.WriteLine("The number of CSV files: {0}.", csvs.Length);
-                if (csvs.Length > 0)
-                {
-                    foreach (string csv in csvs)
-                    {
-                        InternalImportID++;
-                        //Debug.WriteLine(csv);
-                        using (var inputFileStream = File.Open(csv, FileMode.Open))
-                        {
-                            hashBytes = md5.ComputeHash(inputFileStream);
-                            hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
-                        }
-                        if (IsFileImported(hashish) == 1)
-                        {
+                            if (IsFileImported(hashish) == 1)
+                            {
+                                BW.ReportProgress(0, "newrow|~|" + file + "|~|" + hashish);
+                                responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(file, ImportTitle, ImportNotes ))));
+                                BW.ReportProgress(0, responses.Last().Value.ToString());
 
-                            BW.ReportProgress(0, "newrow|~|" + csv + "|~|" + hashish);
-                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(csv))));
-                            BW.ReportProgress(0, responses.Last().Value.ToString());
-                            //Debug.WriteLine(responses.Last().Value.ToString());
-                        }
-                        else
-                        {
-                            //Debug.WriteLine("-------------> File " + csv + " Already Imported.");
-                        }
-                    }
-                }
-                
-                // IMPORT ALL WarDrive 4 Android db3 FILES.
-                string[] db3s = Directory.GetFiles(Path, "*.db3");
-                //Debug.WriteLine("The number of db3 files: {0}.", db3s.Length);
-                if (db3s.Length > 0)
-                {
-                    foreach (string db3 in db3s)
-                    {
-                        InternalImportID++;
-                        //Debug.WriteLine(db3);
-                        using (var inputFileStream = File.Open(db3, FileMode.Open))
-                        {
-                            hashBytes = md5.ComputeHash(inputFileStream);
-                            hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
-                        }
-                        if (IsFileImported(hashish) == 1)
-                        {
-
-                            BW.ReportProgress(0, "newrow|~|" + db3 + "|~|" + hashish);
-                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(db3))));
-                            BW.ReportProgress(0, responses.Last().Value.ToString());
-                            //Debug.WriteLine(responses.Last().Value.ToString());
-                        }
-                        else
-                        {
-                            //Debug.WriteLine("-------------> File " + db3 + " Already Imported.");
+                                ArchiveImportedFile(file);
+                                //Debug.WriteLine(responses.Last().Value.ToString());
+                            }
+                            else
+                            {
+                                Debug.WriteLine("-------------> File " + file + " Already Imported.");
+                            }
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                //Debug.WriteLine("The process failed: {0}", e.ToString());
+                Debug.WriteLine("The process failed: {0}", e.ToString());
             }
             return responses;
         }
 
+        private void ArchiveImportedFile(string FilePath)
+        {
+            if(ArchiveImports && (ArchiveImportsFolderPath != "" || ArchiveImportsFolderPath != null) )
+            {
+                try
+                {
+                    string FileName = Path.GetFileName(FilePath);
 
-        public string ImportFile(string FilePath, BackgroundWorker BW)
+                    string ArchivedFile = ArchiveImportsFolderPath + "\\" + FileName;
+
+                    File.Move(FilePath, ArchivedFile);
+                    Debug.WriteLine("{0} was moved to {1}.", FilePath, ArchivedFile);
+                    
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("The process failed: {0}", e.ToString());
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Archve Imported Files is disabled.");
+            }
+        }
+
+
+        public string ImportFile(string FilePath, string ImportTitle, string ImportNotes, BackgroundWorker BW)
         {
             string response;
             byte[] hashBytes;
@@ -219,13 +167,16 @@ namespace WDBCommon
                 hashBytes = md5.ComputeHash(inputFileStream);
                 hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
             }
-            IsFileImported(hashish);
-
-            BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
-            response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath));
-            BW.ReportProgress(0, response);
-            //Debug.WriteLine(responses.Last().Value.ToString());
-
+            if(IsFileImported(hashish) == 1)
+            {
+                BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
+                response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes,));
+                BW.ReportProgress(0, response);
+                //Debug.WriteLine(responses.Last().Value.ToString());
+            }else
+            {
+                response = "File is already imported.";
+            }
             return response;
         }
     }

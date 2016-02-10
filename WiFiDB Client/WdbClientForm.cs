@@ -60,8 +60,9 @@ namespace WiFiDB_Uploader
             {
                 try
                 {
-                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName);
-                    WDBAPIObj.ParseApiResponse(response);
+                    //if()
+                    //string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName, ImportTitle, ImportNotes);
+                    //WDBAPIObj.ParseApiResponse(response);
                 }
                 catch (Exception ex)
                 {
