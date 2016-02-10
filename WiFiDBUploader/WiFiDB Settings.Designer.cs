@@ -27,7 +27,7 @@ namespace WiFiDBUploader
         {
             foreach (ServerObj Server in ServerList)
             {
-                Debug.WriteLine("Form Drop Down: " + Server.ServerAddress.ToString().Replace("https://", "").Replace("http://", ""));
+                //Debug.WriteLine("Form Drop Down: " + Server.ServerAddress.ToString().Replace("https://", "").Replace("http://", ""));
                 this.comboBox1.Items.AddRange(new object[] { Server.ServerAddress.ToString().Replace("https://", "").Replace("http://", "") });
                 if (Server.Selected)
                 {

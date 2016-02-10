@@ -51,7 +51,7 @@ namespace WiFiDBUploader
         private void RemoveServer_Click(object sender, EventArgs e)
         {
             int RemoveIndex = ServerList.FindIndex(ServerList => ServerList.ServerAddress.ToString().Replace("https://", "").Replace("http://", "").Equals(_SelectedServer, StringComparison.Ordinal));
-            Debug.WriteLine("Remove Server From List, Index: " + RemoveIndex.ToString()  );
+            //Debug.WriteLine("Remove Server From List, Index: " + RemoveIndex.ToString()  );
             ServerList.RemoveAt(RemoveIndex);
             this.comboBox1.Items.Remove(_SelectedServer);
         }
@@ -60,7 +60,7 @@ namespace WiFiDBUploader
         {
             EditServer EditServerForm = new EditServer();
 
-            Debug.WriteLine("Server out: " + ServerList[0].ServerAddress.ToString());
+            //Debug.WriteLine("Server out: " + ServerList[0].ServerAddress.ToString());
 
             foreach(ServerObj server in ServerList)
             {

@@ -30,7 +30,7 @@ namespace WDBAPI
 
         public string ApiGetWaitingImports()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Waiting");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Waiting");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -44,14 +44,14 @@ namespace WDBAPI
                 response = Encoding.ASCII.GetString(responseBytes);
                 //Debug.WriteLine(response);
             }
-            Debug.WriteLine("End Function Call: Get Waiting.");
+            //Debug.WriteLine("End Function Call: Get Waiting.");
             return response;
         }
 
 
         public string ApiGetFinishedImports()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Finished");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Finished");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -64,14 +64,14 @@ namespace WDBAPI
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            Debug.WriteLine("End Function Call: Get Finished.");
+            //Debug.WriteLine("End Function Call: Get Finished.");
             return response;
         }
 
 
         public string ApiGetBadIports()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Bad Imports.");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Bad Imports.");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -84,14 +84,14 @@ namespace WDBAPI
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            Debug.WriteLine("End Function Call: Get Bad Imports.");
+            //Debug.WriteLine("End Function Call: Get Bad Imports.");
             return response;
         }
 
 
         public string ApiGetCurrentImporting()
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Current Imports.");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Current Imports.");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -104,14 +104,14 @@ namespace WDBAPI
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            Debug.WriteLine("End Function Call: Get Current Imports.");
+            //Debug.WriteLine("End Function Call: Get Current Imports.");
             return response;
         }
         
 
         public string ApiGetDaemonStatuses(string query)
         {
-            Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Daemon Stats");
+            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Daemon Stats");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -128,13 +128,13 @@ namespace WDBAPI
                 var responseBytes = client.UploadValues(ApiCompiledPath+"schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            Debug.WriteLine("End Function Call: Get Daemon Stats.");
+            //Debug.WriteLine("End Function Call: Get Daemon Stats.");
             return response;
         }
 
-        public string ApiImportFile(string UploadFile, bool CheckHash = false)
+        public string ApiImportFile(string UploadFile)
         {
-            Debug.WriteLine(ApiCompiledPath + "import.php  ---- Import File.");
+            //Debug.WriteLine(ApiCompiledPath + "import.php  ---- Import File.");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -159,27 +159,28 @@ namespace WDBAPI
                 var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);
                 response = Encoding.ASCII.GetString(responseBytes);
 
-                Debug.WriteLine("End Function Call: Import File.");
+                //Debug.WriteLine("End Function Call: Import File.");
+                //Debug.WriteLine("Response: " + response);
                 return response;
             }
         }
 
         private void InitParameters()
         {
-            Debug.WriteLine("Start Function Call: Init Params.");
+            //Debug.WriteLine("Start Function Call: Init Params.");
             this.parameters = new NameValueCollection();
 
             this.parameters.Add("output", "xml");
             this.parameters.Add("username", Username);
             this.parameters.Add("apikey", ApiKey);
             
-            Debug.WriteLine("InitParameters ApiKey: " + ApiKey);
-            Debug.WriteLine("End Function Call: Init Params.");
+            //Debug.WriteLine("InitParameters ApiKey: " + ApiKey);
+            //Debug.WriteLine("End Function Call: Init Params.");
         }
         
         public string CheckFileHash(string FileHash)
         {
-            Debug.WriteLine("Start Function Call: Check File Hash.");
+            //Debug.WriteLine("Start Function Call: Check File Hash.");
             string response;
             using (WebClient client = new WebClient())
             {
@@ -191,13 +192,13 @@ namespace WDBAPI
                 var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            Debug.WriteLine("End Function Call: Check File Hash.");
+            //Debug.WriteLine("End Function Call: Check File Hash.");
             return response;
         }
 
         public string ParseApiResponse( string response )
         {
-            Debug.WriteLine("Start Function Call: Parse API Response.");
+            //Debug.WriteLine("Start Function Call: Parse API Response.");
             string ret = "";
             if(response == "")
             {
@@ -305,7 +306,7 @@ namespace WDBAPI
                     break;
             }
             ////Debug.WriteLine(ret);
-            Debug.WriteLine("End Function Call: Parse API Response.");
+            //Debug.WriteLine("End Function Call: Parse API Response.");
             return ret;
         }
     }

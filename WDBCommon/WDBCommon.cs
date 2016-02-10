@@ -33,12 +33,14 @@ namespace WDBCommon
 
         public void initApi()
         {
+            //Debug.WriteLine("Start Function Call: Init API.");
             WDBAPIObj.ApiCompiledPath = ApiCompiledPath;
             WDBAPIObj.ApiKey = ApiKey;
             WDBAPIObj.Username = Username;
             WDBAPIObj.DefaultImportTitle = DefaultImportTitle;
             WDBAPIObj.DefaultImportNotes = DefaultImportNotes;
             WDBAPIObj.UseDefaultImportValues = UseDefaultImportValues;
+            //Debug.WriteLine("End Function Call: Init API.");
         }
 
         public void GetHashStatus(string query, BackgroundWorker BgWk)
@@ -47,9 +49,23 @@ namespace WDBCommon
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query)));
         }
 
+        public int IsFileImported(string query)
+        {
+            string response = WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query));
+            //Debug.WriteLine( "IsFileImported Response: " + response );
+
+            if(response == "")
+            {
+                return 1;
+            }else
+            {
+                return 0;
+            }
+        }
+
         public void GetDaemonStatuses(string query, BackgroundWorker BgWk)
         {
-            Debug.WriteLine("Active Server: " + WDBAPIObj.ApiCompiledPath);
+            //Debug.WriteLine("Active Server: " + WDBAPIObj.ApiCompiledPath);
             BgWk.ReportProgress(0, "");
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetDaemonStatuses(query)));
         }
@@ -64,7 +80,6 @@ namespace WDBCommon
             var responses = new List<KeyValuePair<int, string>>();
             try
             {
-
                 byte[] hashBytes;
                 string hashish;
                 var md5 = MD5.Create();
@@ -83,10 +98,17 @@ namespace WDBCommon
                             hashBytes = md5.ComputeHash(inputFileStream);
                             hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                         }
-                        BW.ReportProgress(0, "newrow|~|" + vs1 + "|~|" + hashish);
-                        responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(vs1) ) ) );
-                        BW.ReportProgress(0, responses.Last().Value.ToString());
-                        //Debug.WriteLine(responses.Last().Value.ToString());
+                        if(IsFileImported(hashish) == 1)
+                        {
+                            BW.ReportProgress(0, "newrow|~|" + vs1 + "|~|" + hashish);
+                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(vs1))));
+                            BW.ReportProgress(0, responses.Last().Value.ToString());
+                            //Debug.WriteLine(responses.Last().Value.ToString());
+                        }
+                        else
+                        {
+                            //Debug.WriteLine("-------------> File " + vs1 + " Already Imported.");
+                        }
                     }
                 }
 
@@ -104,11 +126,17 @@ namespace WDBCommon
                             hashBytes = md5.ComputeHash(inputFileStream);
                             hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                         }
+                        if (IsFileImported(hashish) == 1)
+                        {
 
-                        BW.ReportProgress(0, "newrow|~|" + vsz + "|~|" + hashish);
-                        responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ApiImportFile(vsz)));
-                        BW.ReportProgress(0, responses.Last().Value.ToString());
-                        //Debug.WriteLine(responses.Last().Value.ToString());
+                            BW.ReportProgress(0, "newrow|~|" + vsz + "|~|" + hashish);
+                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(vsz))));
+                            BW.ReportProgress(0, responses.Last().Value.ToString());
+                            //Debug.WriteLine(responses.Last().Value.ToString());
+                        }else
+                        {
+                            //Debug.WriteLine("-------------> File " + vsz + " Already Imported.");
+                        }
                     }
                 }
                 
@@ -126,10 +154,18 @@ namespace WDBCommon
                             hashBytes = md5.ComputeHash(inputFileStream);
                             hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                         }
-                        BW.ReportProgress(0, "newrow|~|" + csv + "|~|" + hashish);
-                        responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ApiImportFile(csv)));
-                        BW.ReportProgress(0, responses.Last().Value.ToString());
-                        //Debug.WriteLine(responses.Last().Value.ToString());
+                        if (IsFileImported(hashish) == 1)
+                        {
+
+                            BW.ReportProgress(0, "newrow|~|" + csv + "|~|" + hashish);
+                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(csv))));
+                            BW.ReportProgress(0, responses.Last().Value.ToString());
+                            //Debug.WriteLine(responses.Last().Value.ToString());
+                        }
+                        else
+                        {
+                            //Debug.WriteLine("-------------> File " + csv + " Already Imported.");
+                        }
                     }
                 }
                 
@@ -147,10 +183,18 @@ namespace WDBCommon
                             hashBytes = md5.ComputeHash(inputFileStream);
                             hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
                         }
-                        BW.ReportProgress(0, "newrow|~|" + db3 + "|~|" + hashish);
-                        responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ApiImportFile(db3)));
-                        BW.ReportProgress(0, responses.Last().Value.ToString());
-                        //Debug.WriteLine(responses.Last().Value.ToString());
+                        if (IsFileImported(hashish) == 1)
+                        {
+
+                            BW.ReportProgress(0, "newrow|~|" + db3 + "|~|" + hashish);
+                            responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(db3))));
+                            BW.ReportProgress(0, responses.Last().Value.ToString());
+                            //Debug.WriteLine(responses.Last().Value.ToString());
+                        }
+                        else
+                        {
+                            //Debug.WriteLine("-------------> File " + db3 + " Already Imported.");
+                        }
                     }
                 }
             }
@@ -161,10 +205,28 @@ namespace WDBCommon
             return responses;
         }
 
-        public string ImportFile(string FilePath)
+
+        public string ImportFile(string FilePath, BackgroundWorker BW)
         {
-            WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath));
-            return "return";
+            string response;
+            byte[] hashBytes;
+            string hashish;
+            var md5 = MD5.Create();
+            InternalImportID++;
+            //Debug.WriteLine(db3);
+            using (var inputFileStream = File.Open(FilePath, FileMode.Open))
+            {
+                hashBytes = md5.ComputeHash(inputFileStream);
+                hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+            }
+            IsFileImported(hashish);
+
+            BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
+            response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath));
+            BW.ReportProgress(0, response);
+            //Debug.WriteLine(responses.Last().Value.ToString());
+
+            return response;
         }
     }
 }

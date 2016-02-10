@@ -19,8 +19,8 @@ namespace WiFiDBUploader
 {
     public partial class WiFiDBUploadMainForm : Form
     {
-        WDBAPI.WDBAPI WDBAPIObj;
-        WDBCommon.WDBCommon WDBCommonObj;
+        private WDBAPI.WDBAPI WDBAPIObj;
+        private WDBCommon.WDBCommon WDBCommonObj;
         private int NextID = 0;
         private int ImportInternalID = 0;
         private List<KeyValuePair<int, string>> ImportIDs;
@@ -46,39 +46,6 @@ namespace WiFiDBUploader
         private string ApiKey;
         private string ApiCompiledPath;
 
-        public WiFiDBUploadMainForm()
-        {
-
-            //Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
-            WDBAPIObj = new WDBAPI.WDBAPI();
-            //Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
-
-            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
-            WDBCommonObj = new WDBCommon.WDBCommon();
-            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
-
-
-            //Debug.WriteLine("Start of Call: LoadSettings()");
-            LoadSettings();
-            //Debug.WriteLine("End of Call: LoadSettings()");
-
-            //Debug.WriteLine(ServerAddress);
-
-            //Debug.WriteLine("Start of Call: InitializeComponent()");
-            InitializeComponent();
-            //Debug.WriteLine("End of Call: InitializeComponent()");
-        
-            
-            //Debug.WriteLine("After initApi() - WDBCommonObj.ApiCompiledPath: " + WDBCommonObj.ApiCompiledPath);
-
-            //Debug.WriteLine("Start of Call: InitTimer();");
-            
-            InitTimer();
-            
-            //Debug.WriteLine("End of Call: InitTimer();");
-
-        }
-
         private struct QueryArguments
         {
             public QueryArguments(int QueryID, string Query)
@@ -90,6 +57,44 @@ namespace WiFiDBUploader
             public int QueryID { get; set; }
             public string Query { get; set; }
             public List<KeyValuePair<int, string>> Result { get; set; }
+        }
+
+        public WiFiDBUploadMainForm()
+        {
+            //Debug.WriteLine("Start of Call: new WDBAPI.WDBAPI();");
+            WDBAPIObj = new WDBAPI.WDBAPI();
+            //Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
+
+            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
+            WDBCommonObj = new WDBCommon.WDBCommon();
+            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+            
+            //Debug.WriteLine("Start of Call: LoadSettings()");
+            LoadSettings();
+            //Debug.WriteLine("End of Call: LoadSettings()");
+
+            //Debug.WriteLine("Start of Call: InitializeComponent()");
+            InitializeComponent();
+            //Debug.WriteLine("End of Call: InitializeComponent()");
+
+            //Debug.WriteLine("Start of Call: InitTimer();");
+//            InitTimer();
+            //Debug.WriteLine("End of Call: InitTimer();");
+
+            //Debug.WriteLine("Start of Call: AutoUploadCheck();");
+            AutoUploadCheck();
+            //Debug.WriteLine("End of Call: AutoUploadCheck();");
+        }
+
+        private void AutoUploadCheck()
+        {
+            if(AutoUploadFolder == true && SelectedServer != null)
+            {
+                StartFolderImport(AutoUploadFolderPath);
+            }else
+            {
+                //Debug.WriteLine("Auto Upload Disabled, or No Server Selected.");
+            }
         }
 
         private void InitClasses()
@@ -115,33 +120,41 @@ namespace WiFiDBUploader
 
         private void InitTimer()
         {
-            if(timer1 != null)
+            if (ApiCompiledPath != null)
             {
-                Debug.WriteLine("Restart Timer 1");
-                timer1.Stop();
-                timer1.Dispose();
-                timer1 = null;
+                //Debug.WriteLine("Not running background threads till there is a server selected. whats the point if there is no server?");
             }
-            timer1 = new System.Windows.Forms.Timer();
-            timer1.Tick += new EventHandler(CheckForUpdates);
-            timer1.Interval = 10000; // in miliseconds
-            timer1.Start();
-            
-            StartGetDaemonStats(); //prep the tables.
+            else
+            {
+                if (timer1 != null)
+                {
+                    //Debug.WriteLine("Stopping Import update background thread.");
+                    timer1.Stop();
+                    timer1.Dispose();
+                    timer1 = null;
+                }
+                //Debug.WriteLine("Starting Import update background thread.");
+                timer1 = new System.Windows.Forms.Timer();
+                timer1.Tick += new EventHandler(CheckForUpdates);
+                timer1.Interval = 10000; // in miliseconds
+                timer1.Start();
 
-            if (timer2 != null)
-            {
-                Debug.WriteLine("Restart Timer 2");
-                timer2.Stop();
-                timer2.Dispose();
-                timer2 = null;
+                StartGetDaemonStats(); //prep the tables.
+
+                if (timer2 != null)
+                {
+                    //Debug.WriteLine("Stopping Daemon update background thread.");
+                    //Debug.WriteLine("Restart Timer 2");
+                    timer2.Stop();
+                    timer2.Dispose();
+                    timer2 = null;
+                }
+                //Debug.WriteLine("Starting Daemon update background thread.");
+                timer2 = new System.Windows.Forms.Timer();
+                timer2.Tick += new EventHandler(CheckForDaemonUpdates);
+                timer2.Interval = 4000; // in miliseconds
+                timer2.Start();
             }
-            Debug.WriteLine(ApiKey);
-            timer2 = new System.Windows.Forms.Timer();
-            timer2.Tick += new EventHandler(CheckForDaemonUpdates);
-            timer2.Interval = 4000; // in miliseconds
-            timer2.Start();
-            
         }
 
         private void CreateRegistryKeys(Microsoft.Win32.RegistryKey rootKey)
@@ -165,7 +178,7 @@ namespace WiFiDBUploader
             string[] SubKeys = rootKey.GetSubKeyNames();
             if (SubKeys.Count() == 0)
             {
-                Debug.WriteLine("Servers SubKey not found, creating Default Structure.");
+                //Debug.WriteLine("Servers SubKey not found, creating Default Structure.");
                 CreateRegistryKeys(rootKey);
             }
             Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
@@ -177,7 +190,7 @@ namespace WiFiDBUploader
                 switch(value)
                 {
                     case "AutoUploadFolder":
-                    //    Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                    //    //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
                         AutoUploadFolder = Convert.ToBoolean(rootKey.GetValue(value));
                         break;
                     case "AutoUploadFolderPath":
@@ -228,24 +241,23 @@ namespace WiFiDBUploader
 
                 if(Server.Selected)
                 {
-                    ServerAddress = Server.ServerAddress;
-                    ApiPath = Server.ApiPath;
-                    Username = Server.Username;
-                    ApiKey = Server.ApiKey;
+                    ServerAddress = Server.ServerAddress.ToString();
+                    SelectedServer = ServerAddress.Replace("https://", "").Replace("http://", "");
+                    ApiPath = Server.ApiPath.ToString();
+                    Username = Server.Username.ToString();
+                    ApiKey = Server.ApiKey.ToString();
                     ApiCompiledPath = Server.ServerAddress + Server.ApiPath;
                 }
-
                 ServerList.Add(Server);
                 Increment++;
             }
+            
 
-            if(ServerAddress == "")
+            if (ServerAddress == null)
             {
                 MessageBox.Show("There is no selected server. Go to Settings-> WiFiDB Server. Select a server from the drop down, if there is none, add one with the +");
             }
-            //Debug.WriteLine(ServerAddress);
-            ApiCompiledPath = ServerAddress + ApiPath;
-
+            
             InitClasses();
         }
 
@@ -260,7 +272,7 @@ namespace WiFiDBUploader
             List<ServerNameObj> VarNameList = new List<ServerNameObj>();
             foreach (ServerObj server in ServerList)
             {
-                Debug.WriteLine(server.ServerAddress);
+                //Debug.WriteLine(server.ServerAddress);
 
                 Microsoft.Win32.RegistryKey ServerKey = rootKey.CreateSubKey( server.ServerAddress.ToString().Replace("https://", "").Replace("http://", "") );
                 ServerKey.SetValue("ServerAddress", server.ServerAddress);
@@ -286,10 +298,10 @@ namespace WiFiDBUploader
             }
             
             var list3 = RegNameList.Except(VarNameList, new IdComparer()).ToList();
-            Debug.WriteLine("Servers not in the list now:");
+            //Debug.WriteLine("Servers not in the list now:");
             foreach(ServerNameObj ServerName in list3)
             {
-                Debug.WriteLine(ServerName.ServerName);
+                //Debug.WriteLine(ServerName.ServerName);
                 rootKey.DeleteSubKeyTree(ServerName.ServerName);
             }
 
@@ -314,6 +326,9 @@ namespace WiFiDBUploader
 
             LoadSettings();
         }
+
+
+
 
         /*
             Background init Funtions.
@@ -399,6 +414,8 @@ namespace WiFiDBUploader
         }
 
         
+
+
         //
         // Menu Click Function Items
         //
@@ -486,7 +503,7 @@ namespace WiFiDBUploader
         private void autoSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Auto_Upload_Settings AutoForm = new Auto_Upload_Settings();
-            Debug.WriteLine(AutoUploadFolder);
+            //Debug.WriteLine(AutoUploadFolder);
             AutoForm.AutoUploadFolder = AutoUploadFolder;
             AutoForm.AutoUploadFolderPath = AutoUploadFolderPath;
             AutoForm.ArchiveImports = ArchiveImports;
@@ -565,7 +582,7 @@ namespace WiFiDBUploader
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
-            ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(args.Query) ) ) ;
+            ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(args.Query, backgroundWorker) ) ) ;
             e.Result = args.Result;
         }
 
@@ -589,7 +606,7 @@ namespace WiFiDBUploader
             string ImportID = "";
             string filehash = "";
 
-            //Debug.WriteLine(split[0]);
+            Debug.WriteLine( e.UserState.ToString() );
 
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
@@ -600,7 +617,9 @@ namespace WiFiDBUploader
                     //Debug.WriteLine(split[1]);
                     FileInfo f2 = new FileInfo(split[1]);
 
-                    string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd"), f2.Length.ToString(), split[1], split[2], "", "Uploading File to WiFiDB...", "Uploading" };
+                    string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd    HH:mm:ss"), f2.Length.ToString(), split[1], split[2], "", "Uploading File to WiFiDB...", "Uploading" };
+                    Debug.WriteLine("\n------------------\n------------------\nNew ROW: " + "" + " |=| " + "pferland" + " |=| " + "" + " |=| " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " |=| " + f2.Length.ToString() + " |=| " + split[1] + " |=| " + split[2] + " |=| " + "" + " |=| " + "Uploading File to WiFiDB..." + " |=| " + "Uploading" + " \n------------------\n------------------\n");
+
                     var listViewItemNew = new ListViewItem(row);
                     listView1.Items.Add(listViewItemNew);
                     break;
@@ -653,13 +672,15 @@ namespace WiFiDBUploader
                     //Debug.WriteLine(filehash);
 
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
-
-                    //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
-                    listViewItem.SubItems[0].Text = ImportID;
-                    listViewItem.SubItems[1].Text = user;
-                    listViewItem.SubItems[2].Text = title;
-                    listViewItem.SubItems[7].Text = message;
-                    listViewItem.SubItems[8].Text = "Waiting";
+                    if(user != "")
+                    {
+                        Debug.WriteLine("\n------------------\n------------------\nUpdate ROW: " + ImportID.ToString() + " |=| " + user + " |=| " + title + " |=| " + message + " |=| " + "Waiting" + "\n------------------\n------------------\n");
+                        listViewItem.SubItems[0].Text = ImportID;
+                        listViewItem.SubItems[1].Text = user;
+                        listViewItem.SubItems[2].Text = title;
+                        listViewItem.SubItems[7].Text = message;
+                        listViewItem.SubItems[8].Text = "Waiting";
+                    }
                     break;
             }
             ////Debug.WriteLine(e.ProgressPercentage.ToString());
@@ -768,7 +789,7 @@ namespace WiFiDBUploader
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
                     if( (status == "finished") || ( (ImportID != "") && (message != "") ) )
                     {
-                        //Debug.WriteLine(listViewItem.SubItems[1].Text + " ==== " + listViewItem.SubItems.Count);
+                        Debug.WriteLine("\n------------------\n------------------\nUpdate ROW: " + ImportID.ToString() + " |=| " + user + " |=| " + title + " |=| " + message + " |=| " + status + "\n------------------\n------------------\n");
                         listViewItem.SubItems[0].Text = ImportID;
                         listViewItem.SubItems[1].Text = user;
                         listViewItem.SubItems[2].Text = title;
@@ -826,7 +847,7 @@ namespace WiFiDBUploader
                         //Debug.WriteLine(items_err[0]);
                         //Debug.WriteLine(SplitData[0]);
                         //Debug.WriteLine(SplitData[1]);
-                        Debug.WriteLine( e.UserState.ToString() );
+                        //Debug.WriteLine( e.UserState.ToString() );
                     }
                     break;
 
