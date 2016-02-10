@@ -133,6 +133,10 @@
       <Project>{f4741ebc-a256-4924-b760-d990ef40e825}</Project>
       <Name>WDBCommon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WDBSQLite\WDBSQLite.csproj">
+      <Project>{e9922033-2239-43a7-8e31-bace98a0340e}</Project>
+      <Name>WDBSQLite</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

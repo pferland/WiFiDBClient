@@ -1,31 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using WDBAPI;
-using WDBCommon;
-using System.Collections.Specialized;
 
 namespace WiFiDBUploader
 {
     public partial class WiFiDBUploadMainForm : Form
     {
+        private WDBSQLite.WDBSQLite WDBSQLObj;
         private WDBAPI.WDBAPI WDBAPIObj;
         private WDBCommon.WDBCommon WDBCommonObj;
         private int NextID = 0;
         private int ImportInternalID = 0;
         private List<KeyValuePair<int, string>> ImportIDs;
-        private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Timer timer2;
+        private Timer timer1;
+        private Timer timer2;
 
         private bool   AutoUploadFolder;
         private string AutoUploadFolderPath;
@@ -35,6 +27,7 @@ namespace WiFiDBUploader
         private string DefaultImportNotes;
         private string DefaultImportTitle;
         private bool   UseDefaultImportValues;
+        private string SQLiteFile;
 
         private List<ServerObj> ServerList;
 
@@ -72,6 +65,10 @@ namespace WiFiDBUploader
             //Debug.WriteLine("Start of Call: LoadSettings()");
             LoadSettings();
             //Debug.WriteLine("End of Call: LoadSettings()");
+
+            //Debug.WriteLine("Start of Call: new WDBSQLite.WDBSQLite(SQLiteFile)");
+            WDBSQLObj = new WDBSQLite.WDBSQLite(SQLiteFile);
+            //Debug.WriteLine("End of Call: new WDBSQLite.WDBSQLite(SQLiteFile)");
 
             //Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
@@ -170,10 +167,10 @@ namespace WiFiDBUploader
             Microsoft.Win32.RegistryKey ServersKey;
             rootKey.SetValue("DefaultImportTitle", "Generic Import Title");
             rootKey.SetValue("DefaultImportNotes", "Generic blable about the import, maybe some notes on where you drove or what you saw?");
-            rootKey.SetValue("UseDefaultImportValues", 1);
-            rootKey.SetValue("AutoUploadFolder", 1);
+            rootKey.SetValue("UseDefaultImportValues", "True");
+            rootKey.SetValue("AutoUploadFolder", "True");
             rootKey.SetValue("AutoUploadFolderPath", "");
-            rootKey.SetValue("ArchiveImports", 1);
+            rootKey.SetValue("ArchiveImports", "False");
             rootKey.SetValue("ArchiveImportsFolderPath", "");
 
             ServersKey = rootKey.CreateSubKey("Servers");
@@ -182,7 +179,7 @@ namespace WiFiDBUploader
         private void LoadSettings()
         {
             Microsoft.Win32.RegistryKey rootKey;
-            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
             string[] SubKeys = rootKey.GetSubKeyNames();
             if (SubKeys.Count() == 0)
             {
@@ -224,6 +221,10 @@ namespace WiFiDBUploader
                     case "UseDefaultImportValues":
                         //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
                         UseDefaultImportValues = Convert.ToBoolean(rootKey.GetValue(value));
+                        break;
+                    case "SQLiteFile":
+                        //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                        SQLiteFile = rootKey.GetValue(value).ToString();
                         break;
                 }
             }
@@ -275,7 +276,7 @@ namespace WiFiDBUploader
                 Screw the app.config file, registry is easier to manage.
             */
             Microsoft.Win32.RegistryKey rootKey;
-            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader").CreateSubKey("Servers");
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader").CreateSubKey("Servers");
 
             List<ServerNameObj> VarNameList = new List<ServerNameObj>();
             foreach (ServerObj server in ServerList)
@@ -322,7 +323,7 @@ namespace WiFiDBUploader
                 Screw the app.config file, registry is easier to manage.
             */
             Microsoft.Win32.RegistryKey rootKey;
-            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
 
             rootKey.SetValue("AutoUploadFolder", AutoUploadFolder);
             rootKey.SetValue("AutoUploadFolderPath", AutoUploadFolderPath);
@@ -591,7 +592,7 @@ namespace WiFiDBUploader
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
-            ImportIDs = WDBCommonObj.ImportFolder(args.Query, backgroundWorker);
+            ImportIDs = WDBCommonObj.ImportFolder(args.Query, DefaultImportTitle, DefaultImportNotes, backgroundWorker);
             //Debug.WriteLine(ImportIDs.ToString());
             args.Result = ImportIDs;
             e.Result = args.Result;
@@ -635,10 +636,22 @@ namespace WiFiDBUploader
             {
                 case "newrow":
                     //Debug.WriteLine(split[1]);
-                    FileInfo f2 = new FileInfo(split[1]);
-
-                    string[] row = { "", "pferland", "", DateTime.Now.ToString("yyyy-MM-dd    HH:mm:ss"), f2.Length.ToString(), split[1], split[2], "", "Uploading File to WiFiDB...", "Uploading" };
-                    Debug.WriteLine("\n------------------\n------------------\nNew ROW: " + "" + " |=| " + "pferland" + " |=| " + "" + " |=| " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " |=| " + f2.Length.ToString() + " |=| " + split[1] + " |=| " + split[2] + " |=| " + "" + " |=| " + "Uploading File to WiFiDB..." + " |=| " + "Uploading" + " \n------------------\n------------------\n");
+                    FileInfo FileSizeString = new FileInfo(split[1]);
+                    string Date_Time = DateTime.Now.ToString("yyyy-MM-dd    HH:mm:ss");
+                    string StatusStr = "Uploading";
+                    string MessageStr = "Uploading File to WiFiDB...";
+                    WDBSQLite.ImportRow ImportRowObj = new WDBSQLite.ImportRow();
+                    ImportRowObj.Username = Username;
+                    ImportRowObj.DateTime = Date_Time;
+                    ImportRowObj.FileSize = FileSizeString.Length.ToString();
+                    ImportRowObj.FileName = split[1];
+                    ImportRowObj.FileHash = split[2];
+                    ImportRowObj.Status = StatusStr;
+                    ImportRowObj.Message = MessageStr;
+                    WDBSQLObj.InsertImportRow(ImportRowObj);
+                    string[] row = { "", Username, "", Date_Time, FileSizeString.Length.ToString(), split[1], split[2], StatusStr, MessageStr };
+                    Debug.WriteLine("\n------------------\n------------------\nNew ROW: " + "" + " |=| " + Username + " |=| " + "" + " |=| " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " |=| " 
+                        + FileSizeString.Length.ToString() + " |=| " + split[1] + " |=| " + split[2] + " |=| " + "" + " |=| " + "Uploading File to WiFiDB..." + " |=| " + "Uploading" + " \n------------------\n------------------\n");
 
                     var listViewItemNew = new ListViewItem(row);
                     listView1.Items.Add(listViewItemNew);

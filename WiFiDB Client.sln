@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiFiDBUploader", "WiFiDBUpl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBCommon", "WDBCommon\WDBCommon.csproj", "{F4741EBC-A256-4924-B760-D990EF40E825}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBSQLite", "WDBSQLite\WDBSQLite.csproj", "{E9922033-2239-43A7-8E31-BACE98A0340E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{F4741EBC-A256-4924-B760-D990EF40E825}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4741EBC-A256-4924-B760-D990EF40E825}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4741EBC-A256-4924-B760-D990EF40E825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9922033-2239-43A7-8E31-BACE98A0340E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9922033-2239-43A7-8E31-BACE98A0340E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9922033-2239-43A7-8E31-BACE98A0340E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9922033-2239-43A7-8E31-BACE98A0340E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
