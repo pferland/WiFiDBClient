@@ -202,22 +202,28 @@ namespace WDBCommon
 
         public List<ImportRow> GetImportRows()
         {
-
             SQLiteCommand cmd;
             List<ImportRow> ImportRows = new List<ImportRow>();
-            
+
             cmd = new SQLiteCommand(WDBSQLite.conn);
 
             cmd.CommandText = @"SELECT * FROM `ImportView`";
             SQLiteDataReader reader;
             reader = cmd.ExecuteReader();
-            Console.WriteLine("Creating Array with " + RowCount + " Rows");
-
+            ImportRow ImportRowObj = new ImportRow();
             while (reader.Read())
             {
-                cmd.ExecuteReader();
+                ImportRowObj.ImportID = Int32.Parse(reader["ImportID"].ToString());
+                ImportRowObj.Username = reader["Username"].ToString();
+                ImportRowObj.ImportTitle = reader["ImportTitle"].ToString();
+                ImportRowObj.DateTime = reader["Date_Time"].ToString();
+                ImportRowObj.FileSize = reader["FileSize"].ToString();
+                ImportRowObj.FileName = reader["FileName"].ToString();
+                ImportRowObj.FileHash = reader["FileHash"].ToString();
+                ImportRowObj.Status = reader["Status"].ToString();
+                ImportRowObj.Message = reader["Message"].ToString();
+                ImportRows.Add(ImportRowObj);
             }
-
             return ImportRows;
         }
 

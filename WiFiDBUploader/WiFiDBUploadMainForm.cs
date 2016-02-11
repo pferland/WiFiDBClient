@@ -84,7 +84,21 @@ namespace WiFiDBUploader
 
         private void LoadDbDataIntoUI()
         {
-
+            List<WDBSQLite.ImportRow> ImportedRows = WDBCommonObj.GetImportRows();
+            foreach( WDBSQLite.ImportRow Row in ImportedRows)
+            {
+                ListViewItem listViewItem = listView1.FindItemWithText(Row.FileHash);
+                Debug.WriteLine("\n------------------\n------------------\nCreate ROW from SQL: " + Row.ImportID.ToString() + " |=| " + Row.Username + " |=| " + Row.ImportTitle + " |=| " + Row.Message + " |=| " + Row.Status + "\n------------------\n------------------\n");
+                listViewItem.SubItems[0].Text = Row.ImportID.ToString();
+                listViewItem.SubItems[1].Text = Row.Username;
+                listViewItem.SubItems[2].Text = Row.ImportTitle;
+                listViewItem.SubItems[3].Text = Row.DateTime;
+                listViewItem.SubItems[4].Text = Row.FileSize;
+                listViewItem.SubItems[5].Text = Row.FileName;
+                listViewItem.SubItems[6].Text = Row.FileHash;
+                listViewItem.SubItems[7].Text = Row.Status;
+                listViewItem.SubItems[8].Text = Row.Message;
+            }
         }
 
         private void AutoUploadCheck()
