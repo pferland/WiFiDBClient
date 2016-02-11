@@ -54,6 +54,12 @@ namespace WDBCommon
             //Debug.WriteLine("End Function Call: Init API.");
         }
 
+
+        /// <summary>
+        /// WiFiDB API Functions
+        /// </summary>
+
+
         public void GetHashStatus(string query, BackgroundWorker BgWk)
         {
             BgWk.ReportProgress(0, "");
@@ -185,7 +191,37 @@ namespace WDBCommon
             }
             return response;
         }
-        
+
+
+
+
+        /// <summary>
+        /// SQLite Functions.
+        /// </summary>
+
+
+        public List<ImportRow> GetImportRows()
+        {
+
+            SQLiteCommand cmd;
+            List<ImportRow> ImportRows = new List<ImportRow>();
+            
+            cmd = new SQLiteCommand(WDBSQLite.conn);
+
+            cmd.CommandText = @"SELECT * FROM `ImportView`";
+            SQLiteDataReader reader;
+            reader = cmd.ExecuteReader();
+            Console.WriteLine("Creating Array with " + RowCount + " Rows");
+
+            while (reader.Read())
+            {
+                cmd.ExecuteReader();
+            }
+
+            return ImportRows;
+        }
+
+
         public void InsertImportRow(ImportRow ImportRowObj)
         {
             SQLiteCommand cmd;
