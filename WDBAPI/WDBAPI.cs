@@ -47,8 +47,7 @@ namespace WDBAPI
             //Debug.WriteLine("End Function Call: Get Waiting.");
             return response;
         }
-
-
+        
         public string ApiGetFinishedImports()
         {
             //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Finished");
@@ -67,8 +66,7 @@ namespace WDBAPI
             //Debug.WriteLine("End Function Call: Get Finished.");
             return response;
         }
-
-
+        
         public string ApiGetBadIports()
         {
             //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Bad Imports.");
@@ -87,8 +85,7 @@ namespace WDBAPI
             //Debug.WriteLine("End Function Call: Get Bad Imports.");
             return response;
         }
-
-
+        
         public string ApiGetCurrentImporting()
         {
             //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Current Imports.");
@@ -108,7 +105,6 @@ namespace WDBAPI
             return response;
         }
         
-
         public string ApiGetDaemonStatuses(string query)
         {
             //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Daemon Stats");
@@ -226,6 +222,9 @@ namespace WDBAPI
                     {
                         switch(item.Name.ToString())
                         {
+                            case "unknown":
+                                ret = ret + "Error|~|";
+                                break;
                             case "waiting":
                                 ret = ret + "|~|waiting|";
                                 break;
@@ -249,7 +248,6 @@ namespace WDBAPI
 
                     break;
                 case "daemons":
-                    
                     if(xmlTree.Value.ToString() != "No Daemons running.")
                     {
                         foreach (var item in xmlTree.Elements())

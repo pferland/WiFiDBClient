@@ -54,32 +54,44 @@ namespace WDBCommon
             //Debug.WriteLine("End Function Call: Init API.");
         }
 
-
-        /// <summary>
-        /// WiFiDB API Functions
-        /// </summary>
-
-
-        public void GetHashStatus(string query, BackgroundWorker BgWk)
-        {
-            BgWk.ReportProgress(0, "");
-            BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query)));
-        }
+        ///
+        /// Common Fucntions
+        ///
 
         public int IsFileImported(string query)
         {
             //Check the Local SQLite DB for the File hash, If it is found, return now.
+            if(CheckSQLFileHash(query) == 0)
+            {
+                // If the filehash was not found in the Local SQLite DB, check the WDB API.
+                if (CheckFileHash(query) == 0)
+                {
+                    return 0; //Hash not found.
+                }else
+                {
+                    return 1; //Hash found.
+                }
+            }else
+            {
+                return 1; //Hash Found
+            }            
+        }
 
 
+        ///
+        /// WiFiDB API Functions
+        ///
+        public int CheckFileHash(string query)
+        {
+            string APIResponse = WDBAPIObj.CheckFileHash(query);
+            Debug.WriteLine("IsFileImported Response: " + APIResponse);
+            string response = WDBAPIObj.ParseApiResponse(APIResponse);
 
-            // If the filehash was not found in the Local SQLite DB, check the WDB API.
-            string response = WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query));
-            Debug.WriteLine( "IsFileImported Response: " + response );
 
             string[] stringSeparators = new string[] { "|~|" };
             string[] split = response.Split(stringSeparators, StringSplitOptions.None);
-            
-            if(split[0] == "error")
+
+            if (split[0] == "error")
             {
                 return -1;
             }
@@ -88,12 +100,19 @@ namespace WDBCommon
             if (split[1].ToLower() == "")
             {
                 return 0;
-            }else
+            }
+            else
             {
                 return 1;
             }
         }
 
+        public void GetHashStatus(string query, BackgroundWorker BgWk)
+        {
+            BgWk.ReportProgress(0, "");
+            BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query)));
+        }
+        
         public void GetDaemonStatuses(string query, BackgroundWorker BgWk)
         {
             //Debug.WriteLine("Active Server: " + WDBAPIObj.ApiCompiledPath);
@@ -111,23 +130,31 @@ namespace WDBCommon
             var responses = new List<KeyValuePair<int, string>>();
             try
             {
-                var md5 = MD5.Create();
-
-                string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
-
-                // Loop through the file extension types, find them in the provided folder, then import it.
-                foreach (string ext in extensions)
+                Debug.WriteLine("Auto Import Folder: " + Path + " -> " + Directory.Exists(Path));
+                if (Directory.Exists(Path)) 
                 {
-                    Debug.WriteLine("Extension that will be used: " + ext);
-                    string[] files = Directory.GetFiles(Path, ext);
-                    //Debug.WriteLine("The number of VS1 files: {0}.", files.Length);
-                    if (files.Length > 0)
+                    Debug.WriteLine("Auto Import Folder: " + Path);
+                    var md5 = MD5.Create();
+
+                    string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
+
+                    // Loop through the file extension types, find them in the provided folder, then import it.
+                    foreach (string ext in extensions)
                     {
-                        foreach (string file in files)
+                        Debug.WriteLine("Extension that will be used: " + ext);
+                        string[] files = Directory.GetFiles(Path, ext);
+                        //Debug.WriteLine("The number of VS1 files: {0}.", files.Length);
+                        if (files.Length > 0)
                         {
-                            responses.Add(new KeyValuePair<int, string>(InternalImportID, ImportFile(file, ImportTitle, ImportNotes, BW)));
+                            foreach (string file in files)
+                            {
+                                responses.Add(new KeyValuePair<int, string>(InternalImportID, ImportFile(file, ImportTitle, ImportNotes, BW)));
+                            }
                         }
                     }
+                }else
+                {
+                    responses.Add(new KeyValuePair<int, string>(InternalImportID, "error|~|Auto Import Folder Not Found."));
                 }
             }
             catch (Exception e)
@@ -187,7 +214,7 @@ namespace WDBCommon
             }
             else
             {
-                response = "Already imported or error.";
+                response = "error|~|Already imported or error.";
             }
             return response;
         }
@@ -195,10 +222,30 @@ namespace WDBCommon
 
 
 
-        /// <summary>
+        ///
         /// SQLite Functions.
-        /// </summary>
+        ///
 
+        public int CheckSQLFileHash(string query)
+        {
+            SQLiteCommand cmd;
+            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd.CommandText = @"SELECT `ID` FROM `ImportView` WHERE ?";
+
+            var ID = cmd.CreateParameter();
+            ID.Value = query;
+            cmd.Parameters.Add(ID);
+
+            SQLiteDataReader reader;
+            reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Debug.WriteLine("Reader Value: " + reader.ToString());
+            }
+            cmd.Dispose();
+            return 1;
+        }
 
         public List<ImportRow> GetImportRows()
         {
@@ -226,8 +273,7 @@ namespace WDBCommon
             }
             return ImportRows;
         }
-
-
+        
         public void InsertImportRow(ImportRow ImportRowObj)
         {
             SQLiteCommand cmd;

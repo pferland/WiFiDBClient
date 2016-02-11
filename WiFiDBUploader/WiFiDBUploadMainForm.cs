@@ -61,17 +61,21 @@ namespace WiFiDBUploader
             LoadSettings();
             //Debug.WriteLine("End of Call: LoadSettings()");
 
-            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
+            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon(SQLiteFile);");
             WDBCommonObj = new WDBCommon.WDBCommon(SQLiteFile);
-            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon(SQLiteFile);");
 
+            //Debug.WriteLine("Start of Call: InitClasses()");
             InitClasses();
+            //Debug.WriteLine("End of Call: InitClasses()");
 
             //Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
             //Debug.WriteLine("End of Call: InitializeComponent()");
 
+            //Debug.WriteLine("Start of Call: LoadDbDataIntoUI()");
             LoadDbDataIntoUI();
+            //Debug.WriteLine("End of Call: LoadDbDataIntoUI()");
 
             //Debug.WriteLine("Start of Call: InitTimer();");
 //            InitTimer();
@@ -611,9 +615,10 @@ namespace WiFiDBUploader
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
             ImportIDs = WDBCommonObj.ImportFolder(args.Query, DefaultImportTitle, DefaultImportNotes, backgroundWorker);
-            if (String.IsNullOrEmpty(ImportIDs[0].Value))
+            if (ImportIDs.Count > 0)
             {
-                if(ImportIDs[0].Value == "Error with API")
+                Debug.WriteLine(ImportIDs[0].Value);
+                if (ImportIDs[0].Value == "Error with API")
                 {
                     MessageBox.Show("Error With API.");
                 }else if (ImportIDs[0].Value == "Already Imported.")
