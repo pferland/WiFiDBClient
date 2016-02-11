@@ -32,6 +32,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,6 +51,10 @@
     <ProjectReference Include="..\WDBAPI\WDBAPI.csproj">
       <Project>{61f6ac56-a30e-4f9b-971f-647a8a9c8584}</Project>
       <Name>WDBAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WDBSQLite\WDBSQLite.csproj">
+      <Project>{e9922033-2239-43a7-8e31-bace98a0340e}</Project>
+      <Name>WDBSQLite</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

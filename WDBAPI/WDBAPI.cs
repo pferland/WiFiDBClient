@@ -217,7 +217,7 @@ namespace WDBAPI
             {
                 case "error":
                     ret = "error|~|There was An error during Import-~-" + xmlTree.Value.ToString();
-                    ////Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
+                    Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
                     break;
 
                 case "scheduling":

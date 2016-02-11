@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,12 +9,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using WDBAPI;
-
+using WDBSQLite;
 namespace WDBCommon
 {
     public class WDBCommon
     {
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
+        private WDBSQLite.WDBSQLite WDBSQLite;
+        
         public int InternalImportID = 0;
 
         public bool AutoUploadFolder;
@@ -30,6 +33,14 @@ namespace WDBCommon
         public string Username;
         public string ApiKey;
         public string ApiCompiledPath;
+
+
+        public WDBCommon(string Path)
+        {
+            Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
+            WDBSQLite = new WDBSQLite.WDBSQLite(Path, "uploader");
+            Debug.WriteLine("End of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
+        }
 
         public void initApi()
         {
@@ -51,15 +62,29 @@ namespace WDBCommon
 
         public int IsFileImported(string query)
         {
-            string response = WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query));
-            //Debug.WriteLine( "IsFileImported Response: " + response );
+            //Check the Local SQLite DB for the File hash, If it is found, return now.
 
-            if(response == "")
+
+
+            // If the filehash was not found in the Local SQLite DB, check the WDB API.
+            string response = WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query));
+            Debug.WriteLine( "IsFileImported Response: " + response );
+
+            string[] stringSeparators = new string[] { "|~|" };
+            string[] split = response.Split(stringSeparators, StringSplitOptions.None);
+            
+            if(split[0] == "error")
             {
-                return 1;
-            }else
+                return -1;
+            }
+
+            Debug.WriteLine("split[0].ToLower(): " + split[0].ToLower());
+            if (split[1].ToLower() == "")
             {
                 return 0;
+            }else
+            {
+                return 1;
             }
         }
 
@@ -80,8 +105,6 @@ namespace WDBCommon
             var responses = new List<KeyValuePair<int, string>>();
             try
             {
-                byte[] hashBytes;
-                string hashish;
                 var md5 = MD5.Create();
 
                 string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
@@ -96,27 +119,7 @@ namespace WDBCommon
                     {
                         foreach (string file in files)
                         {
-                            InternalImportID++;
-                            //Debug.WriteLine(file);
-                            using(var inputFileStream = File.Open(file, FileMode.Open))
-                            {
-                                hashBytes = md5.ComputeHash(inputFileStream);
-                                hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
-                            }
-
-                            if (IsFileImported(hashish) == 1)
-                            {
-                                BW.ReportProgress(0, "newrow|~|" + file + "|~|" + hashish);
-                                responses.Add(new KeyValuePair<int, string>(InternalImportID, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(file, ImportTitle, ImportNotes ))));
-                                BW.ReportProgress(0, responses.Last().Value.ToString());
-
-                                ArchiveImportedFile(file);
-                                //Debug.WriteLine(responses.Last().Value.ToString());
-                            }
-                            else
-                            {
-                                Debug.WriteLine("-------------> File " + file + " Already Imported.");
-                            }
+                            responses.Add(new KeyValuePair<int, string>(InternalImportID, ImportFile(file, ImportTitle, ImportNotes, BW)));
                         }
                     }
                 }
@@ -153,7 +156,6 @@ namespace WDBCommon
             }
         }
 
-
         public string ImportFile(string FilePath, string ImportTitle, string ImportNotes, BackgroundWorker BW)
         {
             string response;
@@ -167,17 +169,98 @@ namespace WDBCommon
                 hashBytes = md5.ComputeHash(inputFileStream);
                 hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
             }
-            if(IsFileImported(hashish) == 1)
+            int IsFileImportedResult = IsFileImported(hashish);
+            Debug.WriteLine("IsFileImportedResult :" + IsFileImportedResult);
+            if (IsFileImportedResult == 0)
             {
                 BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
                 response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes));
                 BW.ReportProgress(0, response);
                 //Debug.WriteLine(responses.Last().Value.ToString());
-            }else
+                ArchiveImportedFile(FilePath);
+            }
+            else
             {
-                response = "File is already imported.";
+                response = "Already imported or error.";
             }
             return response;
         }
+        
+        public void InsertImportRow(ImportRow ImportRowObj)
+        {
+            SQLiteCommand cmd;
+            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd.CommandText = @"INSERT INTO `ImportView` 
+(`Username`, `Date_Time`, `FileSize`, `FileName`, `FileHash`, `Status`, `Message`) 
+VALUES ( ?, ?, ?, ?, ?, ?, ?)";
+            var Username = cmd.CreateParameter();
+            Username.Value = ImportRowObj.Username;
+            cmd.Parameters.Add(Username);
+
+            var Date_Time = cmd.CreateParameter();
+            Date_Time.Value = ImportRowObj.DateTime;
+            cmd.Parameters.Add(Date_Time);
+
+            var FileSize = cmd.CreateParameter();
+            FileSize.Value = ImportRowObj.FileSize;
+            cmd.Parameters.Add(FileSize);
+
+            var FileName = cmd.CreateParameter();
+            FileName.Value = ImportRowObj.FileName;
+            cmd.Parameters.Add(FileName);
+
+            var FileHash = cmd.CreateParameter();
+            FileHash.Value = ImportRowObj.FileHash;
+            cmd.Parameters.Add(FileHash);
+
+            var Status = cmd.CreateParameter();
+            Status.Value = ImportRowObj.Status;
+            cmd.Parameters.Add(Status);
+
+            var Message = cmd.CreateParameter();
+            Message.Value = ImportRowObj.Message;
+            cmd.Parameters.Add(Message);
+
+            Debug.WriteLine(cmd.ExecuteNonQuery());
+
+            cmd.Dispose();
+        }
+
+        public void UpdateImportRow(ImportRow ImportRowObj)
+        {
+            SQLiteCommand cmd;
+            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd.CommandText = @"UPDATE `ImportView` SET 
+`ImportID` = ?,
+`ImportTitle` = ?,
+`Status` = ?,
+`Message` = ?
+WHERE `FileHash` = ?";
+
+            var ImportIDParm = cmd.CreateParameter();
+            ImportIDParm.Value = ImportRowObj.ImportID;
+            cmd.Parameters.Add(ImportIDParm);
+
+            var ImportTitleParm = cmd.CreateParameter();
+            ImportTitleParm.Value = ImportRowObj.ImportTitle;
+            cmd.Parameters.Add(ImportTitleParm);
+
+            var StatusParm = cmd.CreateParameter();
+            StatusParm.Value = ImportRowObj.Status;
+            cmd.Parameters.Add(StatusParm);
+
+            var MessageParm = cmd.CreateParameter();
+            ImportTitleParm.Value = ImportRowObj.ImportTitle;
+            cmd.Parameters.Add(ImportTitleParm);
+
+            var FileHashParm = cmd.CreateParameter();
+            FileHashParm.Value = ImportRowObj.FileHash.ToUpper();
+            cmd.Parameters.Add(FileHashParm);
+
+            Debug.WriteLine(cmd.ExecuteNonQuery());
+
+            cmd.Dispose();
+        }
+
     }
 }

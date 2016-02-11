@@ -10,7 +10,6 @@ namespace WiFiDBUploader
 {
     public partial class WiFiDBUploadMainForm : Form
     {
-        private WDBSQLite.WDBSQLite WDBSQLObj;
         private WDBAPI.WDBAPI WDBAPIObj;
         private WDBCommon.WDBCommon WDBCommonObj;
         private int NextID = 0;
@@ -58,17 +57,15 @@ namespace WiFiDBUploader
             WDBAPIObj = new WDBAPI.WDBAPI();
             //Debug.WriteLine("End of Call: new WDBAPI.WDBAPI();");
 
-            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
-            WDBCommonObj = new WDBCommon.WDBCommon();
-            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
-            
             //Debug.WriteLine("Start of Call: LoadSettings()");
             LoadSettings();
             //Debug.WriteLine("End of Call: LoadSettings()");
 
-            //Debug.WriteLine("Start of Call: new WDBSQLite.WDBSQLite(SQLiteFile)");
-            WDBSQLObj = new WDBSQLite.WDBSQLite(SQLiteFile);
-            //Debug.WriteLine("End of Call: new WDBSQLite.WDBSQLite(SQLiteFile)");
+            //Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon();");
+            WDBCommonObj = new WDBCommon.WDBCommon(SQLiteFile);
+            //Debug.WriteLine("End of Call: new WDBCommon.WDBCommon();");
+
+            InitClasses();
 
             //Debug.WriteLine("Start of Call: InitializeComponent()");
             InitializeComponent();
@@ -266,8 +263,6 @@ namespace WiFiDBUploader
             {
                 MessageBox.Show("There is no selected server. Go to Settings-> WiFiDB Server. Select a server from the drop down, if there is none, add one with the +");
             }
-            
-            InitClasses();
         }
 
         private void WriteServerSettings()
@@ -315,6 +310,7 @@ namespace WiFiDBUploader
             }
 
             LoadSettings();
+            InitClasses();
         }
 
         private void WriteGlobalSettings()
@@ -334,6 +330,7 @@ namespace WiFiDBUploader
             rootKey.SetValue("UseDefaultImportValues", UseDefaultImportValues);
 
             LoadSettings();
+            InitClasses();
         }
 
 
@@ -593,9 +590,21 @@ namespace WiFiDBUploader
             QueryArguments args = (QueryArguments)e.Argument;
             //Debug.WriteLine(args.Query);
             ImportIDs = WDBCommonObj.ImportFolder(args.Query, DefaultImportTitle, DefaultImportNotes, backgroundWorker);
-            //Debug.WriteLine(ImportIDs.ToString());
-            args.Result = ImportIDs;
-            e.Result = args.Result;
+            if (String.IsNullOrEmpty(ImportIDs[0].Value))
+            {
+                if(ImportIDs[0].Value == "Error with API")
+                {
+                    MessageBox.Show("Error With API.");
+                }else if (ImportIDs[0].Value == "Already Imported.")
+                {
+                    Debug.WriteLine("File Already Imported.");
+//                    MessageBox.Show("Error With API.");
+                }else
+                {
+                    args.Result = ImportIDs;
+                    e.Result = args.Result;
+                }
+            }
         }
         
         private void backgroundWorker_FileImportDoWork(object sender, DoWorkEventArgs e)
@@ -617,6 +626,7 @@ namespace WiFiDBUploader
         private void backgroundWorker_ImportProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
+            WDBSQLite.ImportRow ImportRowObj = new WDBSQLite.ImportRow();
 
             string[] stringSeparators = new string[] { "|~|" };
             string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
@@ -632,23 +642,26 @@ namespace WiFiDBUploader
             string[] stringSep1 = new string[] { ":" };
             string[] stringSep2 = new string[] { "-~-" };
 
+            Debug.WriteLine("Split[0]" + split[0]);
             switch (split[0])
             {
                 case "newrow":
-                    //Debug.WriteLine(split[1]);
                     FileInfo FileSizeString = new FileInfo(split[1]);
                     string Date_Time = DateTime.Now.ToString("yyyy-MM-dd    HH:mm:ss");
                     string StatusStr = "Uploading";
                     string MessageStr = "Uploading File to WiFiDB...";
-                    WDBSQLite.ImportRow ImportRowObj = new WDBSQLite.ImportRow();
+                    
                     ImportRowObj.Username = Username;
+                    ImportRowObj.ImportTitle = "";
                     ImportRowObj.DateTime = Date_Time;
                     ImportRowObj.FileSize = FileSizeString.Length.ToString();
                     ImportRowObj.FileName = split[1];
                     ImportRowObj.FileHash = split[2];
                     ImportRowObj.Status = StatusStr;
                     ImportRowObj.Message = MessageStr;
-                    WDBSQLObj.InsertImportRow(ImportRowObj);
+
+                    WDBCommonObj.InsertImportRow(ImportRowObj); // Insert import information into SQLite.
+
                     string[] row = { "", Username, "", Date_Time, FileSizeString.Length.ToString(), split[1], split[2], StatusStr, MessageStr };
                     Debug.WriteLine("\n------------------\n------------------\nNew ROW: " + "" + " |=| " + Username + " |=| " + "" + " |=| " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " |=| " 
                         + FileSizeString.Length.ToString() + " |=| " + split[1] + " |=| " + split[2] + " |=| " + "" + " |=| " + "Uploading File to WiFiDB..." + " |=| " + "Uploading" + " \n------------------\n------------------\n");
@@ -703,16 +716,23 @@ namespace WiFiDBUploader
                         //Debug.WriteLine(" \n--------------------\n");
                     }
                     //Debug.WriteLine(filehash);
-
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
-                    if(user != "")
+                    if(user != "" && filehash != "")
                     {
-                        Debug.WriteLine("\n------------------\n------------------\nUpdate ROW: " + ImportID.ToString() + " |=| " + user + " |=| " + title + " |=| " + message + " |=| " + "Waiting" + "\n------------------\n------------------\n");
+                        ImportRowObj.ImportID = Int32.Parse(ImportID);
+                        ImportRowObj.ImportTitle = title;
+                        ImportRowObj.FileHash = filehash;
+                        ImportRowObj.Status = "Waiting";
+                        ImportRowObj.Message = message;
+
+                        WDBCommonObj.UpdateImportRow(ImportRowObj); // Update Import row information in SQLite.
+
+                        Debug.WriteLine("\n------------------\n------------------\nUpdate ROW: " + ImportID + " |=| " + user + " |=| " + title + " |=| " + "Waiting" + " |=| " + message + "\n------------------\n------------------\n");
                         listViewItem.SubItems[0].Text = ImportID;
                         listViewItem.SubItems[1].Text = user;
                         listViewItem.SubItems[2].Text = title;
-                        listViewItem.SubItems[7].Text = message;
-                        listViewItem.SubItems[8].Text = "Waiting";
+                        listViewItem.SubItems[7].Text = "Waiting";
+                        listViewItem.SubItems[8].Text = message;
                     }
                     break;
             }
@@ -722,8 +742,11 @@ namespace WiFiDBUploader
         private void backgroundWorker_UpdateListViewProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             List<KeyValuePair<string, string>> values = new List<KeyValuePair<string, string>>();
+            WDBSQLite.ImportRow ImportRowObj = new WDBSQLite.ImportRow();
 
             string[] stringSeparators = new string[] { "|~|" };
+            string[] stringSep1 = new string[] { ":" };
+            string[] stringSep2 = new string[] { "-~-" };
             string[] split = e.UserState.ToString().Split(stringSeparators, StringSplitOptions.None);
 
             string title = "";
@@ -732,8 +755,6 @@ namespace WiFiDBUploader
             string status = "";
             string ImportID = "";
             string filehash = "";
-            string[] stringSep1 = new string[] { ":" };
-            string[] stringSep2 = new string[] { "-~-" };
             //Debug.WriteLine("========== Update Listview Start ==========");
             //Debug.WriteLine(split[0]);
             switch (split[0])
@@ -741,8 +762,6 @@ namespace WiFiDBUploader
                 case "error":
                     //Debug.WriteLine(split[0]);
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-
-                    
                     string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
 
                     //Debug.WriteLine(items_err[0]);
@@ -822,9 +841,16 @@ namespace WiFiDBUploader
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
                     if( (status == "finished") || ( (ImportID != "") && (message != "") ) )
                     {
+                        ImportRowObj.ImportID = Int32.Parse(ImportID);
+                        ImportRowObj.ImportTitle = title;
+                        ImportRowObj.FileHash = filehash;
+                        ImportRowObj.Status = status;
+                        ImportRowObj.Message = message;
+
+                        WDBCommonObj.UpdateImportRow(ImportRowObj); // Update Import row information in SQLite.
+
                         Debug.WriteLine("\n------------------\n------------------\nUpdate ROW: " + ImportID.ToString() + " |=| " + user + " |=| " + title + " |=| " + message + " |=| " + status + "\n------------------\n------------------\n");
                         listViewItem.SubItems[0].Text = ImportID;
-                        listViewItem.SubItems[1].Text = user;
                         listViewItem.SubItems[2].Text = title;
                         listViewItem.SubItems[7].Text = message;
                         listViewItem.SubItems[8].Text = status;
