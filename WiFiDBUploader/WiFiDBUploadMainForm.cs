@@ -71,6 +71,8 @@ namespace WiFiDBUploader
             InitializeComponent();
             //Debug.WriteLine("End of Call: InitializeComponent()");
 
+            LoadDbDataIntoUI();
+
             //Debug.WriteLine("Start of Call: InitTimer();");
 //            InitTimer();
             //Debug.WriteLine("End of Call: InitTimer();");
@@ -78,6 +80,11 @@ namespace WiFiDBUploader
             //Debug.WriteLine("Start of Call: AutoUploadCheck();");
             AutoUploadCheck();
             //Debug.WriteLine("End of Call: AutoUploadCheck();");
+        }
+
+        private void LoadDbDataIntoUI()
+        {
+
         }
 
         private void AutoUploadCheck()
