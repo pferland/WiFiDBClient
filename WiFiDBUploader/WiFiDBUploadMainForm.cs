@@ -91,8 +91,14 @@ namespace WiFiDBUploader
             List<WDBSQLite.ImportRow> ImportedRows = WDBCommonObj.GetImportRows();
             foreach( WDBSQLite.ImportRow Row in ImportedRows)
             {
-                ListViewItem listViewItem = listView1.FindItemWithText(Row.FileHash);
+
                 Debug.WriteLine("\n------------------\n------------------\nCreate ROW from SQL: " + Row.ImportID.ToString() + " |=| " + Row.Username + " |=| " + Row.ImportTitle + " |=| " + Row.Message + " |=| " + Row.Status + "\n------------------\n------------------\n");
+                string[] row = { Row.ImportID.ToString(), Row.Username, Row.ImportTitle, Row.DateTime,
+                    Row.FileSize, Row.FileName, Row.FileHash, Row.Status, Row.Message };
+
+                var listViewItemNew = new ListViewItem(row);
+                listView1.Items.Add(listViewItemNew);
+                /* Was trying to update a row, when it should be inserted. This is why you dont code while being up for 30hrs.
                 listViewItem.SubItems[0].Text = Row.ImportID.ToString();
                 listViewItem.SubItems[1].Text = Row.Username;
                 listViewItem.SubItems[2].Text = Row.ImportTitle;
@@ -102,6 +108,7 @@ namespace WiFiDBUploader
                 listViewItem.SubItems[6].Text = Row.FileHash;
                 listViewItem.SubItems[7].Text = Row.Status;
                 listViewItem.SubItems[8].Text = Row.Message;
+                */
             }
         }
 
