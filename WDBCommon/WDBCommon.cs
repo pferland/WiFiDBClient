@@ -230,21 +230,27 @@ namespace WDBCommon
         {
             SQLiteCommand cmd;
             cmd = new SQLiteCommand(WDBSQLite.conn);
-            cmd.CommandText = @"SELECT `ID` FROM `ImportView` WHERE ?";
+            int ret = 0;
+            cmd.CommandText = @"SELECT `ID` FROM `ImportView` WHERE `FileHash` = ?";
 
-            var ID = cmd.CreateParameter();
-            ID.Value = query;
-            cmd.Parameters.Add(ID);
+            Debug.WriteLine("FileHash query: " + query);
+
+            var filehash = cmd.CreateParameter();
+            filehash.Value = query;
+            cmd.Parameters.Add(filehash);
 
             SQLiteDataReader reader;
             reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
-                Debug.WriteLine("Reader Value: " + reader.ToString());
+                if(Int32.Parse(reader["ID"].ToString()) > 0)
+                {
+                    ret = 1;
+                }
             }
             cmd.Dispose();
-            return 1;
+            return ret;
         }
 
         public List<ImportRow> GetImportRows()
@@ -338,8 +344,8 @@ WHERE `FileHash` = ?";
             cmd.Parameters.Add(StatusParm);
 
             var MessageParm = cmd.CreateParameter();
-            ImportTitleParm.Value = ImportRowObj.ImportTitle;
-            cmd.Parameters.Add(ImportTitleParm);
+            MessageParm.Value = ImportRowObj.Message;
+            cmd.Parameters.Add(MessageParm);
 
             var FileHashParm = cmd.CreateParameter();
             FileHashParm.Value = ImportRowObj.FileHash.ToUpper();
