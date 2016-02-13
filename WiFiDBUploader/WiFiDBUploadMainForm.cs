@@ -202,10 +202,10 @@ namespace WiFiDBUploader
             rootKey.SetValue("ArchiveImports", "False");
             rootKey.SetValue("ArchiveImportsFolderPath", "");
             rootKey.SetValue("AutoCloseTimerSeconds", "30");
-            rootKey.SetValue("SQLiteFile", ".\\DB");
+            rootKey.SetValue("SQLiteFile", ".\\DB\\Uploader.db3");
 
             ServersKey = rootKey.CreateSubKey("Servers");
-            DefaultServerKey = ServersKey.CreateSubKey("api.wifidb.net");\
+            DefaultServerKey = ServersKey.CreateSubKey("api.wifidb.net");
 
             DefaultServerKey.SetValue("ServerAddress", "https://api.wifidb.net");
             DefaultServerKey.SetValue("ApiPath", "/v2");
