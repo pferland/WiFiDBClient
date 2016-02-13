@@ -32,6 +32,7 @@ namespace WiFiDBUploader
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WiFiDBUploadMainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -270,7 +271,7 @@ namespace WiFiDBUploader
             this.tabPage1.Controls.Add(this.listView1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(1275, 539);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Uploaded Files";
@@ -281,8 +282,8 @@ namespace WiFiDBUploader
             this.tabPage2.Controls.Add(this.listView2);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPage2.Size = new System.Drawing.Size(1437, 542);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1275, 539);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Daemon Statuses";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -301,7 +302,7 @@ namespace WiFiDBUploader
             this.listView2.HideSelection = false;
             this.listView2.Location = new System.Drawing.Point(3, 3);
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(1431, 536);
+            this.listView2.Size = new System.Drawing.Size(1269, 533);
             this.listView2.TabIndex = 0;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
@@ -351,6 +352,7 @@ namespace WiFiDBUploader
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "WiFiDBUploadMainForm";
             this.Text = "WiFiDB Uploader";
