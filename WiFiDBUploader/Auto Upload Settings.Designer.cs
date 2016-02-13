@@ -27,13 +27,19 @@ namespace WiFiDBUploader
         public bool AutoUploadFolder
         {
             get { return checkBox1.Checked; }
-            set{ checkBox1.Checked = value; Debug.WriteLine("Setter, setting :" + value); }
+            set{ checkBox1.Checked = value;}
         }
 
         public string AutoUploadFolderPath
         {
             get { return textBox1.Text; }
             set { textBox1.Text = value; }
+        }
+
+        public string AutoCloseTimerSeconds
+        {
+            get { return AutoUploadTimerTextBox.Text; }
+            set { AutoUploadTimerTextBox.Text = value; }
         }
 
         public bool ArchiveImports
@@ -65,6 +71,8 @@ namespace WiFiDBUploader
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.AutoCancelButton = new System.Windows.Forms.Button();
             this.AutoOKButton = new System.Windows.Forms.Button();
+            this.AutoUploadTimerTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -98,12 +106,14 @@ namespace WiFiDBUploader
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.AutoUploadTimerTextBox);
             this.groupBox1.Controls.Add(this.AutoBrowseButton);
             this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Location = new System.Drawing.Point(19, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(467, 90);
+            this.groupBox1.Size = new System.Drawing.Size(467, 136);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Auto Upload Folder";
@@ -113,7 +123,7 @@ namespace WiFiDBUploader
             this.groupBox2.Controls.Add(this.AutoBrowse2Button);
             this.groupBox2.Controls.Add(this.textBox2);
             this.groupBox2.Controls.Add(this.checkBox2);
-            this.groupBox2.Location = new System.Drawing.Point(19, 119);
+            this.groupBox2.Location = new System.Drawing.Point(19, 154);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(466, 91);
             this.groupBox2.TabIndex = 5;
@@ -167,6 +177,22 @@ namespace WiFiDBUploader
             this.AutoOKButton.Text = "OK";
             this.AutoOKButton.UseVisualStyleBackColor = true;
             // 
+            // AutoUploadTimerTextBox
+            // 
+            this.AutoUploadTimerTextBox.Location = new System.Drawing.Point(345, 95);
+            this.AutoUploadTimerTextBox.Name = "AutoUploadTimerTextBox";
+            this.AutoUploadTimerTextBox.Size = new System.Drawing.Size(27, 20);
+            this.AutoUploadTimerTextBox.TabIndex = 4;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(74, 95);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(261, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Seconds til close the UI after finishing the auto upload";
+            // 
             // Auto_Upload_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -198,5 +224,7 @@ namespace WiFiDBUploader
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.Button AutoCancelButton;
         private System.Windows.Forms.Button AutoOKButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox AutoUploadTimerTextBox;
     }
 }

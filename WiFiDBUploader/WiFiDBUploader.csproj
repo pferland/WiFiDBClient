@@ -101,6 +101,12 @@
     <Compile Include="Auto Upload Settings.Designer.cs">
       <DependentUpon>Auto Upload Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="AutoCloseTimer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AutoCloseTimer.Designer.cs">
+      <DependentUpon>AutoCloseTimer.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditServer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -132,6 +138,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Auto Upload Settings.resx">
       <DependentUpon>Auto Upload Settings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AutoCloseTimer.resx">
+      <DependentUpon>AutoCloseTimer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditServer.resx">
       <DependentUpon>EditServer.cs</DependentUpon>

@@ -22,7 +22,8 @@ namespace WiFiDBUploader
         private string AutoUploadFolderPath;
         private bool   ArchiveImports;
         private string ArchiveImportsFolderPath;
-
+        private int    AutoCloseTimerSeconds;
+        private int    TimerSeconds;
         private string DefaultImportNotes;
         private string DefaultImportTitle;
         private bool   UseDefaultImportValues;
@@ -117,12 +118,13 @@ namespace WiFiDBUploader
             if(AutoUploadFolder == true && SelectedServer != null)
             {
                 StartFolderImport(AutoUploadFolderPath);
-            }else
+            }
+            else
             {
                 //Debug.WriteLine("Auto Upload Disabled, or No Server Selected.");
             }
         }
-
+        
         public void WriteLog(string message)
         {
             string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" +"[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
@@ -201,7 +203,8 @@ namespace WiFiDBUploader
             rootKey.SetValue("AutoUploadFolderPath", "");
             rootKey.SetValue("ArchiveImports", "False");
             rootKey.SetValue("ArchiveImportsFolderPath", "");
-
+            rootKey.SetValue("AutoCloseTimerSeconds", "30");
+            
             ServersKey = rootKey.CreateSubKey("Servers");
         }
 
@@ -230,6 +233,10 @@ namespace WiFiDBUploader
                     case "AutoUploadFolderPath":
                         //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
                         AutoUploadFolderPath = rootKey.GetValue(value).ToString();
+                        break;
+                    case "AutoCloseTimerSeconds":
+                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                        AutoCloseTimerSeconds = Int32.Parse(rootKey.GetValue(value).ToString());
                         break;
                     case "ArchiveImports":
                         //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
@@ -354,6 +361,7 @@ namespace WiFiDBUploader
             rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
 
             rootKey.SetValue("AutoUploadFolder", AutoUploadFolder);
+            rootKey.SetValue("AutoCloseTimerSeconds", AutoCloseTimerSeconds);
             rootKey.SetValue("AutoUploadFolderPath", AutoUploadFolderPath);
             rootKey.SetValue("ArchiveImports", ArchiveImports);
             rootKey.SetValue("ArchiveImportsFolderPath", ArchiveImportsFolderPath);
@@ -446,6 +454,7 @@ namespace WiFiDBUploader
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_FolderImportDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ImportProgressChanged);
+            backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_ImportCompleted);
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
@@ -558,6 +567,7 @@ namespace WiFiDBUploader
             AutoForm.AutoUploadFolderPath = AutoUploadFolderPath;
             AutoForm.ArchiveImports = ArchiveImports;
             AutoForm.ArchiveImportsFolderPath = ArchiveImportsFolderPath;
+            AutoForm.AutoCloseTimerSeconds = AutoCloseTimerSeconds.ToString();
 
             if (AutoForm.ShowDialog() == DialogResult.OK)
             {
@@ -566,10 +576,11 @@ namespace WiFiDBUploader
                 //Debug.WriteLine("AutoForm.ArchiveImports: " + AutoForm.ArchiveImports);
                 //Debug.WriteLine("AutoForm.ArchiveImportsFolderPath: " + AutoForm.ArchiveImportsFolderPath);
 
-                this.AutoUploadFolder = Convert.ToBoolean(AutoForm.AutoUploadFolder);
-                this.AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
-                this.ArchiveImports = Convert.ToBoolean(AutoForm.ArchiveImports);
-                this.ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
+                AutoUploadFolder = Convert.ToBoolean(AutoForm.AutoUploadFolder);
+                AutoUploadFolderPath = AutoForm.AutoUploadFolderPath;
+                ArchiveImports = Convert.ToBoolean(AutoForm.ArchiveImports);
+                ArchiveImportsFolderPath = AutoForm.ArchiveImportsFolderPath;
+                AutoCloseTimerSeconds = Int32.Parse(AutoForm.AutoCloseTimerSeconds);
 
                 //Debug.WriteLine("this.AutoUploadFolder: " + this.AutoUploadFolder);
                 //Debug.WriteLine("this.AutoUploadFolderPath: " + this.AutoUploadFolderPath);
@@ -1176,13 +1187,16 @@ namespace WiFiDBUploader
         //
         // Process Completed Functions
         //
-
-        /*
-        private void backgroundWorker_ImportWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        
+        private void backgroundWorker1_ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-          //maybe do something?
+            //maybe do something?
+
+            AutoCloseTimer AutoCloseTimerForm = new AutoCloseTimer();
+            AutoCloseTimerForm.TimerSeconds = AutoCloseTimerSeconds.ToString();
+            Debug.WriteLine(AutoCloseTimerForm.ShowDialog());
         }
-        */
+        
     }
 
 
