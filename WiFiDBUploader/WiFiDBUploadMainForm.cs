@@ -192,6 +192,8 @@ namespace WiFiDBUploader
         private void CreateRegistryKeys(Microsoft.Win32.RegistryKey rootKey)
         {
             Microsoft.Win32.RegistryKey ServersKey;
+            Microsoft.Win32.RegistryKey DefaultServerKey;
+
             rootKey.SetValue("DefaultImportTitle", "Generic Import Title");
             rootKey.SetValue("DefaultImportNotes", "Generic blable about the import, maybe some notes on where you drove or what you saw?");
             rootKey.SetValue("UseDefaultImportValues", "True");
@@ -200,8 +202,17 @@ namespace WiFiDBUploader
             rootKey.SetValue("ArchiveImports", "False");
             rootKey.SetValue("ArchiveImportsFolderPath", "");
             rootKey.SetValue("AutoCloseTimerSeconds", "30");
-            
+            rootKey.SetValue("SQLiteFile", ".\\DB");
+
             ServersKey = rootKey.CreateSubKey("Servers");
+            DefaultServerKey = ServersKey.CreateSubKey("api.wifidb.net");\
+
+            DefaultServerKey.SetValue("ServerAddress", "https://api.wifidb.net");
+            DefaultServerKey.SetValue("ApiPath", "/v2");
+            DefaultServerKey.SetValue("Username", "AnonCoward");
+            DefaultServerKey.SetValue("ApiKey", "");
+            DefaultServerKey.SetValue("Selected", "True");
+            
         }
 
         private void LoadSettings()
@@ -209,94 +220,99 @@ namespace WiFiDBUploader
             Microsoft.Win32.RegistryKey rootKey;
             rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
             string[] SubKeys = rootKey.GetSubKeyNames();
+
             if (SubKeys.Count() == 0)
             {
                 //Debug.WriteLine("Servers SubKey not found, creating Default Structure.");
                 CreateRegistryKeys(rootKey);
+                LoadSettings();
             }
-            Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
-
-            foreach (string value in rootKey.GetValueNames())
+            else
             {
-                //Debug.WriteLine(value);
+                Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
 
-                switch(value)
+                foreach (string value in rootKey.GetValueNames())
                 {
-                    case "AutoUploadFolder":
-                    //    //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
-                        AutoUploadFolder = Convert.ToBoolean(rootKey.GetValue(value));
-                        break;
-                    case "AutoUploadFolderPath":
-                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
-                        AutoUploadFolderPath = rootKey.GetValue(value).ToString();
-                        break;
-                    case "AutoCloseTimerSeconds":
-                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
-                        AutoCloseTimerSeconds = Int32.Parse(rootKey.GetValue(value).ToString());
-                        break;
-                    case "ArchiveImports":
-                        //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
-                        ArchiveImports = Convert.ToBoolean(rootKey.GetValue(value));
-                        break;
-                    case "ArchiveImportsFolderPath":
-                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
-                        ArchiveImportsFolderPath = rootKey.GetValue(value).ToString();
-                        break;
-                    case "DefaultImportNotes":
-                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
-                        DefaultImportNotes = rootKey.GetValue(value).ToString();
-                        break;
-                    case "DefaultImportTitle":
-                        //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
-                        DefaultImportTitle = rootKey.GetValue(value).ToString();
-                        break;
-                    case "UseDefaultImportValues":
-                        //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
-                        UseDefaultImportValues = Convert.ToBoolean(rootKey.GetValue(value));
-                        break;
-                    case "SQLiteFile":
-                        //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
-                        SQLiteFile = rootKey.GetValue(value).ToString();
-                        break;
+                    //Debug.WriteLine(value);
+
+                    switch (value)
+                    {
+                        case "AutoUploadFolder":
+                            //    //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                            AutoUploadFolder = Convert.ToBoolean(rootKey.GetValue(value));
+                            break;
+                        case "AutoUploadFolderPath":
+                            //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                            AutoUploadFolderPath = rootKey.GetValue(value).ToString();
+                            break;
+                        case "AutoCloseTimerSeconds":
+                            //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                            AutoCloseTimerSeconds = Int32.Parse(rootKey.GetValue(value).ToString());
+                            break;
+                        case "ArchiveImports":
+                            //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                            ArchiveImports = Convert.ToBoolean(rootKey.GetValue(value));
+                            break;
+                        case "ArchiveImportsFolderPath":
+                            //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                            ArchiveImportsFolderPath = rootKey.GetValue(value).ToString();
+                            break;
+                        case "DefaultImportNotes":
+                            //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                            DefaultImportNotes = rootKey.GetValue(value).ToString();
+                            break;
+                        case "DefaultImportTitle":
+                            //Debug.WriteLine(value + " : " + rootKey.GetValue(value).ToString());
+                            DefaultImportTitle = rootKey.GetValue(value).ToString();
+                            break;
+                        case "UseDefaultImportValues":
+                            //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                            UseDefaultImportValues = Convert.ToBoolean(rootKey.GetValue(value));
+                            break;
+                        case "SQLiteFile":
+                            //Debug.WriteLine(value + " : " + Convert.ToBoolean(rootKey.GetValue(value)));
+                            SQLiteFile = rootKey.GetValue(value).ToString();
+                            break;
+                    }
                 }
-            }
-            ServerList = new List<ServerObj>();
-            int Increment = 0;
-            foreach (string subitem in ServerSubkeys.GetSubKeyNames())
-            {
-                //Debug.WriteLine("-------------------\n"+subitem);
-                Microsoft.Win32.RegistryKey ServerKey = ServerSubkeys.CreateSubKey(subitem);
-
-                ServerObj Server = new ServerObj();
-                //Debug.WriteLine("ServerAddress = "+ ServerKey.GetValue("ServerAddress").ToString());
-                //Debug.WriteLine("ApiPath = " + ServerKey.GetValue("ApiPath").ToString());
-                //Debug.WriteLine("Username = " + ServerKey.GetValue("Username").ToString());
-                //Debug.WriteLine("ApiKey = " + ServerKey.GetValue("ApiKey").ToString());
-
-                Server.ID = Increment;
-                Server.ServerAddress = ServerKey.GetValue("ServerAddress").ToString();
-                Server.ApiPath = ServerKey.GetValue("ApiPath").ToString();
-                Server.Username = ServerKey.GetValue("Username").ToString();
-                Server.ApiKey = ServerKey.GetValue("ApiKey").ToString();
-                Server.Selected = Convert.ToBoolean(ServerKey.GetValue("Selected"));
-
-                if(Server.Selected)
+                ServerList = new List<ServerObj>();
+                int Increment = 0;
+                foreach (string subitem in ServerSubkeys.GetSubKeyNames())
                 {
-                    ServerAddress = Server.ServerAddress.ToString();
-                    SelectedServer = ServerAddress.Replace("https://", "").Replace("http://", "");
-                    ApiPath = Server.ApiPath.ToString();
-                    Username = Server.Username.ToString();
-                    ApiKey = Server.ApiKey.ToString();
-                    ApiCompiledPath = Server.ServerAddress + Server.ApiPath;
-                }
-                ServerList.Add(Server);
-                Increment++;
-            }
-            
+                    //Debug.WriteLine("-------------------\n"+subitem);
+                    Microsoft.Win32.RegistryKey ServerKey = ServerSubkeys.CreateSubKey(subitem);
 
-            if (ServerAddress == null)
-            {
-                MessageBox.Show("There is no selected server. Go to Settings-> WiFiDB Server. Select a server from the drop down, if there is none, add one with the +");
+                    ServerObj Server = new ServerObj();
+                    //Debug.WriteLine("ServerAddress = "+ ServerKey.GetValue("ServerAddress").ToString());
+                    //Debug.WriteLine("ApiPath = " + ServerKey.GetValue("ApiPath").ToString());
+                    //Debug.WriteLine("Username = " + ServerKey.GetValue("Username").ToString());
+                    //Debug.WriteLine("ApiKey = " + ServerKey.GetValue("ApiKey").ToString());
+
+                    Server.ID = Increment;
+                    Server.ServerAddress = ServerKey.GetValue("ServerAddress").ToString();
+                    Server.ApiPath = ServerKey.GetValue("ApiPath").ToString();
+                    Server.Username = ServerKey.GetValue("Username").ToString();
+                    Server.ApiKey = ServerKey.GetValue("ApiKey").ToString();
+                    Server.Selected = Convert.ToBoolean(ServerKey.GetValue("Selected"));
+
+                    if (Server.Selected)
+                    {
+                        ServerAddress = Server.ServerAddress.ToString();
+                        SelectedServer = ServerAddress.Replace("https://", "").Replace("http://", "");
+                        ApiPath = Server.ApiPath.ToString();
+                        Username = Server.Username.ToString();
+                        ApiKey = Server.ApiKey.ToString();
+                        ApiCompiledPath = Server.ServerAddress + Server.ApiPath;
+                    }
+                    ServerList.Add(Server);
+                    Increment++;
+                }
+
+
+                if (ServerAddress == null)
+                {
+                    MessageBox.Show("There is no selected server. Go to Settings-> WiFiDB Server. Select a server from the drop down, if there is none, add one with the +");
+                }
             }
         }
 
