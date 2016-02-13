@@ -79,7 +79,7 @@ namespace WiFiDBUploader
             //Debug.WriteLine("End of Call: LoadDbDataIntoUI()");
 
             //Debug.WriteLine("Start of Call: InitTimer();");
-//            InitTimer();
+            InitTimer();
             //Debug.WriteLine("End of Call: InitTimer();");
 
             //Debug.WriteLine("Start of Call: AutoUploadCheck();");
@@ -118,10 +118,6 @@ namespace WiFiDBUploader
             if(AutoUploadFolder == true && SelectedServer != null)
             {
                 StartFolderImport(AutoUploadFolderPath);
-            }
-            else
-            {
-                //Debug.WriteLine("Auto Upload Disabled, or No Server Selected.");
             }
         }
         
@@ -1191,10 +1187,9 @@ namespace WiFiDBUploader
         private void backgroundWorker1_ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //maybe do something?
-
             AutoCloseTimer AutoCloseTimerForm = new AutoCloseTimer();
             AutoCloseTimerForm.TimerSeconds = AutoCloseTimerSeconds.ToString();
-            Debug.WriteLine(AutoCloseTimerForm.ShowDialog());
+            AutoCloseTimerForm.ShowDialog();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
