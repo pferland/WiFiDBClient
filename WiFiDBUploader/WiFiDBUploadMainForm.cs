@@ -1196,7 +1196,11 @@ namespace WiFiDBUploader
             AutoCloseTimerForm.TimerSeconds = AutoCloseTimerSeconds.ToString();
             Debug.WriteLine(AutoCloseTimerForm.ShowDialog());
         }
-        
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 
 
