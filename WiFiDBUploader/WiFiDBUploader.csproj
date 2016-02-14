@@ -140,6 +140,12 @@
     <Compile Include="Import Settings.Designer.cs">
       <DependentUpon>Import Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImportDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportDetails.Designer.cs">
+      <DependentUpon>ImportDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="WiFiDB Settings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -168,6 +174,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Import Settings.resx">
       <DependentUpon>Import Settings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportDetails.resx">
+      <DependentUpon>ImportDetails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WiFiDB Settings.resx">
       <DependentUpon>WiFiDB Settings.cs</DependentUpon>

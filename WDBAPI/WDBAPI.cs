@@ -184,7 +184,7 @@ namespace WDBAPI
             {
                 InitParameters();
                 //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                Debug.WriteLine(ApiCompiledPath + "import.php");
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
                 var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);

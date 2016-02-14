@@ -197,7 +197,7 @@ namespace WiFiDBUploader
             rootKey.SetValue("DefaultImportTitle", "Generic Import Title");
             rootKey.SetValue("DefaultImportNotes", "Generic blable about the import, maybe some notes on where you drove or what you saw?");
             rootKey.SetValue("UseDefaultImportValues", "True");
-            rootKey.SetValue("AutoUploadFolder", "True");
+            rootKey.SetValue("AutoUploadFolder", "False");
             rootKey.SetValue("AutoUploadFolderPath", "");
             rootKey.SetValue("ArchiveImports", "False");
             rootKey.SetValue("ArchiveImportsFolderPath", "");
@@ -208,7 +208,7 @@ namespace WiFiDBUploader
             DefaultServerKey = ServersKey.CreateSubKey("api.wifidb.net");
 
             DefaultServerKey.SetValue("ServerAddress", "https://api.wifidb.net");
-            DefaultServerKey.SetValue("ApiPath", "/v2");
+            DefaultServerKey.SetValue("ApiPath", "/v2/");
             DefaultServerKey.SetValue("Username", "AnonCoward");
             DefaultServerKey.SetValue("ApiKey", "");
             DefaultServerKey.SetValue("Selected", "True");
@@ -504,11 +504,22 @@ namespace WiFiDBUploader
                     }else
                     {
                         //Ask For Import Title and Notes. They dont want to use the defaults.
-                        ImportTitle = "Temp Title";
-                        ImportNotes = "Temp Notes";
+                        ImportDetails ImportDetailsForm = new ImportDetails();
+
+                        if (ImportDetailsForm.ShowDialog() == DialogResult.OK)
+                        {
+                            ImportTitle = ImportDetailsForm.ImportTitle;
+                            ImportNotes = ImportDetailsForm.ImportNotes;
+                        }else
+                        {
+                            ImportTitle = DefaultImportTitle;
+                            ImportNotes = DefaultImportNotes;
+                        }
                     }
-                    string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName, ImportTitle, ImportNotes);
-                    WDBAPIObj.ParseApiResponse(response);
+                    //string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName, ImportTitle, ImportNotes);
+                    //WDBAPIObj.ParseApiResponse(response);
+                    string Query = openFileDialog1.FileName + "|" + ImportTitle + "|" + ImportNotes;
+                    StartFileImport(Query);
                 }
                 catch (Exception ex)
                 {
@@ -519,11 +530,37 @@ namespace WiFiDBUploader
 
         private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string ImportTitle;
+            string ImportNotes;
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
-                StartFolderImport(folderBrowserDialog1.SelectedPath, true);
+                if (UseDefaultImportValues)
+                {
+                    ImportTitle = DefaultImportTitle;
+                    ImportNotes = DefaultImportNotes;
+                }
+                else
+                {
+                    //Ask For Import Title and Notes. They dont want to use the defaults.
+
+                    ImportDetails ImportDetailsForm = new ImportDetails();
+
+                    if (ImportDetailsForm.ShowDialog() == DialogResult.OK)
+                    {
+                        ImportTitle = ImportDetailsForm.ImportTitle;
+                        ImportNotes = ImportDetailsForm.ImportNotes;
+                    }
+                    else
+                    {
+                        ImportTitle = DefaultImportTitle;
+                        ImportNotes = DefaultImportNotes;
+                    }
+                }
+                string Query = folderBrowserDialog1.SelectedPath + "|" + ImportTitle + "|" + ImportNotes;
+
+                StartFolderImport(Query, true);
             }
         }
 
@@ -670,8 +707,13 @@ namespace WiFiDBUploader
         {
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
-            //Debug.WriteLine(args.Query);
-            ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(args.Query, DefaultImportTitle, DefaultImportNotes, backgroundWorker) ) ) ;
+            Debug.WriteLine(args.Query);
+            string[] splits = args.Query.Split('|');
+            //splits[0] == ImportFile
+            //splits[1] == ImportTitle
+            //splits[2] == ImportNotes
+
+            ImportIDs.Add(new KeyValuePair <int, string >(ImportInternalID, WDBCommonObj.ImportFile(splits[0], splits[1], splits[2], backgroundWorker) ) ) ;
             e.Result = args.Result;
         }
 
