@@ -220,7 +220,7 @@ namespace WDBAPI
                     //case "waiting":
                     foreach (var item in xmlTree.Elements())
                     {
-                        switch(item.Name.ToString())
+                        switch(item.Name.ToString().ToLower())
                         {
                             case "unknown":
                                 ret = ret + "Error|~|";
@@ -233,6 +233,9 @@ namespace WDBAPI
                                 break;
                             case "finished":
                                 ret = ret + "|~|finished|";
+                                break;
+                            case "bad":
+                                ret = ret + "Error|~|";
                                 break;
                         }
                         
