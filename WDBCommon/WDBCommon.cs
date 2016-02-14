@@ -207,9 +207,12 @@ namespace WDBCommon
             if (IsFileImportedResult == 0)
             {
                 BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
-                response = WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes));
+                string RawResponse = WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes);
+
+                Debug.WriteLine(RawResponse);
+
+                response = WDBAPIObj.ParseApiResponse(RawResponse);
                 BW.ReportProgress(0, response);
-                //Debug.WriteLine(responses.Last().Value.ToString());
                 ArchiveImportedFile(FilePath);
             }
             else
@@ -255,18 +258,27 @@ namespace WDBCommon
 
         public List<ImportRow> GetImportRows()
         {
+            string ImportID;
             SQLiteCommand cmd;
-            List<ImportRow> ImportRows = new List<ImportRow>();
-
-            cmd = new SQLiteCommand(WDBSQLite.conn);
-
-            cmd.CommandText = @"SELECT * FROM `ImportView`";
             SQLiteDataReader reader;
+
+            List<ImportRow> ImportRows = new List<ImportRow>();
+            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd.CommandText = @"SELECT * FROM `ImportView`";
+            
             reader = cmd.ExecuteReader();
             ImportRow ImportRowObj = new ImportRow();
             while (reader.Read())
             {
-                ImportRowObj.ImportID = Int32.Parse(reader["ImportID"].ToString());
+                if (reader["ImportID"].ToString() == "")
+                {
+                    ImportID = "0";
+                }else
+                {
+                    ImportID = reader["ImportID"].ToString();
+                }
+                Debug.WriteLine("ImportID For IntParse: "+ImportID);
+                ImportRowObj.ImportID = Int32.Parse(ImportID);
                 ImportRowObj.Username = reader["Username"].ToString();
                 ImportRowObj.ImportTitle = reader["ImportTitle"].ToString();
                 ImportRowObj.DateTime = reader["Date_Time"].ToString();
