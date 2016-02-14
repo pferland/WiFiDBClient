@@ -459,14 +459,17 @@ namespace WiFiDBUploader
 
         }
 
-        private void StartFolderImport(string query)
+        private void StartFolderImport(string query, bool ManualRun = false)
         {
             QueryArguments args = new QueryArguments(NextID++, query);
 
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_FolderImportDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ImportProgressChanged);
-            backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_ImportCompleted);
+            if(!ManualRun)
+            {
+                backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_ImportCompleted);
+            }
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
@@ -520,7 +523,7 @@ namespace WiFiDBUploader
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 //Debug.WriteLine(folderBrowserDialog1.SelectedPath);
-                StartFolderImport(folderBrowserDialog1.SelectedPath);
+                StartFolderImport(folderBrowserDialog1.SelectedPath, true);
             }
         }
 
