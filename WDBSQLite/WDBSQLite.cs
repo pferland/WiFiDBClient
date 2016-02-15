@@ -12,14 +12,14 @@ namespace WDBSQLite
     public class WDBSQLite
     {
         public SQLiteConnection conn;
-        public string LogPath;
-        
-        public WDBSQLite(string Path, string UI, string LogPath)
+        private WDBTraceLog.TraceLog TraceLogObj;
+
+        public WDBSQLite(string Path, string UI, string LogPath, WDBTraceLog.TraceLog WDBTraceLogObj)
         {
-            this.LogPath = LogPath;
+            TraceLogObj = WDBTraceLogObj;
             if (!File.Exists(Path))
             {
-                Debug.WriteLine("Start of Create SQLite DB. " + Path);
+                TraceLogObj.WriteToLog("Start of Create SQLite DB. " + Path);
                 if (UI.ToLower() == "client")
                 {
                     this.conn = CreateClientDB(Path);
@@ -28,11 +28,11 @@ namespace WDBSQLite
                 {
                     this.conn = CreateUploadDB(Path);
                 }
-                Debug.WriteLine("End of Create SQLite DB." + Path);
+                TraceLogObj.WriteToLog("End of Create SQLite DB." + Path);
             }
             else
             {
-                Debug.WriteLine("SQLite data source=" + Path);
+                TraceLogObj.WriteToLog("SQLite data source=" + Path);
                 conn = new SQLiteConnection("data source=" + Path);
                 conn.Open();
             }
@@ -49,7 +49,14 @@ namespace WDBSQLite
             SQLiteCommand cmd;
 
             SQLiteConnection.CreateFile(DbPath);
-            Debug.Write("Created Database: " + DbPath);
+            if(File.Exists(DbPath))
+            {
+                Debug.Write("Created Database: " + DbPath);
+            }else
+            {
+                TraceLogObj.WriteToLog("Failed to Create SQLite DB...");
+            }
+            
 
             conn = new SQLiteConnection("data source=" + DbPath);
             conn.Open();
@@ -111,17 +118,6 @@ Message VARCHAR(255)
         }
 
 
-        public void WriteLog(string message)
-        {
-            string LogFile = LogPath + "/Trace.log";
-            string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" + "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
-
-            Debug.WriteLine(line);
-
-            System.IO.StreamWriter file = new System.IO.StreamWriter(LogFile, true);
-            file.WriteLine(line);
-            file.Close();
-        }
 
     }
 }

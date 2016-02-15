@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBCommon", "WDBCommon\WDBC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBSQLite", "WDBSQLite\WDBSQLite.csproj", "{E9922033-2239-43A7-8E31-BACE98A0340E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDBTraceLog", "WDBTraceLog\WDBTraceLog.csproj", "{01AF9905-8FD2-496D-B8DA-DFC5290D665E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +86,18 @@ Global
 		{E9922033-2239-43A7-8E31-BACE98A0340E}.Release|x64.Build.0 = Release|x64
 		{E9922033-2239-43A7-8E31-BACE98A0340E}.Release|x86.ActiveCfg = Release|x86
 		{E9922033-2239-43A7-8E31-BACE98A0340E}.Release|x86.Build.0 = Release|x86
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Debug|x64.Build.0 = Debug|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Debug|x86.Build.0 = Debug|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Release|x64.ActiveCfg = Release|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Release|x64.Build.0 = Release|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Release|x86.ActiveCfg = Release|Any CPU
+		{01AF9905-8FD2-496D-B8DA-DFC5290D665E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

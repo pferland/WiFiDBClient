@@ -152,6 +152,12 @@
     <Compile Include="ImportDetails.Designer.cs">
       <DependentUpon>ImportDetails.cs</DependentUpon>
     </Compile>
+    <Compile Include="LoggingSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoggingSettings.Designer.cs">
+      <DependentUpon>LoggingSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="WiFiDB Settings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -186,6 +192,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ImportDetails.resx">
       <DependentUpon>ImportDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoggingSettings.resx">
+      <DependentUpon>LoggingSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WiFiDB Settings.resx">
       <DependentUpon>WiFiDB Settings.cs</DependentUpon>
@@ -227,6 +236,10 @@
     <ProjectReference Include="..\WDBSQLite\WDBSQLite.csproj">
       <Project>{e9922033-2239-43a7-8e31-bace98a0340e}</Project>
       <Name>WDBSQLite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WDBTraceLog\WDBTraceLog.csproj">
+      <Project>{01af9905-8fd2-496d-b8da-dfc5290d665e}</Project>
+      <Name>WDBTraceLog</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

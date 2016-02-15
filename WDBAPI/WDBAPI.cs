@@ -29,94 +29,100 @@ namespace WDBAPI
         public string Username;
         public string ApiKey;
         public string ApiCompiledPath;
+        private WDBTraceLog.TraceLog TraceLogObj;
+
+        public WDBAPI(WDBTraceLog.TraceLog WDBTraceLogObj)
+        {
+            this.TraceLogObj = WDBTraceLogObj;
+        }
 
         public string ApiGetWaitingImports()
         {
-            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Waiting");
+            //TraceLogObj.WriteToLog(ApiCompiledPath + "schedule.php  ---- Get Waiting");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "waiting");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
-                //Debug.WriteLine(response);
+                //TraceLogObj.WriteToLog(response);
             }
-            //Debug.WriteLine("End Function Call: Get Waiting.");
+            //TraceLogObj.WriteToLog("End Function Call: Get Waiting.");
             return response;
         }
         
         public string ApiGetFinishedImports()
         {
-            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Finished");
+            //TraceLogObj.WriteToLog(ApiCompiledPath + "schedule.php  ---- Get Finished");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "finished");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            //Debug.WriteLine("End Function Call: Get Finished.");
+            //TraceLogObj.WriteToLog("End Function Call: Get Finished.");
             return response;
         }
         
         public string ApiGetBadIports()
         {
-            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Bad Imports.");
+            //TraceLogObj.WriteToLog(ApiCompiledPath + "schedule.php  ---- Get Bad Imports.");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "bad");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            //Debug.WriteLine("End Function Call: Get Bad Imports.");
+            //TraceLogObj.WriteToLog("End Function Call: Get Bad Imports.");
             return response;
         }
         
         public string ApiGetCurrentImporting()
         {
-            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Current Imports.");
+            //TraceLogObj.WriteToLog(ApiCompiledPath + "schedule.php  ---- Get Current Imports.");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "importing");
 
                 var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            //Debug.WriteLine("End Function Call: Get Current Imports.");
+            //TraceLogObj.WriteToLog("End Function Call: Get Current Imports.");
             return response;
         }
         
         public string ApiGetDaemonStatuses(string query)
         {
-            //Debug.WriteLine(ApiCompiledPath + "schedule.php  ---- Get Daemon Stats");
+            //TraceLogObj.WriteToLog(ApiCompiledPath + "schedule.php  ---- Get Daemon Stats");
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("apikey"));
                 this.parameters.Add("func", "daemonstatuses");
                 if(query != "")
                 {
@@ -126,20 +132,20 @@ namespace WDBAPI
                 var responseBytes = client.UploadValues(ApiCompiledPath+"schedule.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            //Debug.WriteLine("End Function Call: Get Daemon Stats.");
+            //TraceLogObj.WriteToLog("End Function Call: Get Daemon Stats.");
             return response;
         }
 
         public string ApiImportFile(string UploadFile, string ImportTitle, string ImportNotes)
         {
-            //Debug.WriteLine(ApiCompiledPath + "import.php  ---- Import File.");
+            //TraceLogObj.WriteToLog(ApiCompiledPath + "import.php  ---- Import File.");
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                //Debug.WriteLine(this.parameters.Get("apikey"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                //TraceLogObj.WriteToLog(this.parameters.Get("apikey"));
                 byte[] hashBytes;
                 string hashish;
                 using (var inputFileStream = File.Open(UploadFile, FileMode.Open))
@@ -159,63 +165,63 @@ namespace WDBAPI
                 var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);
                 response = Encoding.ASCII.GetString(responseBytes);
 
-                //Debug.WriteLine("End Function Call: Import File.");
-                //Debug.WriteLine("Response: " + response);
+                //TraceLogObj.WriteToLog("End Function Call: Import File.");
+                //TraceLogObj.WriteToLog("Response: " + response);
                 return response;
             }
         }
 
         private void InitParameters()
         {
-            //Debug.WriteLine("Start Function Call: Init Params.");
+            //TraceLogObj.WriteToLog("Start Function Call: Init Params.");
             this.parameters = new NameValueCollection();
 
             this.parameters.Add("output", "xml");
             this.parameters.Add("username", Username);
             this.parameters.Add("apikey", ApiKey);
             
-            //Debug.WriteLine("InitParameters ApiKey: " + ApiKey);
-            //Debug.WriteLine("End Function Call: Init Params.");
+            //TraceLogObj.WriteToLog("InitParameters ApiKey: " + ApiKey);
+            //TraceLogObj.WriteToLog("End Function Call: Init Params.");
         }
         
         public string CheckFileHash(string FileHash)
         {
-            //Debug.WriteLine("Start Function Call: Check File Hash.");
+            //TraceLogObj.WriteToLog("Start Function Call: Check File Hash.");
             string response;
             using (WebClient client = new WebClient())
             {
                 InitParameters();
-                //Debug.WriteLine(this.parameters.Get("username"));
-                Debug.WriteLine(ApiCompiledPath + "import.php");
+                //TraceLogObj.WriteToLog(this.parameters.Get("username"));
+                TraceLogObj.WriteToLog(ApiCompiledPath + "import.php");
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
                 var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
                 response = Encoding.ASCII.GetString(responseBytes);
             }
-            //Debug.WriteLine("End Function Call: Check File Hash.");
+            //TraceLogObj.WriteToLog("End Function Call: Check File Hash.");
             return response;
         }
 
         public string ParseApiResponse( string response )
         {
-            //Debug.WriteLine("Start Function Call: Parse API Response.");
+            //TraceLogObj.WriteToLog("Start Function Call: Parse API Response.");
             string ret = "";
             if(response == "")
             {
                 return "errorParsing";
             }
-            //Debug.WriteLine("RESPONSE: -------------------------- ");
-            //Debug.WriteLine(response);
-            //Debug.WriteLine(" -------------------------- ");
+            //TraceLogObj.WriteToLog("RESPONSE: -------------------------- ");
+            //TraceLogObj.WriteToLog(response);
+            //TraceLogObj.WriteToLog(" -------------------------- ");
             //System.Threading.Thread.Sleep(2000);
-            //Debug.WriteLine(response);
+            //TraceLogObj.WriteToLog(response);
             XElement xmlTree = XElement.Parse(response);
-            //Debug.WriteLine("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
+            //TraceLogObj.WriteToLog("Name: " + xmlTree.Name.ToString() + " - Value: " + xmlTree.Value.ToString());
             switch(xmlTree.Name.ToString())
             {
                 case "error":
                     ret = "error|~|There was An error during Import-~-" + xmlTree.Value.ToString();
-                    Debug.WriteLine("There was An error during Import: " + xmlTree.Value.ToString());
+                    TraceLogObj.WriteToLog("There was An error during Import: " + xmlTree.Value.ToString());
                     break;
 
                 case "scheduling":
@@ -241,14 +247,14 @@ namespace WDBAPI
                                 break;
                         }
                         
-                        //Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        //TraceLogObj.WriteToLog("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                         foreach (var subitem in item.Elements())
                         {
                             ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
-                            //Debug.WriteLine("Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
+                            //TraceLogObj.WriteToLog("Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
                         }
                     }
-                    //Debug.WriteLine("Parse Return: "+ret);
+                    //TraceLogObj.WriteToLog("Parse Return: "+ret);
                     //    break;
 
                     break;
@@ -257,11 +263,11 @@ namespace WDBAPI
                     {
                         foreach (var item in xmlTree.Elements())
                         {
-                            //Debug.WriteLine("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                            //TraceLogObj.WriteToLog("--Parent Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                             ret = ret + "|~|" + item.Name.ToString() + "|";
                             foreach (var subitem in item.Elements())
                             {
-                                //Debug.WriteLine("------Child Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
+                                //TraceLogObj.WriteToLog("------Child Name: " + subitem.Name.ToString() + " --   Value: " + subitem.Value.ToString());
                                 ret = ret + subitem.Name.ToString() + "-~-" + subitem.Value.ToString() + "|";
                             }
                         }
@@ -269,22 +275,22 @@ namespace WDBAPI
                     {
                         ret = "error|~|No_Daemons_Running";
                     }
-                    //Debug.WriteLine("Ret: " + ret);
+                    //TraceLogObj.WriteToLog("Ret: " + ret);
                     break;
                 case "import":
                     foreach(var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|import|"+ item.Name.ToString() + "-~-" + item.Value.ToString();
-                        ////Debug.WriteLine("Name: " + item.Name.ToString() + "-~-" + item.Value.ToString());
+                        ////TraceLogObj.WriteToLog("Name: " + item.Name.ToString() + "-~-" + item.Value.ToString());
                     }
                     break;
 
                 case "importing":
                     foreach (var item in xmlTree.Elements())
                     {
-                        //Debug.WriteLine("Type: " + item.GetType().ToString());
+                        //TraceLogObj.WriteToLog("Type: " + item.GetType().ToString());
                         ret = ret+ "|~|importing|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        ////Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ////TraceLogObj.WriteToLog("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
                     break;
 
@@ -292,7 +298,7 @@ namespace WDBAPI
                     foreach (var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|finished|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        ////Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ////TraceLogObj.WriteToLog("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
                     break;
 
@@ -301,17 +307,17 @@ namespace WDBAPI
                     foreach (var item in xmlTree.Elements())
                     {
                         ret = ret + "|~|bad|" + item.Name.ToString() + "-~-" + item.Value.ToString();
-                        ////Debug.WriteLine("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
+                        ////TraceLogObj.WriteToLog("Name: " + item.Name.ToString() + " --   Value: " + item.Value.ToString());
                     }
                     break;
 
                 default:
                     ret = "unknown|Unknown return: " + xmlTree.Value.ToString();
-                    ////Debug.WriteLine("Unknown return: " + xmlTree.Value.ToString());
+                    ////TraceLogObj.WriteToLog("Unknown return: " + xmlTree.Value.ToString());
                     break;
             }
-            ////Debug.WriteLine(ret);
-            //Debug.WriteLine("End Function Call: Parse API Response.");
+            ////TraceLogObj.WriteToLog(ret);
+            //TraceLogObj.WriteToLog("End Function Call: Parse API Response.");
             return ret;
         }
 
@@ -320,7 +326,7 @@ namespace WDBAPI
             string LogFile = LogPath + "/Trace.log";
             string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" + "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
 
-            Debug.WriteLine(line);
+            TraceLogObj.WriteToLog(line);
 
             System.IO.StreamWriter file = new System.IO.StreamWriter(LogFile, true);
             file.WriteLine(line);
