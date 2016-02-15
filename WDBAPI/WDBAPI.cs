@@ -13,6 +13,8 @@ namespace WDBAPI
     {
         public NameValueCollection parameters = null;
 
+        public string LogPath;
+
         public bool AutoUploadFolder;
         public string AutoUploadFolderPath;
         public bool ArchiveImports;
@@ -311,6 +313,18 @@ namespace WDBAPI
             ////Debug.WriteLine(ret);
             //Debug.WriteLine("End Function Call: Parse API Response.");
             return ret;
+        }
+
+        public void WriteLog(string message)
+        {
+            string LogFile = LogPath + "/Trace.log";
+            string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" + "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
+
+            Debug.WriteLine(line);
+
+            System.IO.StreamWriter file = new System.IO.StreamWriter(LogFile, true);
+            file.WriteLine(line);
+            file.Close();
         }
     }
 }

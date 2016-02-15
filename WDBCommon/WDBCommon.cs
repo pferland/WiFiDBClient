@@ -16,7 +16,9 @@ namespace WDBCommon
     {
         private WDBAPI.WDBAPI WDBAPIObj = new WDBAPI.WDBAPI();
         private WDBSQLite.WDBSQLite WDBSQLite;
-        
+
+        public string LogPath;
+
         public int InternalImportID = 0;
 
         public bool AutoUploadFolder;
@@ -37,43 +39,51 @@ namespace WDBCommon
 
         public WDBCommon(string Path)
         {
-            Debug.WriteLine("Start of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
-            WDBSQLite = new WDBSQLite.WDBSQLite(Path, "uploader");
-            Debug.WriteLine("End of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
+            WriteLog("Start of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
+            WDBSQLite = new WDBSQLite.WDBSQLite(Path, "uploader", LogPath);
+            WriteLog("End of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
         }
 
         public void initApi()
         {
-            //Debug.WriteLine("Start Function Call: Init API.");
+            //WriteLog("Start Function Call: Init API.");
             WDBAPIObj.ApiCompiledPath = ApiCompiledPath;
             WDBAPIObj.ApiKey = ApiKey;
             WDBAPIObj.Username = Username;
             WDBAPIObj.DefaultImportTitle = DefaultImportTitle;
             WDBAPIObj.DefaultImportNotes = DefaultImportNotes;
             WDBAPIObj.UseDefaultImportValues = UseDefaultImportValues;
-            //Debug.WriteLine("End Function Call: Init API.");
+            WDBAPIObj.LogPath = LogPath;
+            //WriteLog("End Function Call: Init API.");
         }
 
         ///
         /// Common Fucntions
         ///
 
-        public int IsFileImported(string query)
+        public int IsFileImported(string query, bool LocalOnly)
         {
             //Check the Local SQLite DB for the File hash, If it is found, return now.
             if(CheckSQLFileHash(query) == 0)
             {
-                // If the filehash was not found in the Local SQLite DB, check the WDB API.
-                if (CheckFileHash(query) == 0)
+                if(!LocalOnly)
                 {
-                    return 0; //Hash not found.
+                    // If the filehash was not found in the Local SQLite DB, check the WDB API.
+                    if (CheckFileHash(query) == 0)
+                    {
+                        return 0; //Hash not found.
+                    }
+                    else
+                    {
+                        return 1; //Hash found.
+                    }
                 }else
                 {
-                    return 1; //Hash found.
+                    return 0;
                 }
-            }else
+            } else
             {
-                return 1; //Hash Found
+                return 0; //Hash Found
             }            
         }
 
@@ -84,7 +94,7 @@ namespace WDBCommon
         public int CheckFileHash(string query)
         {
             string APIResponse = WDBAPIObj.CheckFileHash(query);
-            Debug.WriteLine("IsFileImported Response: " + APIResponse);
+            WriteLog("IsFileImported Response: " + APIResponse);
             string response = WDBAPIObj.ParseApiResponse(APIResponse);
 
 
@@ -96,7 +106,7 @@ namespace WDBCommon
                 return -1;
             }
 
-            Debug.WriteLine("split[0].ToLower(): " + split[0].ToLower());
+            WriteLog("split[0].ToLower(): " + split[0].ToLower());
             if (split[1].ToLower() == "")
             {
                 return 0;
@@ -115,7 +125,7 @@ namespace WDBCommon
         
         public void GetDaemonStatuses(string query, BackgroundWorker BgWk)
         {
-            //Debug.WriteLine("Active Server: " + WDBAPIObj.ApiCompiledPath);
+            //WriteLog("Active Server: " + WDBAPIObj.ApiCompiledPath);
             BgWk.ReportProgress(0, "");
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetDaemonStatuses(query)));
         }
@@ -130,10 +140,10 @@ namespace WDBCommon
             var responses = new List<KeyValuePair<int, string>>();
             try
             {
-                Debug.WriteLine("Auto Import Folder: " + Path + " -> " + Directory.Exists(Path));
+                WriteLog("Auto Import Folder: " + Path + " -> " + Directory.Exists(Path));
                 if (Directory.Exists(Path)) 
                 {
-                    Debug.WriteLine("Auto Import Folder: " + Path);
+                    WriteLog("Auto Import Folder: " + Path);
                     var md5 = MD5.Create();
 
                     string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
@@ -141,9 +151,9 @@ namespace WDBCommon
                     // Loop through the file extension types, find them in the provided folder, then import it.
                     foreach (string ext in extensions)
                     {
-                        Debug.WriteLine("Extension that will be used: " + ext);
+                        WriteLog("Extension that will be used: " + ext);
                         string[] files = Directory.GetFiles(Path, ext);
-                        //Debug.WriteLine("The number of VS1 files: {0}.", files.Length);
+                        //WriteLog("The number of VS1 files: {0}.", files.Length);
                         if (files.Length > 0)
                         {
                             foreach (string file in files)
@@ -159,7 +169,7 @@ namespace WDBCommon
             }
             catch (Exception e)
             {
-                Debug.WriteLine("The process failed: {0}", e.ToString());
+                WriteLog("The process failed: " + e.ToString());
             }
             return responses;
         }
@@ -175,17 +185,17 @@ namespace WDBCommon
                     string ArchivedFile = ArchiveImportsFolderPath + "\\" + FileName;
 
                     File.Move(FilePath, ArchivedFile);
-                    Debug.WriteLine("{0} was moved to {1}.", FilePath, ArchivedFile);
+                    WriteLog(FilePath + " was moved to " + ArchivedFile);
                     
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("The process failed: {0}", e.ToString());
+                    WriteLog("The process failed: " + e.ToString());
                 }
             }
             else
             {
-                Debug.WriteLine("Archve Imported Files is disabled.");
+                WriteLog("Archve Imported Files is disabled.");
             }
         }
 
@@ -196,34 +206,34 @@ namespace WDBCommon
             string hashish;
             var md5 = MD5.Create();
             InternalImportID++;
-            //Debug.WriteLine(db3);
+            //WriteLog(db3);
             using (var inputFileStream = File.Open(FilePath, FileMode.Open))
             {
                 hashBytes = md5.ComputeHash(inputFileStream);
                 hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
             }
-            int IsFileImportedResult = IsFileImported(hashish);
+            int IsFileImportedResult = IsFileImported(hashish, true);
 
-            Debug.WriteLine("IsFileImportedResult :" + IsFileImportedResult);
+            WriteLog("IsFileImportedResult :" + IsFileImportedResult);
             if (IsFileImportedResult == 0)
             {
                 BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
                 string RawResponse = WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes);
 
-                Debug.WriteLine(RawResponse);
+                WriteLog(RawResponse);
 
                 response = WDBAPIObj.ParseApiResponse(RawResponse);
 
-                Debug.WriteLine("Parse Response Result: " + response);
+                WriteLog("Parse Response Result: " + response);
 
-                BW.ReportProgress(0, response);
+                BW.ReportProgress(0, response+"::"+FilePath);
                 ArchiveImportedFile(FilePath);
             }
             else
             {
-                response = "Already Imported.";
+                response = "error|~|Already Imported.-~-" + FilePath + "::" + hashish;
             }
-            Debug.WriteLine("File Import Response return: " + response);
+            WriteLog("File Import Response return: " + response);
             return response;
         }
 
@@ -241,7 +251,7 @@ namespace WDBCommon
             int ret = 0;
             cmd.CommandText = @"SELECT `ID` FROM `ImportView` WHERE `FileHash` = ?";
 
-            Debug.WriteLine("FileHash query: " + query);
+            WriteLog("FileHash query: " + query);
 
             var filehash = cmd.CreateParameter();
             filehash.Value = query;
@@ -282,7 +292,7 @@ namespace WDBCommon
                 {
                     ImportID = reader["ImportID"].ToString();
                 }
-                Debug.WriteLine("ImportID For IntParse: "+ImportID);
+                WriteLog("ImportID For IntParse: "+ImportID);
                 ImportRowObj.ImportID = Int32.Parse(ImportID);
                 ImportRowObj.Username = reader["Username"].ToString();
                 ImportRowObj.ImportTitle = reader["ImportTitle"].ToString();
@@ -296,8 +306,6 @@ namespace WDBCommon
                 ImportRows.Add(ImportRowObj);
 
             }
-            Debug.WriteLine("ImportRows[0].ImportID: " + ImportRows[0].ImportID.ToString());
-            Debug.WriteLine("ImportRows[1].ImportID: " + ImportRows[1].ImportID.ToString());
             return ImportRows;
         }
         
@@ -336,7 +344,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?)";
             Message.Value = ImportRowObj.Message;
             cmd.Parameters.Add(Message);
 
-            Debug.WriteLine(cmd.ExecuteNonQuery());
+            WriteLog("cmd.ExecuteNonQuery(): " + cmd.ExecuteNonQuery().ToString());
 
             cmd.Dispose();
         }
@@ -372,10 +380,27 @@ WHERE `FileHash` = ?";
             FileHashParm.Value = ImportRowObj.FileHash.ToUpper();
             cmd.Parameters.Add(FileHashParm);
 
-            Debug.WriteLine(cmd.ExecuteNonQuery());
+            WriteLog("cmd.ExecuteNonQuery(): " + cmd.ExecuteNonQuery().ToString());
 
             cmd.Dispose();
         }
+
+
+
+
+
+        public void WriteLog(string message)
+        {
+            string LogFile = LogPath + "/Trace.log";
+            string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" + "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
+
+            Debug.WriteLine(line);
+
+            //System.IO.StreamWriter file = new System.IO.StreamWriter(LogFile, true);
+            //file.WriteLine(line);
+            //file.Close();
+        }
+
 
     }
 }

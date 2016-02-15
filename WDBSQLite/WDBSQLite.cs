@@ -12,8 +12,11 @@ namespace WDBSQLite
     public class WDBSQLite
     {
         public SQLiteConnection conn;
-        public WDBSQLite(string Path, string UI)
+        public string LogPath;
+        
+        public WDBSQLite(string Path, string UI, string LogPath)
         {
+            this.LogPath = LogPath;
             if (!File.Exists(Path))
             {
                 Debug.WriteLine("Start of Create SQLite DB. " + Path);
@@ -106,5 +109,19 @@ Message VARCHAR(255)
 
             return conn;
         }
+
+
+        public void WriteLog(string message)
+        {
+            string LogFile = LogPath + "/Trace.log";
+            string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" + "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + message + "]";
+
+            Debug.WriteLine(line);
+
+            System.IO.StreamWriter file = new System.IO.StreamWriter(LogFile, true);
+            file.WriteLine(line);
+            file.Close();
+        }
+
     }
 }
