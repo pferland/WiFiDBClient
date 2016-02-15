@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,20 @@ namespace WDBCommon
     public class WDBCommon
     {
         private WDBAPI.WDBAPI WDBAPIObj;
-        private WDBSQLite.WDBSQLite WDBSQLite;
+        private WDBSQLite.WDBSQLite WDBSQLiteObj;
 
         public string LogPath;
+        private string _ThreadName;
+        public string ThreadName
+        {
+            get { return _ThreadName; }
+            set {
+                _ThreadName = value;
+                WDBSQLiteObj.ThreadName = value;
+                WDBAPIObj.ThreadName = value;
+            }
+        }
+        public string ObjectName = "WDBCommon";
 
         public int InternalImportID = 0;
 
@@ -37,25 +49,30 @@ namespace WDBCommon
         public string ApiCompiledPath;
         private WDBTraceLog.TraceLog TraceLogObj;
 
-        public WDBCommon(string Path, WDBAPI.WDBAPI WDBAPIObj, WDBTraceLog.TraceLog TraceLogObj)
+        public WDBCommon(string Path, WDBAPI.WDBAPI WDBAPIObj, WDBTraceLog.TraceLog WDBTraceLogObj)
         {
+            WDBTraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBCommon()");
             this.WDBAPIObj = WDBAPIObj;
-            this.TraceLogObj.WriteToLog("Start of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
-            WDBSQLite = new WDBSQLite.WDBSQLite(Path, "uploader", LogPath, TraceLogObj);
-            this.TraceLogObj.WriteToLog("End of Call: new WDBCommon.WDBCommon(Path, \"Uploader\")");
+            TraceLogObj = WDBTraceLogObj;
+            WDBSQLiteObj = new WDBSQLite.WDBSQLite(Path, "uploader", LogPath, WDBTraceLogObj);
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBCommon()");
         }
 
         public void initApi()
         {
-            TraceLogObj.WriteToLog("Start Function Call: Init API.");
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start Function Call: Init API.");
             WDBAPIObj.ApiCompiledPath = ApiCompiledPath;
+
+            Debug.WriteLine(_ThreadName);
+            WDBSQLiteObj.ThreadName = _ThreadName;
+            WDBAPIObj.ThreadName = _ThreadName;
             WDBAPIObj.ApiKey = ApiKey;
             WDBAPIObj.Username = Username;
             WDBAPIObj.DefaultImportTitle = DefaultImportTitle;
             WDBAPIObj.DefaultImportNotes = DefaultImportNotes;
             WDBAPIObj.UseDefaultImportValues = UseDefaultImportValues;
             WDBAPIObj.LogPath = LogPath;
-            TraceLogObj.WriteToLog("End Function Call: Init API.");
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Function Call: Init API.");
         }
 
         ///
@@ -64,26 +81,31 @@ namespace WDBCommon
 
         public int IsFileImported(string query, bool LocalOnly)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: IsFileImported");
             //Check the Local SQLite DB for the File hash, If it is found, return now.
-            if(CheckSQLFileHash(query) == 0)
+            if (CheckSQLFileHash(query) == 0)
             {
                 if(!LocalOnly)
                 {
                     // If the filehash was not found in the Local SQLite DB, check the WDB API.
                     if (CheckFileHash(query) == 0)
                     {
+                        TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
                         return 0; //Hash not found.
                     }
                     else
                     {
+                        TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
                         return 1; //Hash found.
                     }
                 }else
                 {
+                    TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
                     return 0;
                 }
             } else
             {
+                TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
                 return 0; //Hash Found
             }            
         }
@@ -94,8 +116,9 @@ namespace WDBCommon
         ///
         public int CheckFileHash(string query)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CheckFileHash");
             string APIResponse = WDBAPIObj.CheckFileHash(query);
-            TraceLogObj.WriteToLog("IsFileImported Response: " + APIResponse);
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "IsFileImported Response: " + APIResponse);
             string response = WDBAPIObj.ParseApiResponse(APIResponse);
 
 
@@ -104,31 +127,38 @@ namespace WDBCommon
 
             if (split[0] == "error")
             {
+                TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash: Error");
                 return -1;
             }
 
-            TraceLogObj.WriteToLog("split[0].ToLower(): " + split[0].ToLower());
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "split[0].ToLower(): " + split[0].ToLower());
             if (split[1].ToLower() == "")
             {
+                TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash");
                 return 0;
             }
             else
             {
+                TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash");
                 return 1;
             }
         }
 
         public void GetHashStatus(string query, BackgroundWorker BgWk)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: GetHashStatus");
             BgWk.ReportProgress(0, "");
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.CheckFileHash(query)));
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: GetHashStatus");
         }
         
         public void GetDaemonStatuses(string query, BackgroundWorker BgWk)
         {
-            TraceLogObj.WriteToLog("Active Server: " + WDBAPIObj.ApiCompiledPath);
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: GetDaemonStatuses");
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Active Server: " + WDBAPIObj.ApiCompiledPath);
             BgWk.ReportProgress(0, "");
             BgWk.ReportProgress(100, WDBAPIObj.ParseApiResponse(WDBAPIObj.ApiGetDaemonStatuses(query)));
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: GetDaemonStatuses");
         }
 
         public void GetWaiting(string query, BackgroundWorker BgWk)
@@ -138,13 +168,18 @@ namespace WDBCommon
 
         public List<KeyValuePair<int, string>> ImportFolder(string Path, string ImportTitle, string ImportNotes, BackgroundWorker BW)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: ImportFolder");
             var responses = new List<KeyValuePair<int, string>>();
             try
             {
-                TraceLogObj.WriteToLog("Auto Import Folder: " + Path + " -> " + Directory.Exists(Path));
-                if (Directory.Exists(Path)) 
+                string[] PathSplit = Path.Split('|');
+                string SendTitle = PathSplit[1];
+                string SendNotes = PathSplit[2];
+
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Auto Import Folder: " + PathSplit[0] + " -> " + Directory.Exists(PathSplit[0]));
+                if (Directory.Exists(PathSplit[0])) 
                 {
-                    TraceLogObj.WriteToLog("Auto Import Folder: " + Path);
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Auto Import Folder: " + PathSplit[0]);
                     var md5 = MD5.Create();
 
                     string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
@@ -152,9 +187,9 @@ namespace WDBCommon
                     // Loop through the file extension types, find them in the provided folder, then import it.
                     foreach (string ext in extensions)
                     {
-                        TraceLogObj.WriteToLog("Extension that will be used: " + ext);
-                        string[] files = Directory.GetFiles(Path, ext);
-                        TraceLogObj.WriteToLog("The number of VS1 files: " + files.Length);
+                        TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Extension that will be used: " + ext);
+                        string[] files = Directory.GetFiles(PathSplit[0], ext);
+                        TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "The number of VS1 files: " + files.Length);
                         if (files.Length > 0)
                         {
                             foreach (string file in files)
@@ -170,14 +205,16 @@ namespace WDBCommon
             }
             catch (Exception e)
             {
-                TraceLogObj.WriteToLog("The process failed: " + e.ToString());
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "The process failed: " + e.ToString());
             }
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ImportFolder");
             return responses;
         }
 
         private void ArchiveImportedFile(string FilePath)
         {
-            if(ArchiveImports && (ArchiveImportsFolderPath != "" || ArchiveImportsFolderPath != null) )
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: ArchiveImportedFile");
+            if (ArchiveImports && (ArchiveImportsFolderPath != "" || ArchiveImportsFolderPath != null) )
             {
                 try
                 {
@@ -186,22 +223,24 @@ namespace WDBCommon
                     string ArchivedFile = ArchiveImportsFolderPath + "\\" + FileName;
 
                     File.Move(FilePath, ArchivedFile);
-                    TraceLogObj.WriteToLog(FilePath + " was moved to " + ArchivedFile);
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), FilePath + " was moved to " + ArchivedFile);
                     
                 }
                 catch (Exception e)
                 {
-                    TraceLogObj.WriteToLog("The process failed: " + e.ToString());
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "The process failed: " + e.ToString());
                 }
             }
             else
             {
-                TraceLogObj.WriteToLog("Archve Imported Files is disabled.");
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Archve Imported Files is disabled.");
             }
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ArchiveImportedFile");
         }
 
         public string ImportFile(string FilePath, string ImportTitle, string ImportNotes, BackgroundWorker BW)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: ImportFile");
             string response;
             byte[] hashBytes;
             string hashish;
@@ -213,17 +252,17 @@ namespace WDBCommon
             }
             int IsFileImportedResult = IsFileImported(hashish, true);
 
-            TraceLogObj.WriteToLog("IsFileImportedResult :" + IsFileImportedResult);
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "IsFileImportedResult :" + IsFileImportedResult);
             if (IsFileImportedResult == 0)
             {
                 BW.ReportProgress(0, "newrow|~|" + FilePath + "|~|" + hashish);
                 string RawResponse = WDBAPIObj.ApiImportFile(FilePath, ImportTitle, ImportNotes);
 
-                TraceLogObj.WriteToLog(RawResponse);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), RawResponse);
 
                 response = WDBAPIObj.ParseApiResponse(RawResponse);
 
-                TraceLogObj.WriteToLog("Parse Response Result: " + response);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Parse Response Result: " + response);
 
                 BW.ReportProgress(0, response+"::"+FilePath);
                 ArchiveImportedFile(FilePath);
@@ -232,7 +271,8 @@ namespace WDBCommon
             {
                 response = "error|~|Already Imported.-~-" + FilePath + "::" + hashish;
             }
-            TraceLogObj.WriteToLog("File Import Response return: " + response);
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "File Import Response return: " + response);
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ImportFile");
             return response;
         }
 
@@ -245,12 +285,13 @@ namespace WDBCommon
 
         public int CheckSQLFileHash(string query)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CheckSQLFileHash");
             SQLiteCommand cmd;
-            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd = new SQLiteCommand(WDBSQLiteObj.conn);
             int ret = 0;
             cmd.CommandText = @"SELECT `ID` FROM `ImportView` WHERE `FileHash` = ?";
 
-            TraceLogObj.WriteToLog("FileHash query: " + query);
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "FileHash query: " + query);
 
             var filehash = cmd.CreateParameter();
             filehash.Value = query;
@@ -267,17 +308,19 @@ namespace WDBCommon
                 }
             }
             cmd.Dispose();
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckSQLFileHash");
             return ret;
         }
 
         public List<ImportRow> GetImportRows()
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: GetImportRows");
             string ImportID;
             SQLiteCommand cmd;
             SQLiteDataReader reader;
 
             List<ImportRow> ImportRows = new List<ImportRow>();
-            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd = new SQLiteCommand(WDBSQLiteObj.conn);
             cmd.CommandText = @"SELECT * FROM `ImportView`";
             
             reader = cmd.ExecuteReader();
@@ -291,7 +334,7 @@ namespace WDBCommon
                 {
                     ImportID = reader["ImportID"].ToString();
                 }
-                TraceLogObj.WriteToLog("ImportID For IntParse: "+ImportID);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "ImportID For IntParse: "+ImportID);
                 ImportRowObj.ImportID = Int32.Parse(ImportID);
                 ImportRowObj.Username = reader["Username"].ToString();
                 ImportRowObj.ImportTitle = reader["ImportTitle"].ToString();
@@ -305,13 +348,15 @@ namespace WDBCommon
                 ImportRows.Add(ImportRowObj);
 
             }
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: GetImportRows");
             return ImportRows;
         }
         
         public void InsertImportRow(ImportRow ImportRowObj)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: InsertImportRow");
             SQLiteCommand cmd;
-            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd = new SQLiteCommand(WDBSQLiteObj.conn);
             cmd.CommandText = @"INSERT INTO `ImportView` 
 (`Username`, `Date_Time`, `FileSize`, `FileName`, `FileHash`, `Status`, `Message`) 
 VALUES ( ?, ?, ?, ?, ?, ?, ?)";
@@ -343,15 +388,17 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?)";
             Message.Value = ImportRowObj.Message;
             cmd.Parameters.Add(Message);
 
-            TraceLogObj.WriteToLog("cmd.ExecuteNonQuery(): " + cmd.ExecuteNonQuery().ToString());
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "cmd.ExecuteNonQuery(): " + cmd.ExecuteNonQuery().ToString());
 
             cmd.Dispose();
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: InsertImportRow");
         }
 
         public void UpdateImportRow(ImportRow ImportRowObj)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: UpdateImportRow");
             SQLiteCommand cmd;
-            cmd = new SQLiteCommand(WDBSQLite.conn);
+            cmd = new SQLiteCommand(WDBSQLiteObj.conn);
             cmd.CommandText = @"UPDATE `ImportView` SET 
 `ImportID` = ?,
 `ImportTitle` = ?,
@@ -379,9 +426,20 @@ WHERE `FileHash` = ?";
             FileHashParm.Value = ImportRowObj.FileHash.ToUpper();
             cmd.Parameters.Add(FileHashParm);
 
-            TraceLogObj.WriteToLog("cmd.ExecuteNonQuery(): " + cmd.ExecuteNonQuery().ToString());
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "cmd.ExecuteNonQuery(): " + cmd.ExecuteNonQuery().ToString());
 
             cmd.Dispose();
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: UpdateImportRow");
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public string GetCurrentMethod()
+        {
+            StackTrace st = new StackTrace();
+            StackFrame sf = st.GetFrame(1);
+
+            return sf.GetMethod().Name;
+        }
+
     }
 }

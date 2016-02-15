@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,13 +14,22 @@ namespace WDBSQLite
     {
         public SQLiteConnection conn;
         private WDBTraceLog.TraceLog TraceLogObj;
+        public string ObjectName = "WDBSQLite";
+
+        private string _ThreadName;
+        public string ThreadName
+        {
+            get { return _ThreadName; }
+            set { _ThreadName = value; }
+        }
 
         public WDBSQLite(string Path, string UI, string LogPath, WDBTraceLog.TraceLog WDBTraceLogObj)
         {
-            TraceLogObj = WDBTraceLogObj;
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBSQLite()");
+            this.TraceLogObj = WDBTraceLogObj;
             if (!File.Exists(Path))
             {
-                TraceLogObj.WriteToLog("Start of Create SQLite DB. " + Path);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start of Create SQLite DB. " + Path);
                 if (UI.ToLower() == "client")
                 {
                     this.conn = CreateClientDB(Path);
@@ -28,14 +38,15 @@ namespace WDBSQLite
                 {
                     this.conn = CreateUploadDB(Path);
                 }
-                TraceLogObj.WriteToLog("End of Create SQLite DB." + Path);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End of Create SQLite DB." + Path);
             }
             else
             {
-                TraceLogObj.WriteToLog("SQLite data source=" + Path);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "SQLite data source=" + Path);
                 conn = new SQLiteConnection("data source=" + Path);
                 conn.Open();
             }
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: WDBSQLite()");
         }
 
         public void Close()
@@ -43,26 +54,37 @@ namespace WDBSQLite
             this.conn.Dispose();
         }
 
+        private SQLiteConnection CreateDB(string DbFile)
+        {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CreateDB");
+            try
+            {
+                SQLiteConnection.CreateFile(DbFile);
+            }
+            catch (Exception e)
+            {
+                string DbPath = Path.GetDirectoryName(DbFile);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Failed to Create SQLite DB: " + e.Message.ToString());
+                Directory.CreateDirectory(DbPath);
+                SQLiteConnection.CreateFile(DbFile);
+            }
+            Debug.Write("Created Database: " + DbFile);
+
+            conn = new SQLiteConnection("data source=" + DbFile);
+            conn.Open();
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CreateDB");
+            return conn;
+        }
+
         private SQLiteConnection CreateUploadDB(string DbPath)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CreateUploadDB");
             SQLiteConnection conn;
             SQLiteCommand cmd;
 
-            SQLiteConnection.CreateFile(DbPath);
-            if(File.Exists(DbPath))
-            {
-                Debug.Write("Created Database: " + DbPath);
-            }else
-            {
-                TraceLogObj.WriteToLog("Failed to Create SQLite DB...");
-            }
-            
-
-            conn = new SQLiteConnection("data source=" + DbPath);
-            conn.Open();
+            conn = CreateDB(DbPath);
 
             cmd = new SQLiteCommand(conn);
-
             cmd.CommandText = @"CREATE TABLE ImportView (
 ID INTEGER PRIMARY KEY AUTOINCREMENT,
 ImportID INT,
@@ -80,20 +102,17 @@ Message VARCHAR(255)
             Debug.Write("Successfully created `ImportView` Table");
 
             cmd.Dispose();
-
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CreateUploadDB");
             return conn;
         }
 
         private SQLiteConnection CreateClientDB(string DbPath)
         {
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CreateClientDB");
             SQLiteConnection conn;
             SQLiteCommand cmd;
 
-            SQLiteConnection.CreateFile(DbPath);
-            Debug.Write("Created Database: " + DbPath);
-
-            conn = new SQLiteConnection("data source=" + DbPath);
-            conn.Open();
+            conn = CreateDB(DbPath);
 
             cmd = new SQLiteCommand(conn);
 
@@ -113,11 +132,18 @@ Message VARCHAR(255)
             Debug.Write("Successfully created `ImportView` Table");
 
             cmd.Dispose();
-
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CreateClientDB");
             return conn;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public string GetCurrentMethod()
+        {
+            StackTrace st = new StackTrace();
+            StackFrame sf = st.GetFrame(1);
 
+            return sf.GetMethod().Name;
+        }
 
     }
 }

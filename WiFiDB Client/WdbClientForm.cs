@@ -14,12 +14,21 @@ namespace WiFiDB_Uploader
     public partial class WdbClientForm : Form
     {
         WDBAPI.WDBAPI WDBAPIObj;
+        WDBTraceLog.TraceLog TraceLogObj;
         public WdbClientForm()
         {
             InitializeComponent();
+
+            //// These need to be replaced with registrty keys to be loaded by the client. Will be done once v1.0 of the Uploader is done.
+            string LogPath = ".\\Logs\\";
+            bool TraceLogEnable = false;
+            bool PerRunRotate = true;
+
+
+            TraceLogObj = new WDBTraceLog.TraceLog(LogPath, TraceLogEnable, PerRunRotate);
             listView1.View = View.Details;
 
-            WDBAPIObj = new WDBAPI.WDBAPI();
+            WDBAPIObj = new WDBAPI.WDBAPI(TraceLogObj);
 
             string[] row = { "1", "Pferland", "Test Import", "2016-01-05", "248.02kb", "WDB_Upload_20160105.vs1", "DUMMYHASHSUM", "N/A", "Not Importing" };
             var listViewItem = new ListViewItem(row);
