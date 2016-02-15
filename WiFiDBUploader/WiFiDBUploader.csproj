@@ -128,6 +128,12 @@
     <Compile Include="AutoCloseTimer.Designer.cs">
       <DependentUpon>AutoCloseTimer.cs</DependentUpon>
     </Compile>
+    <Compile Include="BGThreadsSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BGThreadsSettings.Designer.cs">
+      <DependentUpon>BGThreadsSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditServer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -168,6 +174,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AutoCloseTimer.resx">
       <DependentUpon>AutoCloseTimer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BGThreadsSettings.resx">
+      <DependentUpon>BGThreadsSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditServer.resx">
       <DependentUpon>EditServer.cs</DependentUpon>

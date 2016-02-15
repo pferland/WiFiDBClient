@@ -71,6 +71,7 @@ namespace WiFiDBUploader
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.AutoBrowseButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.AutoUploadTimerTextBox = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -79,7 +80,6 @@ namespace WiFiDBUploader
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.AutoCancelButton = new System.Windows.Forms.Button();
             this.AutoOKButton = new System.Windows.Forms.Button();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -125,6 +125,16 @@ namespace WiFiDBUploader
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Auto Upload Folder";
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(87, 86);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(200, 17);
+            this.checkBox3.TabIndex = 6;
+            this.checkBox3.Text = "Enable Auto Close After Auto Upload";
+            this.checkBox3.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -200,16 +210,6 @@ namespace WiFiDBUploader
             this.AutoOKButton.TabIndex = 7;
             this.AutoOKButton.Text = "OK";
             this.AutoOKButton.UseVisualStyleBackColor = true;
-            // 
-            // checkBox3
-            // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(87, 86);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(200, 17);
-            this.checkBox3.TabIndex = 6;
-            this.checkBox3.Text = "Enable Auto Close After Auto Upload";
-            this.checkBox3.UseVisualStyleBackColor = true;
             // 
             // Auto_Upload_Settings
             // 

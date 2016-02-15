@@ -48,17 +48,17 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.ImportCancelButton = new System.Windows.Forms.Button();
             this.ImportOKButton = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // Default Import Values Group box ( The thing that goes around all of the import thingys )
+            // groupBox1
             // 
             this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Controls.Add(this.richTextBox1);
@@ -72,7 +72,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Default Import Values";
             // 
-            // Notes text input field
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(12, 290);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(231, 17);
+            this.checkBox1.TabIndex = 3;
+            this.checkBox1.Text = "Use Default Import Values for Auto Uploads";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox1
             // 
             this.richTextBox1.Location = new System.Drawing.Point(51, 74);
             this.richTextBox1.Name = "richTextBox1";
@@ -81,7 +91,7 @@
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "";
             // 
-            // Notes label
+            // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(9, 74);
@@ -90,14 +100,14 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Notes";
             // 
-            // Title input field
+            // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(50, 32);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(583, 20);
             this.textBox1.TabIndex = 1;
             // 
-            // Title Label
+            // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 32);
@@ -125,16 +135,6 @@
             this.ImportOKButton.TabIndex = 2;
             this.ImportOKButton.Text = "OK";
             this.ImportOKButton.UseVisualStyleBackColor = true;
-            // 
-            // Use Deafult Values CheckBox
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(12, 290);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(231, 17);
-            this.checkBox1.TabIndex = 3;
-            this.checkBox1.Text = "Use Default Import Values for Auto Uploads";
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // Import_Settings
             // 

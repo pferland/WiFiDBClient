@@ -68,6 +68,7 @@ namespace WiFiDBUploader
             this.PidMem = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.CMD = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.DateTimeCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.backgroundThreadSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -83,7 +84,7 @@ namespace WiFiDBUploader
             this.settingsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1450, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1280, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -123,7 +124,8 @@ namespace WiFiDBUploader
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.autoSettingsToolStripMenuItem,
             this.uploadSettingsToolStripMenuItem,
-            this.importSettingsToolStripMenuItem});
+            this.importSettingsToolStripMenuItem,
+            this.backgroundThreadSettingsToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -131,21 +133,21 @@ namespace WiFiDBUploader
             // autoSettingsToolStripMenuItem
             // 
             this.autoSettingsToolStripMenuItem.Name = "autoSettingsToolStripMenuItem";
-            this.autoSettingsToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.autoSettingsToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
             this.autoSettingsToolStripMenuItem.Text = "Auto Settings";
             this.autoSettingsToolStripMenuItem.Click += new System.EventHandler(this.autoSettingsToolStripMenuItem_Click);
             // 
             // uploadSettingsToolStripMenuItem
             // 
             this.uploadSettingsToolStripMenuItem.Name = "uploadSettingsToolStripMenuItem";
-            this.uploadSettingsToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.uploadSettingsToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
             this.uploadSettingsToolStripMenuItem.Text = "WiFiDB Settings";
             this.uploadSettingsToolStripMenuItem.Click += new System.EventHandler(this.wifidbSettingsToolStripMenuItem_Click);
             // 
             // importSettingsToolStripMenuItem
             // 
             this.importSettingsToolStripMenuItem.Name = "importSettingsToolStripMenuItem";
-            this.importSettingsToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.importSettingsToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
             this.importSettingsToolStripMenuItem.Text = "Import Settings";
             this.importSettingsToolStripMenuItem.Click += new System.EventHandler(this.importSettingsToolStripMenuItem_Click);
             // 
@@ -184,7 +186,7 @@ namespace WiFiDBUploader
             this.listView1.GridLines = true;
             this.listView1.Location = new System.Drawing.Point(3, 3);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1436, 533);
+            this.listView1.Size = new System.Drawing.Size(1266, 533);
             this.listView1.TabIndex = 3;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -242,7 +244,7 @@ namespace WiFiDBUploader
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 589);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1450, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1280, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -264,7 +266,7 @@ namespace WiFiDBUploader
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1450, 565);
+            this.tabControl1.Size = new System.Drawing.Size(1280, 565);
             this.tabControl1.TabIndex = 5;
             // 
             // tabPage1
@@ -274,7 +276,7 @@ namespace WiFiDBUploader
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1442, 539);
+            this.tabPage1.Size = new System.Drawing.Size(1272, 539);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Uploaded Files";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -346,6 +348,13 @@ namespace WiFiDBUploader
             this.DateTimeCol.Text = "Date Time";
             this.DateTimeCol.Width = 150;
             // 
+            // backgroundThreadSettingsToolStripMenuItem
+            // 
+            this.backgroundThreadSettingsToolStripMenuItem.Name = "backgroundThreadSettingsToolStripMenuItem";
+            this.backgroundThreadSettingsToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.backgroundThreadSettingsToolStripMenuItem.Text = "Background Thread Settings";
+            this.backgroundThreadSettingsToolStripMenuItem.Click += new System.EventHandler(this.backgroundThreadSettingsToolStripMenuItem_Click);
+            // 
             // WiFiDBUploadMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -409,6 +418,7 @@ namespace WiFiDBUploader
         private System.Windows.Forms.ColumnHeader PidMem;
         private System.Windows.Forms.ColumnHeader CMD;
         private System.Windows.Forms.ColumnHeader DateTimeCol;
+        private ToolStripMenuItem backgroundThreadSettingsToolStripMenuItem;
     }
 }
 

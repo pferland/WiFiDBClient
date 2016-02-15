@@ -203,6 +203,7 @@ namespace WDBCommon
                 hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
             }
             int IsFileImportedResult = IsFileImported(hashish);
+
             Debug.WriteLine("IsFileImportedResult :" + IsFileImportedResult);
             if (IsFileImportedResult == 0)
             {
@@ -212,13 +213,17 @@ namespace WDBCommon
                 Debug.WriteLine(RawResponse);
 
                 response = WDBAPIObj.ParseApiResponse(RawResponse);
+
+                Debug.WriteLine("Parse Response Result: " + response);
+
                 BW.ReportProgress(0, response);
                 ArchiveImportedFile(FilePath);
             }
             else
             {
-                response = "error|~|Already imported or error.";
+                response = "Already Imported.";
             }
+            Debug.WriteLine("File Import Response return: " + response);
             return response;
         }
 
@@ -267,9 +272,9 @@ namespace WDBCommon
             cmd.CommandText = @"SELECT * FROM `ImportView`";
             
             reader = cmd.ExecuteReader();
-            ImportRow ImportRowObj = new ImportRow();
             while (reader.Read())
             {
+                ImportRow ImportRowObj = new ImportRow();
                 if (reader["ImportID"].ToString() == "")
                 {
                     ImportID = "0";
@@ -287,8 +292,12 @@ namespace WDBCommon
                 ImportRowObj.FileHash = reader["FileHash"].ToString();
                 ImportRowObj.Status = reader["Status"].ToString();
                 ImportRowObj.Message = reader["Message"].ToString();
+
                 ImportRows.Add(ImportRowObj);
+
             }
+            Debug.WriteLine("ImportRows[0].ImportID: " + ImportRows[0].ImportID.ToString());
+            Debug.WriteLine("ImportRows[1].ImportID: " + ImportRows[1].ImportID.ToString());
             return ImportRows;
         }
         
