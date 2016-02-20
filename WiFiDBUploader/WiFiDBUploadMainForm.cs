@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows.Forms;
 using WDBSQLite;
 
@@ -15,8 +16,8 @@ namespace WiFiDBUploader
         private WDBAPI.WDBAPI WDBAPIObj;
         private WDBCommon.WDBCommon WDBCommonObj;
         private WDBTraceLog.TraceLog WDBTraceLogObj;
-        private Timer timer1;
-        private Timer timer2;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timer2;
         private List<ServerObj> ServerList;
 
         private int    NextID = 0;
@@ -529,6 +530,7 @@ namespace WiFiDBUploader
             {
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), item.SubItems[8].Text);
                 StartUpdateWiaitng(item.SubItems[6].Text);
+                Thread.Sleep(1000);
             }
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckForImportUpdates");
         }
@@ -818,8 +820,8 @@ namespace WiFiDBUploader
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: GetImportValues");
             string UseImportTitle;
             string UseImportNotes;
-            try
-            {
+            //try
+            //{
                 if (UseDefaultImportValues)
                 {
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use Defaults from settings.");
@@ -861,12 +863,13 @@ namespace WiFiDBUploader
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: GetImportValues");
                 return ReturnString;
 
-            }catch(Exception e)
-            {
-                string[] ret = { "Error", e.Message };
-                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: GetImportValues");
-                return ret;
-            }
+            //}catch(Exception e)
+            //{
+            //    string[] ret = { "Error|~|", e.Message };
+            //    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Exception Message: " + e.Message);
+            //    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: GetImportValues");
+            //    return ret;
+            //}
         }
         //
         // Do Work Functions
