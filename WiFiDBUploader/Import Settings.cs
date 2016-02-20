@@ -16,5 +16,16 @@ namespace WiFiDBUploader
         {
             InitializeComponent();
         }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBox2.Checked)
+            {
+                textBox1.ReadOnly = true;
+            }else
+            {
+                textBox1.ReadOnly = false;
+            }
+        }
     }
 }
