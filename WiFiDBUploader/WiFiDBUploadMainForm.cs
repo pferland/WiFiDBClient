@@ -605,8 +605,8 @@ namespace WiFiDBUploader
         private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: importFileToolStripMenuItem_Click");
-            string ImportTitle;
-            string ImportNotes;
+            string UseImportTitle;
+            string UseImportNotes;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
             openFileDialog1.InitialDirectory = "c:\\";
@@ -620,8 +620,9 @@ namespace WiFiDBUploader
                 {
                     if(UseDefaultImportValues)
                     {
-                        ImportTitle = DefaultImportTitle;
-                        ImportNotes = DefaultImportNotes;
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use Defaults from settings.");
+                        UseImportTitle = DefaultImportTitle;
+                        UseImportNotes = DefaultImportNotes;
                     }else
                     {
                         //Ask For Import Title and Notes. They dont want to use the defaults.
@@ -629,17 +630,22 @@ namespace WiFiDBUploader
 
                         if (ImportDetailsForm.ShowDialog() == DialogResult.OK)
                         {
-                            ImportTitle = ImportDetailsForm.ImportTitle;
-                            ImportNotes = ImportDetailsForm.ImportNotes;
-                        }else
+                            UseImportTitle = ImportDetailsForm.ImportTitle;
+                            UseImportNotes = ImportDetailsForm.ImportNotes;
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use GUI Values: ");
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Title: " + UseImportTitle);
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Notes: " + UseImportNotes);
+                        }
+                        else
                         {
-                            ImportTitle = DefaultImportTitle;
-                            ImportNotes = DefaultImportNotes;
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "GUI Cancel, Use Defaults.");
+                            UseImportTitle = DefaultImportTitle;
+                            UseImportNotes = DefaultImportNotes;
                         }
                     }
                     //string response = WDBAPIObj.ApiImportFile(openFileDialog1.FileName, ImportTitle, ImportNotes);
                     //WDBAPIObj.ParseApiResponse(response);
-                    string Query = openFileDialog1.FileName + "|" + ImportTitle + "|" + ImportNotes;
+                    string Query = openFileDialog1.FileName + "|" + UseImportTitle + "|" + UseImportNotes;
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), Query);
                     StartFileImport(Query);
                 }
@@ -654,35 +660,39 @@ namespace WiFiDBUploader
         private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: importFolderToolStripMenuItem_Click");
-            string ImportTitle;
-            string ImportNotes;
+            string UseImportTitle;
+            string UseImportNotes;
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), folderBrowserDialog1.SelectedPath);
                 if (UseDefaultImportValues)
                 {
-                    ImportTitle = DefaultImportTitle;
-                    ImportNotes = DefaultImportNotes;
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use Defaults from settings.");
+                    UseImportTitle = DefaultImportTitle;
+                    UseImportNotes = DefaultImportNotes;
                 }
                 else
                 {
                     //Ask For Import Title and Notes. They dont want to use the defaults.
-
                     ImportDetails ImportDetailsForm = new ImportDetails();
 
                     if (ImportDetailsForm.ShowDialog() == DialogResult.OK)
                     {
-                        ImportTitle = ImportDetailsForm.ImportTitle;
-                        ImportNotes = ImportDetailsForm.ImportNotes;
+                        UseImportTitle = ImportDetailsForm.ImportTitle;
+                        UseImportNotes = ImportDetailsForm.ImportNotes;
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use GUI Values: ");
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Title: " + UseImportTitle);
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Notes: " + UseImportNotes);
                     }
                     else
                     {
-                        ImportTitle = DefaultImportTitle;
-                        ImportNotes = DefaultImportNotes;
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "GUI Cancel, Use Defaults.");
+                        UseImportTitle = DefaultImportTitle;
+                        UseImportNotes = DefaultImportNotes;
                     }
                 }
-                string Query = folderBrowserDialog1.SelectedPath + "|" + ImportTitle + "|" + ImportNotes;
+                string Query = folderBrowserDialog1.SelectedPath + "|" + UseImportTitle + "|" + UseImportNotes;
 
                 StartFolderImport(Query, true);
             }
@@ -909,8 +919,16 @@ namespace WiFiDBUploader
             List<KeyValuePair<int, string>> ImportIDs;
             var backgroundWorker = sender as BackgroundWorker;
             QueryArguments args = (QueryArguments)e.Argument;
+
+            string[] splits = args.Query.Split('|');
+
+            //splits[0] == ImportFolder
+            //splits[1] == ImportTitle
+            //splits[2] == ImportNotes
+
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), args.Query);
-            ImportIDs = WDBCommonObj.ImportFolder(args.Query, DefaultImportTitle, DefaultImportNotes, backgroundWorker);
+            ImportIDs = WDBCommonObj.ImportFolder(splits[0], splits[1], splits[2], backgroundWorker);
+            /*
             if (ImportIDs.Count > 0)
             {
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), ImportIDs[0].Value);
@@ -927,6 +945,7 @@ namespace WiFiDBUploader
                     e.Result = args.Result;
                 }
             }
+            */
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: backgroundWorker_FolderImportDoWork");
             ThreadName = "Main";
         }

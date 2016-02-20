@@ -172,14 +172,10 @@ namespace WDBCommon
             var responses = new List<KeyValuePair<int, string>>();
             try
             {
-                string[] PathSplit = Path.Split('|');
-                string SendTitle = PathSplit[1];
-                string SendNotes = PathSplit[2];
-
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Auto Import Folder: " + PathSplit[0] + " -> " + Directory.Exists(PathSplit[0]));
-                if (Directory.Exists(PathSplit[0])) 
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Auto Import Folder: " + Path + " -> " + Directory.Exists(Path));
+                if (Directory.Exists(Path)) 
                 {
-                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Auto Import Folder: " + PathSplit[0]);
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Auto Import Folder: " + Path);
                     var md5 = MD5.Create();
 
                     string[] extensions = new string[] { "*.vs1", "*.vsz", "*.csv", "*.db3" };
@@ -188,7 +184,7 @@ namespace WDBCommon
                     foreach (string ext in extensions)
                     {
                         TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Extension that will be used: " + ext);
-                        string[] files = Directory.GetFiles(PathSplit[0], ext);
+                        string[] files = Directory.GetFiles(Path, ext);
                         TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "The number of VS1 files: " + files.Length);
                         if (files.Length > 0)
                         {
