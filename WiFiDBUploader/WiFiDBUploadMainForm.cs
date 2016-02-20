@@ -417,6 +417,7 @@ namespace WiFiDBUploader
             rootKey.SetValue("DefaultImportNotes", DefaultImportNotes);
             rootKey.SetValue("DefaultImportTitle", DefaultImportTitle);
             rootKey.SetValue("UseAutoDateTimeTitle", UseAutoDateTimeTitle);
+            rootKey.SetValue("UseDefaultImportValues", UseDefaultImportValues;
             rootKey.SetValue("SQLiteFile", SQLiteFile);
             rootKey.SetValue("LogPath", LogPath);
             rootKey.SetValue("ImportUpdateThreadEnable", ImportUpdateThreadEnable);
@@ -666,39 +667,15 @@ namespace WiFiDBUploader
         private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: importFolderToolStripMenuItem_Click");
-            string UseImportTitle;
-            string UseImportNotes;
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), folderBrowserDialog1.SelectedPath);
-                if (UseDefaultImportValues)
-                {
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use Defaults from settings.");
-                    UseImportTitle = DefaultImportTitle;
-                    UseImportNotes = DefaultImportNotes;
-                }
-                else
-                {
-                    //Ask For Import Title and Notes. They dont want to use the defaults.
-                    ImportDetails ImportDetailsForm = new ImportDetails();
+                string[] GUIValues = GetImportValues();
 
-                    if (ImportDetailsForm.ShowDialog() == DialogResult.OK)
-                    {
-                        UseImportTitle = ImportDetailsForm.ImportTitle;
-                        UseImportNotes = ImportDetailsForm.ImportNotes;
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use GUI Values: ");
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Title: " + UseImportTitle);
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Notes: " + UseImportNotes);
-                    }
-                    else
-                    {
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "GUI Cancel, Use Defaults.");
-                        UseImportTitle = DefaultImportTitle;
-                        UseImportNotes = DefaultImportNotes;
-                    }
-                }
-                string Query = folderBrowserDialog1.SelectedPath + "|" + UseImportTitle + "|" + UseImportNotes;
+                string Query = folderBrowserDialog1.SelectedPath + "|" 
+                    + GUIValues[0] + "|" 
+                    + GUIValues[1];
 
                 StartFolderImport(Query, true);
             }
@@ -869,6 +846,51 @@ namespace WiFiDBUploader
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: loggingSettingsToolStripMenuItem_Click");
         }
 
+        private string[] GetImportValues()
+        {
+            string UseImportTitle;
+            string UseImportNotes;
+
+            if (UseDefaultImportValues)
+            {
+                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use Defaults from settings.");
+                if (UseAutoDateTimeTitle)
+                {
+                    UseImportTitle = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                else
+                {
+                    UseImportTitle = DefaultImportTitle;
+                }
+                UseImportNotes = DefaultImportNotes;
+            }
+            else
+            {
+                //Ask For Import Title and Notes. They dont want to use the defaults.
+                ImportDetails ImportDetailsForm = new ImportDetails();
+
+                if (ImportDetailsForm.ShowDialog() == DialogResult.OK)
+                {
+                    UseImportTitle = ImportDetailsForm.ImportTitle;
+                    UseImportNotes = ImportDetailsForm.ImportNotes;
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Use GUI Values: ");
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Title: " + UseImportTitle);
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import Notes: " + UseImportNotes);
+                }
+                else
+                {
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "GUI Cancel, Use Defaults.");
+                    UseImportTitle = DefaultImportTitle;
+                    UseImportNotes = DefaultImportNotes;
+                }
+            }
+            string[] ReturnString = 
+                {
+                    UseImportTitle.Replace("%DATETIME", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
+                    UseImportNotes.Replace("%DATETIME", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                };
+            return ReturnString;
+        }
         //
         // Do Work Functions
         //
