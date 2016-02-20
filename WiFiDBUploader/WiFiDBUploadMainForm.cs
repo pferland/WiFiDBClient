@@ -45,7 +45,8 @@ namespace WiFiDBUploader
         private int    DaemonUpdateThreadSeconds;
 
         private string LogPath;
-        private bool   TraceLogEnable;
+        private bool   TraceLogEnable = false;
+        private bool   TogglePerRun = false;
         private bool   PerRunRotate;
         private bool   DEBUG;
 
@@ -115,6 +116,11 @@ namespace WiFiDBUploader
         
         private void InitClasses()
         {
+            if( (WDBTraceLogObj != null) || (TogglePerRun == true))
+            {
+                WDBTraceLogObj.Dispose();
+                this.TogglePerRun = false;
+            }
             WDBTraceLogObj = new WDBTraceLog.TraceLog(LogPath, TraceLogEnable, PerRunRotate);
             WDBAPIObj = new WDBAPI.WDBAPI(WDBTraceLogObj);
             WDBCommonObj = new WDBCommon.WDBCommon(SQLiteFile, WDBAPIObj, WDBTraceLogObj);
@@ -207,7 +213,7 @@ namespace WiFiDBUploader
             rootKey.SetValue("DaemonUpdateThreadSeconds", 60);
             rootKey.SetValue("TraceLogEnable", "False");
             rootKey.SetValue("LogPath", ".\\Logs\\");
-            rootKey.SetValue("DEBUG", "False");
+            rootKey.SetValue("DEBUGEnable", "False");
             
             ServersKey = rootKey.CreateSubKey("Servers");
             DefaultServerKey = ServersKey.CreateSubKey("api.wifidb.net");
@@ -289,6 +295,7 @@ namespace WiFiDBUploader
                             break;
                         case "TraceLogEnable":
                             TraceLogEnable = Convert.ToBoolean(rootKey.GetValue(value));
+                            Debug.WriteLine("TraceLogEnable: " + TraceLogEnable);
                             break;
                         case "LogPath":
                             LogPath = rootKey.GetValue(value).ToString();
@@ -296,7 +303,7 @@ namespace WiFiDBUploader
                         case "PerRunRotate":
                             PerRunRotate = Convert.ToBoolean(rootKey.GetValue(value));
                             break;
-                        case "DEBUG":
+                        case "DEBUGEnable":
                             DEBUG = Convert.ToBoolean(rootKey.GetValue(value));
                             break;
                     }
@@ -799,7 +806,7 @@ namespace WiFiDBUploader
 
         private void loggingSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: loggingSettingsToolStripMenuItem_Click");
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: loggingSettingsToolStripMenuItem_Click");
             LoggingSettings LoggingSettingsForm = new LoggingSettings();
             LoggingSettingsForm.TraceLogEnable = TraceLogEnable;
             LoggingSettingsForm.DEBUG = DEBUG;
@@ -807,13 +814,40 @@ namespace WiFiDBUploader
 
             if(LoggingSettingsForm.ShowDialog() == DialogResult.OK)
             {
-                TraceLogEnable = LoggingSettingsForm.TraceLogEnable;
-                DEBUG = LoggingSettingsForm.DEBUG;
-                PerRunRotate = LoggingSettingsForm.PerRunRotate;
+                if( (TraceLogEnable != LoggingSettingsForm.TraceLogEnable) || (DEBUG != LoggingSettingsForm.DEBUG) || (PerRunRotate != LoggingSettingsForm.PerRunRotate) )
+                {
+                    if(PerRunRotate != LoggingSettingsForm.PerRunRotate)
+                    {
+                        this.TogglePerRun = true;
+                    }else
+                    {
+                        this.TogglePerRun = false;
+                    }
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "One of the Logging Settings has changed, update them.");
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "TraceLogEnable: " + TraceLogEnable.ToString() + " ----- LoggingForm.TraceLogEnable: " + LoggingSettingsForm.TraceLogEnable.ToString());
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Debug: " + DEBUG.ToString() + " ----- LoggingForm.Debug: " + LoggingSettingsForm.DEBUG.ToString());
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "PerRunRotate: " + PerRunRotate.ToString() + " ----- LoggingForm.PerRunRotate: " + LoggingSettingsForm.PerRunRotate.ToString());
 
-                WriteGlobalSettings();
-                LoadSettings();
-                InitTimer();
+                    this.TraceLogEnable = LoggingSettingsForm.TraceLogEnable;
+                    DEBUG = LoggingSettingsForm.DEBUG;
+                    PerRunRotate = LoggingSettingsForm.PerRunRotate;
+
+
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Write registry settings then re-init settings, classes, and timers.");
+                    WriteGlobalSettings();
+                    
+                    
+                    /*
+                    WDBTraceLogObj = new WDBTraceLog.TraceLog(LogPath, TraceLogEnable, PerRunRotate);
+
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Save Settings to Registry.");
+                    
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Re-load Settings from Registry.");
+                    LoadSettings();
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Re-init Timers for background threads.");
+                    InitTimer();
+                    */
+                }
             }
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: loggingSettingsToolStripMenuItem_Click");
         }

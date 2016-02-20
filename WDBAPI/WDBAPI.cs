@@ -129,6 +129,7 @@ namespace WDBAPI
         {
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: ApiGetDaemonStatuses");
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), ApiCompiledPath + "schedule.php  ---- Get Daemon Stats");
+            
             string response;
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -141,12 +142,19 @@ namespace WDBAPI
                 {
                     this.parameters.Add("pidfile", query);
                 }
-
-                var responseBytes = client.UploadValues(ApiCompiledPath+"schedule.php", "POST", this.parameters);
-                response = Encoding.ASCII.GetString(responseBytes);
+                try
+                {
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                    return response;
+                }
+                catch(Exception e)
+                {
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "UploadValues Exception: " + e.Message);
+                }
             }
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ApiGetDaemonStatuses");
-            return response;
+            return "Error";
         }
 
         public string ApiImportFile(string UploadFile, string ImportTitle, string ImportNotes)

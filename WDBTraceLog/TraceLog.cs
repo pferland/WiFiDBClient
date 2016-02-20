@@ -22,7 +22,8 @@ namespace WDBTraceLog
             this.TraceLogEnable = TraceLogEnable;
             this.PerRunRotate = PerRunRotate;
             this.LogPath = LogPath;
-            if(TraceLogEnable)
+            Debug.WriteLine("TraceLogging TraceLogEnable: " + TraceLogEnable);
+            if (TraceLogEnable)
             {
                 if (PerRunRotate)
                 {
@@ -48,7 +49,10 @@ namespace WDBTraceLog
 
         public void Dispose()
         {
-            file.Close();
+            if( file != null)
+            {
+                file.Close();
+            }
         }
 
         public void WriteToLog(string ThreadName, string ObjectName, string MethodName, string message)
@@ -58,7 +62,7 @@ namespace WDBTraceLog
             {
                 Debug.WriteLine(line);
             }
-            
+            Debug.WriteLine("TraceLogWrite TraceLogEnable: " + TraceLogEnable);
             if (TraceLogEnable)
             {
                 file.WriteLine(line);
