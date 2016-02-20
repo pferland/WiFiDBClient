@@ -58,11 +58,11 @@ namespace WDBTraceLog
         public void WriteToLog(string ThreadName, string ObjectName, string MethodName, string message)
         {
             string line = "[" + DateTime.Now.ToString("yyyy-MM-dd") + "]" + "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + "[" + ThreadName + "]" + "[" + ObjectName + "]" + "[" + MethodName + "]" + "[" + message + "]";
-            if (DEBUG)
+            Debug.WriteLine(line);
+            if (DEBUG == true)
             {
                 Debug.WriteLine(line);
             }
-            Debug.WriteLine("TraceLogWrite TraceLogEnable: " + TraceLogEnable);
             if (TraceLogEnable)
             {
                 file.WriteLine(line);

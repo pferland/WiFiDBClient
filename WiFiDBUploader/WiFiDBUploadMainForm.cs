@@ -168,8 +168,6 @@ namespace WiFiDBUploader
                     timer1.Tick += new EventHandler(CheckForImportUpdates);
                     timer1.Interval = (ImportUpdateThreadSeconds * 1000); // in miliseconds
                     timer1.Start();
-
-                    
                 }
 
                 if(DaemonUpdateThreadEnable)
@@ -178,7 +176,6 @@ namespace WiFiDBUploader
                     if (timer2 != null)
                     {
                         WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Stopping Daemon update background thread.");
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Restart Timer 2");
                         timer2.Stop();
                         timer2.Dispose();
                         timer2 = null;
@@ -526,12 +523,14 @@ namespace WiFiDBUploader
         private void CheckForImportUpdates(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CheckForImportUpdates");
+            List<string> HashList = new List<string>();
             foreach (ListViewItem item in listView1.Items)
             {
-                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), item.SubItems[8].Text);
-                StartUpdateWiaitng(item.SubItems[6].Text);
-                Thread.Sleep(1000);
+                HashList.Add(item.SubItems[6].Text);
+                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "CheckForImportUpdates: item.SubItems[6].Text: " + item.SubItems[6].Text);
+
             }
+            StartUpdateWiaitng(HashList.ToArray());
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckForImportUpdates");
         }
         
@@ -561,10 +560,10 @@ namespace WiFiDBUploader
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: StartGetDaemonStats");
         }
 
-        private void StartUpdateWiaitng(string query)
+        private void StartUpdateWiaitng(string[] Queries)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: StartUpdateWaiting");
-            QueryArguments args = new QueryArguments(NextID++, query);
+            QueryArguments args = new QueryArguments(NextID++, String.Join("|", Queries) );
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateWaitingDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_UpdateListViewProgressChanged);
@@ -631,8 +630,7 @@ namespace WiFiDBUploader
             }
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: importFileToolStripMenuItem_Click");
         }
-
-
+        
         private void importFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: importFolderToolStripMenuItem_Click");
@@ -908,14 +906,18 @@ namespace WiFiDBUploader
 
         private void backgroundWorker_UpdateWaitingDoWork(object sender, DoWorkEventArgs e)
         {
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: backgroundWorker_UpdateWaitingDoWork");
+            QueryArguments args = (QueryArguments)e.Argument;
             ThreadName = "UpdateWaiting";
             WDBCommonObj.ThreadName = "UpdateWaiting";
-            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: backgroundWorker_UpdateWaitingDoWork");
-            var backgroundWorker = sender as BackgroundWorker;
-            QueryArguments args = (QueryArguments)e.Argument;
-            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), args.Query);
-            WDBCommonObj.GetHashStatus(args.Query, backgroundWorker);
-            //e.Result = "Waiting Done";
+
+            foreach (string str in args.Query.Split('|'))
+            {
+                Thread.Sleep(1000);
+                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Spawning Function for: " + str);
+                var backgroundWorker = sender as BackgroundWorker;
+                WDBCommonObj.GetHashStatus(str, backgroundWorker);
+            }
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: backgroundWorker_UpdateWaitingDoWork");
             ThreadName = "Main";
         }
@@ -1035,37 +1037,39 @@ namespace WiFiDBUploader
                     break;
                 case "error":
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[0]);
-                    
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
-                    string[] SplitData1 = SplitData[1].Split(stringSep3, StringSplitOptions.None);
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "items_err.Count(): " + items_err.Count().ToString());
+                    if (items_err.Count() <= 1)
+                    {
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[0]);
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "HHmmmm...... e.UserState: " + e.UserState.ToString());
+                    }
+                    else
+                    {
+                        string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+                        string[] SplitData1 = SplitData[1].Split(stringSep3, StringSplitOptions.None);
 
-                    FilePath = SplitData[1];
-                    FileHash = SplitData1[0].ToUpper();
-                    FileSizeString = new FileInfo(FilePath).Length.ToString();
+                        FilePath = SplitData[1];
+                        FileHash = SplitData1[0].ToUpper();
+                        FileSizeString = new FileInfo(FilePath).Length.ToString();
 
-                    StatusStr = "Error";
-                    MessageStr = split[1];
+                        StatusStr = "Error";
+                        MessageStr = split[1];
+                        
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "split[0]: " + split[0]);
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "items_err[0]: " + items_err[0]);
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "SplitData[0]: " + SplitData[1]); //FilePath
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "SplitData[1]: " + SplitData1[0]); //FileHash
 
+                        ListViewItem listViewItem1 = listView1.FindItemWithText(FileHash);
 
-                    /*
-                    string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-                    string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
-                    */
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
 
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "split[0]: " + split[0]);
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "items_err[0]: " + items_err[0]);
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "SplitData[0]: " + SplitData[1]); //FilePath
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "SplitData[1]: " + SplitData1[0]); //FileHash
-                    
-                    ListViewItem listViewItem1 = listView1.FindItemWithText(FileHash);
+                        listViewItem1.SubItems[7].Text = StatusStr;
+                        listViewItem1.SubItems[8].Text = MessageStr;
 
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
-
-                    listViewItem1.SubItems[7].Text = StatusStr;
-                    listViewItem1.SubItems[8].Text = MessageStr;
-                    
-                    //InsertNewListViewRow(split, "Error");
+                        //InsertNewListViewRow(split, "Error");
+                    }
                     break;
                 default:
                     foreach (string part in split)
@@ -1124,6 +1128,7 @@ namespace WiFiDBUploader
                     }
                     break;
             }
+            listView1.TopItem = listView1.Items[listView1.Items.Count - 1];
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), e.ProgressPercentage.ToString());
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: backgroundWorker_ImportProgressChanged");
 
@@ -1293,12 +1298,20 @@ namespace WiFiDBUploader
                     }
                     else
                     {
-                        string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
-                        string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), items_err[0]);
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), SplitData[0]);
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), SplitData[1]);
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(),  e.UserState.ToString() );
+                        string E_UserString = e.UserState.ToString();
+                        try
+                        {
+                            string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
+                            string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), items_err[0]);
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), SplitData[0]);
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), SplitData[1]);
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), E_UserString);
+                        }
+                        catch (Exception ex)
+                        {
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Exception Updating Daemon Listview: " + E_UserString + " ----+++---- Exception: " + ex.Message);
+                        }
                     }
                     break;
 

@@ -241,10 +241,12 @@ namespace WDBCommon
             byte[] hashBytes;
             string hashish;
             var md5 = MD5.Create();
+            TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Open Import File: " + FilePath);
             using (var inputFileStream = File.Open(FilePath, FileMode.Open))
             {
                 hashBytes = md5.ComputeHash(inputFileStream);
                 hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+                TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import File Hash: " + hashish);
             }
             int IsFileImportedResult = IsFileImported(hashish, true);
 

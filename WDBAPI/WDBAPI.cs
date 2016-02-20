@@ -56,9 +56,15 @@ namespace WDBAPI
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
                 this.parameters.Add("func", "waiting");
-
-                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
-                response = Encoding.ASCII.GetString(responseBytes);
+                try
+                {
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                }catch(Exception e)
+                {
+                    response = "Error";
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), e.Message);
+                }
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), response);
             }
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ApiGetWaitingImports");
@@ -77,9 +83,16 @@ namespace WDBAPI
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
                 this.parameters.Add("func", "finished");
-
-                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
-                response = Encoding.ASCII.GetString(responseBytes);
+                try
+                {
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                }
+                catch (Exception e)
+                {
+                    response = "Error";
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), e.Message);
+                }
             }
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Function Call: ApiGetFinishedImports.");
             return response;
@@ -97,9 +110,16 @@ namespace WDBAPI
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
                 this.parameters.Add("func", "bad");
-
-                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
-                response = Encoding.ASCII.GetString(responseBytes);
+                try
+                {
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                }
+                catch (Exception e)
+                {
+                    response = "Error";
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), e.Message);
+                }
             }
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ApiGetBadIports");
             return response;
@@ -117,9 +137,16 @@ namespace WDBAPI
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
                 this.parameters.Add("func", "importing");
-
-                var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
-                response = Encoding.ASCII.GetString(responseBytes);
+                try
+                {
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                }
+                catch (Exception e)
+                {
+                    response = "Error";
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), e.Message);
+                }
             }
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ApiGetCurrentImporting");
             return response;
@@ -160,7 +187,7 @@ namespace WDBAPI
         public string ApiImportFile(string UploadFile, string ImportTitle, string ImportNotes)
         {
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: ApiImportFile");
-            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), ApiCompiledPath + "import.php  ---- Import File.");
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), ApiCompiledPath + "import.php  ---- Import File: " + UploadFile);
             string response;
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
@@ -183,10 +210,21 @@ namespace WDBAPI
 
                 //parameters.Add("otherusers", "");
                 this.parameters.Add("hash", hashish);
-                client.QueryString = this.parameters;
-                var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);
-                response = Encoding.ASCII.GetString(responseBytes);
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Response: " + response);
+
+                try
+                {
+                    client.QueryString = this.parameters;
+                    var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Response: " + response);
+                }
+                catch (Exception e)
+                {
+                    response = "Error";
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), e.Message);
+                }
+
+
                 TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ApiImportFile");
                 return response;
             }
@@ -221,8 +259,17 @@ namespace WDBAPI
                 this.parameters.Add("func", "check_hash");
                 this.parameters.Add("hash", FileHash);
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Number of Params for CheckFileHash: " + this.parameters.Count);
-                var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
-                response = Encoding.ASCII.GetString(responseBytes);
+                try
+                {
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
+                    response = Encoding.ASCII.GetString(responseBytes);
+                }
+                catch(Exception e)
+                {
+                    response = "Error";
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "UploadValues Exception: " + e.Message);
+                }
+                
             }
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Function Call: Check File Hash.");
             return response;
@@ -233,6 +280,9 @@ namespace WDBAPI
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start Function Call: Parse API Response.");
             string ret = "";
             if(response == "")
+            {
+                return "errorParsing";
+            }else if(response == "Error")
             {
                 return "errorParsing";
             }
