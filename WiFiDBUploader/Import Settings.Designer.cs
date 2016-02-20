@@ -38,6 +38,11 @@
             set { checkBox1.Checked = value; }
         }
 
+        public bool UseAutoDateTimeTitle
+        {
+            get { return checkBox2.Checked; }
+            set { checkBox2.Checked = value; }
+        }
         #region Windows Form Designer generated code
 
         /// <summary>

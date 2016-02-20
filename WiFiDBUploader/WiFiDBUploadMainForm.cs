@@ -34,6 +34,7 @@ namespace WiFiDBUploader
         private string DefaultImportTitle;
         private bool   DefaultImportTitleIsDateTime;
         private bool   UseDefaultImportValues;
+        private bool   UseAutoDateTimeTitle;
 
         private string SQLiteDBFile;
         private string SQLiteDBPath;
@@ -199,6 +200,7 @@ namespace WiFiDBUploader
             rootKey.SetValue("DefaultImportTitleIsDateTime", "True");
             rootKey.SetValue("DefaultImportNotes", "WiFiDB Uploader\nVersion :" + WDBVersionNumber + "\nCode Name: " + WDBCodeName);
             rootKey.SetValue("UseDefaultImportValues", "False");
+            rootKey.SetValue("UseAutoDateTimeTitle", "False");
             rootKey.SetValue("AutoUploadFolder", "False");
             rootKey.SetValue("AutoUploadFolderPath", "");
             rootKey.SetValue("ArchiveImports", "False");
@@ -271,6 +273,9 @@ namespace WiFiDBUploader
                             break;
                         case "DefaultImportTitleIsDateTime":
                             DefaultImportTitleIsDateTime = Convert.ToBoolean(rootKey.GetValue(value));
+                            break;
+                        case "UseAutoDateTimeTitle":
+                            UseAutoDateTimeTitle = Convert.ToBoolean(rootKey.GetValue(value));
                             break;
                         case "UseDefaultImportValues":
                             UseDefaultImportValues = Convert.ToBoolean(rootKey.GetValue(value));
@@ -411,6 +416,7 @@ namespace WiFiDBUploader
             rootKey.SetValue("ArchiveImportsFolderPath", ArchiveImportsFolderPath);
             rootKey.SetValue("DefaultImportNotes", DefaultImportNotes);
             rootKey.SetValue("DefaultImportTitle", DefaultImportTitle);
+            rootKey.SetValue("UseAutoDateTimeTitle", UseAutoDateTimeTitle);
             rootKey.SetValue("SQLiteFile", SQLiteFile);
             rootKey.SetValue("LogPath", LogPath);
             rootKey.SetValue("ImportUpdateThreadEnable", ImportUpdateThreadEnable);
@@ -738,9 +744,10 @@ namespace WiFiDBUploader
             ImportSettingsForm.ImportNotes = DefaultImportNotes;
             ImportSettingsForm.ImportTitle = DefaultImportTitle;
             ImportSettingsForm.UseImportDefaultValues = UseDefaultImportValues;
-
+            ImportSettingsForm.UseAutoDateTimeTitle = UseAutoDateTimeTitle;
             if (ImportSettingsForm.ShowDialog() == DialogResult.OK)
             {
+                this.UseAutoDateTimeTitle = ImportSettingsForm.UseAutoDateTimeTitle;
                 this.DefaultImportTitle = ImportSettingsForm.ImportTitle;
                 this.DefaultImportNotes = ImportSettingsForm.ImportNotes;
                 this.UseDefaultImportValues = ImportSettingsForm.UseImportDefaultValues;
