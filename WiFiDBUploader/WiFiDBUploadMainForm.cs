@@ -16,6 +16,7 @@ namespace WiFiDBUploader
         private WDBAPI.WDBAPI WDBAPIObj;
         private WDBCommon.WDBCommon WDBCommonObj;
         private WDBTraceLog.TraceLog WDBTraceLogObj;
+        private WDBSQLite.WDBSQLite WDBSQLiteObj;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
         private List<ServerObj> ServerList;
@@ -123,9 +124,11 @@ namespace WiFiDBUploader
                 WDBTraceLogObj.Dispose();
                 this.TogglePerRun = false;
             }
+            
             WDBTraceLogObj = new WDBTraceLog.TraceLog(LogPath, TraceLogEnable, PerRunRotate);
+            WDBSQLiteObj = new WDBSQLite.WDBSQLite(SQLiteDBFile, "uploader", LogPath, WDBTraceLogObj);
             WDBAPIObj = new WDBAPI.WDBAPI(WDBTraceLogObj);
-            WDBCommonObj = new WDBCommon.WDBCommon(SQLiteFile, WDBAPIObj, WDBTraceLogObj);
+            WDBCommonObj = new WDBCommon.WDBCommon(WDBSQLiteObj, WDBAPIObj, WDBTraceLogObj);
             
             WDBCommonObj.AutoUploadFolder = AutoUploadFolder;
             WDBCommonObj.AutoUploadFolderPath = AutoUploadFolderPath;
@@ -526,8 +529,15 @@ namespace WiFiDBUploader
             List<string> HashList = new List<string>();
             foreach (ListViewItem item in listView1.Items)
             {
-                HashList.Add(item.SubItems[6].Text);
-                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "CheckForImportUpdates: item.SubItems[6].Text: " + item.SubItems[6].Text);
+                if (item.SubItems[7].Text == "Waiting" || item.SubItems[7].Text == "Uploading" || item.SubItems[7].Text == "Error")
+                //{
+                //    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Removing: " + item.SubItems[6].Text + " |---| Hash:  " + item.SubItems[6].Text);
+                //    item.Remove();
+                //}else
+                {
+                    HashList.Add(item.SubItems[6].Text);
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "CheckForImportUpdates: item.SubItems[6].Text: " + item.SubItems[6].Text);
+                }
 
             }
             StartUpdateWiaitng(HashList.ToArray());
@@ -635,6 +645,7 @@ namespace WiFiDBUploader
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: importFolderToolStripMenuItem_Click");
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            folderBrowserDialog1.SelectedPath = "M:\\vi_wifidb_archives\\VS1_FILES\\duplicates";
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), folderBrowserDialog1.SelectedPath);
@@ -761,8 +772,17 @@ namespace WiFiDBUploader
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: exitToolStripMenuItem_Click");
+            WDBSQLiteObj.Dispose(false);
             Application.Exit();
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: exitToolStripMenuItem_Click");
+        }
+
+        private void exitAndSaveDBToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: exitAndSaveDBToolStripMenuItem_Click");
+            WDBSQLiteObj.Dispose(true);
+            Application.Exit();
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: exitAndSaveDBToolStripMenuItem_Click");
         }
 
         private void loggingSettingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -913,7 +933,7 @@ namespace WiFiDBUploader
 
             foreach (string str in args.Query.Split('|'))
             {
-                Thread.Sleep(1000);
+                //Thread.Sleep(2000);
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Spawning Function for: " + str);
                 var backgroundWorker = sender as BackgroundWorker;
                 WDBCommonObj.GetHashStatus(str, backgroundWorker);
@@ -1449,6 +1469,11 @@ namespace WiFiDBUploader
             StackFrame sf = st.GetFrame(1);
 
             return sf.GetMethod().Name;
+        }
+        
+        private void WiFiDBUploadMainForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 

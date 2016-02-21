@@ -263,6 +263,7 @@ namespace WDBAPI
                 {
                     var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
+                    TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "CheckHash Response: " + response);
                 }
                 catch(Exception e)
                 {

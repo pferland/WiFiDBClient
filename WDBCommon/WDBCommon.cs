@@ -49,15 +49,15 @@ namespace WDBCommon
         public string ApiCompiledPath;
         private WDBTraceLog.TraceLog TraceLogObj;
 
-        public WDBCommon(string Path, WDBAPI.WDBAPI WDBAPIObj, WDBTraceLog.TraceLog WDBTraceLogObj)
+        public WDBCommon(WDBSQLite.WDBSQLite ArgWDBSQliteObj, WDBAPI.WDBAPI WDBAPIObj, WDBTraceLog.TraceLog WDBTraceLogObj)
         {
             WDBTraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBCommon()");
             this.WDBAPIObj = WDBAPIObj;
             TraceLogObj = WDBTraceLogObj;
-            WDBSQLiteObj = new WDBSQLite.WDBSQLite(Path, "uploader", LogPath, WDBTraceLogObj);
+            WDBSQLiteObj = ArgWDBSQliteObj;
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBCommon()");
         }
-
+        
         public void initApi()
         {
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start Function Call: Init API.");

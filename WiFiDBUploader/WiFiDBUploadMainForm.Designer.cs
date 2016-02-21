@@ -37,12 +37,14 @@ namespace WiFiDBUploader
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitAndSaveDBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundThreadSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loggingSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
@@ -69,7 +71,6 @@ namespace WiFiDBUploader
             this.PidMem = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.CMD = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.DateTimeCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.loggingSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -94,6 +95,7 @@ namespace WiFiDBUploader
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importFolderToolStripMenuItem,
             this.importFileToolStripMenuItem,
+            this.exitAndSaveDBToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -102,21 +104,28 @@ namespace WiFiDBUploader
             // importFolderToolStripMenuItem
             // 
             this.importFolderToolStripMenuItem.Name = "importFolderToolStripMenuItem";
-            this.importFolderToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.importFolderToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.importFolderToolStripMenuItem.Text = "Import Folder";
             this.importFolderToolStripMenuItem.Click += new System.EventHandler(this.importFolderToolStripMenuItem_Click);
             // 
             // importFileToolStripMenuItem
             // 
             this.importFileToolStripMenuItem.Name = "importFileToolStripMenuItem";
-            this.importFileToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.importFileToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.importFileToolStripMenuItem.Text = "Import File";
             this.importFileToolStripMenuItem.Click += new System.EventHandler(this.importFileToolStripMenuItem_Click);
+            // 
+            // exitAndSaveDBToolStripMenuItem
+            // 
+            this.exitAndSaveDBToolStripMenuItem.Name = "exitAndSaveDBToolStripMenuItem";
+            this.exitAndSaveDBToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.exitAndSaveDBToolStripMenuItem.Text = "Exit and Save DB";
+            this.exitAndSaveDBToolStripMenuItem.Click += new System.EventHandler(this.exitAndSaveDBToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -159,6 +168,13 @@ namespace WiFiDBUploader
             this.backgroundThreadSettingsToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.backgroundThreadSettingsToolStripMenuItem.Text = "Background Thread Settings";
             this.backgroundThreadSettingsToolStripMenuItem.Click += new System.EventHandler(this.backgroundThreadSettingsToolStripMenuItem_Click);
+            // 
+            // loggingSettingsToolStripMenuItem
+            // 
+            this.loggingSettingsToolStripMenuItem.Name = "loggingSettingsToolStripMenuItem";
+            this.loggingSettingsToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.loggingSettingsToolStripMenuItem.Text = "Debug and Logging Settings";
+            this.loggingSettingsToolStripMenuItem.Click += new System.EventHandler(this.loggingSettingsToolStripMenuItem_Click);
             // 
             // button1
             // 
@@ -357,13 +373,6 @@ namespace WiFiDBUploader
             this.DateTimeCol.Text = "Date Time";
             this.DateTimeCol.Width = 150;
             // 
-            // loggingSettingsToolStripMenuItem
-            // 
-            this.loggingSettingsToolStripMenuItem.Name = "loggingSettingsToolStripMenuItem";
-            this.loggingSettingsToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.loggingSettingsToolStripMenuItem.Text = "Debug and Logging Settings";
-            this.loggingSettingsToolStripMenuItem.Click += new System.EventHandler(this.loggingSettingsToolStripMenuItem_Click);
-            // 
             // WiFiDBUploadMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -378,6 +387,7 @@ namespace WiFiDBUploader
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "WiFiDBUploadMainForm";
             this.Text = "WiFiDB Uploader";
+            this.Load += new System.EventHandler(this.WiFiDBUploadMainForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -429,6 +439,7 @@ namespace WiFiDBUploader
         private System.Windows.Forms.ColumnHeader DateTimeCol;
         private ToolStripMenuItem backgroundThreadSettingsToolStripMenuItem;
         private ToolStripMenuItem loggingSettingsToolStripMenuItem;
+        private ToolStripMenuItem exitAndSaveDBToolStripMenuItem;
     }
 }
 

@@ -15,7 +15,7 @@ namespace WDBSQLite
         public SQLiteConnection conn;
         private WDBTraceLog.TraceLog TraceLogObj;
         public string ObjectName = "WDBSQLite";
-
+        private string SQLFile;
         private string _ThreadName;
         public string ThreadName
         {
@@ -25,6 +25,7 @@ namespace WDBSQLite
 
         public WDBSQLite(string Path, string UI, string LogPath, WDBTraceLog.TraceLog WDBTraceLogObj)
         {
+            SQLFile = Path;
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBSQLite()");
             this.TraceLogObj = WDBTraceLogObj;
             if (!File.Exists(Path))
@@ -52,6 +53,16 @@ namespace WDBSQLite
         public void Close()
         {
             this.conn.Dispose();
+        }
+
+
+        public void Dispose(bool SaveDB = false)
+        {
+            Close();
+            if(!SaveDB)
+            {
+                File.Delete(SQLFile);
+            }
         }
 
         private SQLiteConnection CreateDB(string DbFile)
