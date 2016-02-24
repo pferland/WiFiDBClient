@@ -50,16 +50,10 @@ namespace WDBSQLite
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: WDBSQLite()");
         }
 
-        public void Close()
-        {
-            this.conn.Dispose();
-        }
-
-
         public void Dispose(bool SaveDB = false)
         {
-            Close();
-            if(!SaveDB)
+            this.conn.Dispose();
+            if (!SaveDB)
             {
                 File.Delete(SQLFile);
             }

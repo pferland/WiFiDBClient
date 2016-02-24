@@ -20,7 +20,8 @@ namespace WiFiDBUploader
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
         private List<ServerObj> ServerList;
-
+        private List<BackgroundWorker> BackgroungWorkersList;
+        private List<QueryAccessibilityHelpEventHandler> QueryArgsList;
         private int    NextID = 0;
 
         private bool   AutoUploadFolder;
@@ -578,6 +579,8 @@ namespace WiFiDBUploader
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateWaitingDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_UpdateListViewProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Background Worker: backgroundWorker_UpdateWaitingDoWork");
+
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: StartUpdateWaiting");
@@ -931,9 +934,10 @@ namespace WiFiDBUploader
             ThreadName = "UpdateWaiting";
             WDBCommonObj.ThreadName = "UpdateWaiting";
 
+            Random rand = new Random();
             foreach (string str in args.Query.Split('|'))
             {
-                //Thread.Sleep(2000);
+                Thread.Sleep( (rand.Next(5, 100) * 100 ) );
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Spawning Function for: " + str);
                 var backgroundWorker = sender as BackgroundWorker;
                 WDBCommonObj.GetHashStatus(str, backgroundWorker);
