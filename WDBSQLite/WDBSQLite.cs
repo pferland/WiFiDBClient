@@ -23,7 +23,7 @@ namespace WDBSQLite
             set { _ThreadName = value; }
         }
 
-        public WDBSQLite(string Path, string UI, string LogPath, WDBTraceLog.TraceLog WDBTraceLogObj)
+        public WDBSQLite(string Path, string UI, WDBTraceLog.TraceLog WDBTraceLogObj)
         {
             SQLFile = Path;
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WDBSQLite()");
@@ -52,11 +52,16 @@ namespace WDBSQLite
 
         public void Dispose(bool SaveDB = false)
         {
-            this.conn.Dispose();
             if (!SaveDB)
             {
-                File.Delete(SQLFile);
+                SQLiteCommand cmd;
+                cmd = new SQLiteCommand(this.conn);
+                cmd.CommandText = @"DELETE FROM ImportView;    
+DELETE FROM sqlite_sequence WHERE name = 'ImportView'";
+                cmd.ExecuteNonQuery();
+                //File.Delete(SQLFile);
             }
+            this.conn.Dispose();
         }
 
         private SQLiteConnection CreateDB(string DbFile)

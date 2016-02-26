@@ -40,6 +40,7 @@ namespace WDBTraceLog
                 }
                 catch(Exception e)
                 {
+                    Debug.WriteLine("Exception Message: " + e.Message);
                     Directory.CreateDirectory(LogPath);
                     this.file = new System.IO.StreamWriter(LogFile, true);
                 }

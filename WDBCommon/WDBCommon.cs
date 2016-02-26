@@ -79,13 +79,13 @@ namespace WDBCommon
         /// Common Fucntions
         ///
 
-        public int IsFileImported(string query, bool LocalOnly)
+        public int IsFileImported(string query, bool LocalOnly = false)
         {
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: IsFileImported");
             //Check the Local SQLite DB for the File hash, If it is found, return now.
             if (CheckSQLFileHash(query) == 0)
             {
-                if(!LocalOnly)
+                if(!LocalOnly) //if set to true, dont Check the WiFiDB API
                 {
                     // If the filehash was not found in the Local SQLite DB, check the WDB API.
                     if (CheckFileHash(query) == 0)
@@ -101,12 +101,12 @@ namespace WDBCommon
                 }else
                 {
                     TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
-                    return 0;
+                    return 0; //
                 }
             } else
             {
                 TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
-                return 0; //Hash Found
+                return 1; //Hash Found
             }            
         }
 

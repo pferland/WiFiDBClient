@@ -152,6 +152,9 @@
     <Compile Include="ImportDetails.Designer.cs">
       <DependentUpon>ImportDetails.cs</DependentUpon>
     </Compile>
+    <Compile Include="ListViewNF.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="LoggingSettings.cs">
       <SubType>Form</SubType>
     </Compile>

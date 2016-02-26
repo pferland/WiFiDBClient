@@ -17,12 +17,20 @@ namespace WiFiDBUploader
         private WDBCommon.WDBCommon WDBCommonObj;
         private WDBTraceLog.TraceLog WDBTraceLogObj;
         private WDBSQLite.WDBSQLite WDBSQLiteObj;
+
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
+
         private List<ServerObj> ServerList;
-        private List<BackgroundWorker> BackgroungWorkersList;
-        private List<QueryAccessibilityHelpEventHandler> QueryArgsList;
-        private int    NextID = 0;
+        private List<BackgroundWorker> ImportUpdatesBackgroungWorkersList = new List<BackgroundWorker>();
+        private List<QueryArguments> ImportUpdatesQueryArgsList = new List<QueryArguments>();
+        private List<BackgroundWorker> DaemonBackgroungWorkersList = new List<BackgroundWorker>();
+        private List<QueryArguments> DaemonQueryArgsList = new List<QueryArguments>();
+
+        private int    ImportNextID = 0;
+        private int    DaemonNextID = 0;
+        private int    FileImportNextID = 0;
+        private int    FolderImportNextID = 0;
 
         private bool   AutoUploadFolder;
         private string AutoUploadFolderPath;
@@ -127,7 +135,7 @@ namespace WiFiDBUploader
             }
             
             WDBTraceLogObj = new WDBTraceLog.TraceLog(LogPath, TraceLogEnable, PerRunRotate);
-            WDBSQLiteObj = new WDBSQLite.WDBSQLite(SQLiteDBFile, "uploader", LogPath, WDBTraceLogObj);
+            WDBSQLiteObj = new WDBSQLite.WDBSQLite(SQLiteDBPath + "\\" +SQLiteDBFile, "uploader", WDBTraceLogObj);
             WDBAPIObj = new WDBAPI.WDBAPI(WDBTraceLogObj);
             WDBCommonObj = new WDBCommon.WDBCommon(WDBSQLiteObj, WDBAPIObj, WDBTraceLogObj);
             
@@ -162,16 +170,22 @@ namespace WiFiDBUploader
                 {
                     if (timer1 != null)
                     {
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Stopping Import update background thread.");
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Stopping Import update background threads.");
                         timer1.Stop();
                         timer1.Dispose();
                         timer1 = null;
+                        foreach(BackgroundWorker BW in ImportUpdatesBackgroungWorkersList)
+                        {
+                            BW.CancelAsync();
+                            BW.Dispose();
+                        }
                     }
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Import update background thread.");
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Import update background Timer and Workers.");
                     timer1 = new System.Windows.Forms.Timer();
                     timer1.Tick += new EventHandler(CheckForImportUpdates);
                     timer1.Interval = (ImportUpdateThreadSeconds * 1000); // in miliseconds
                     timer1.Start();
+                    //CheckForImportUpdates(new object(), new EventArgs());
                 }
 
                 if(DaemonUpdateThreadEnable)
@@ -179,12 +193,17 @@ namespace WiFiDBUploader
                     StartGetDaemonStats(); //prep the tables.
                     if (timer2 != null)
                     {
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Stopping Daemon update background thread.");
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Stopping Daemon update background Timer and Workers.");
                         timer2.Stop();
                         timer2.Dispose();
                         timer2 = null;
+                        foreach (BackgroundWorker BW in DaemonBackgroungWorkersList)
+                        {
+                            BW.CancelAsync();
+                            BW.Dispose();
+                        }
                     }
-                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Daemon update background thread.");
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Daemon update background Timer.");
                     timer2 = new System.Windows.Forms.Timer();
                     timer2.Tick += new EventHandler(CheckForDaemonUpdates);
                     timer2.Interval = (DaemonUpdateThreadSeconds * 1000); // in miliseconds
@@ -530,16 +549,11 @@ namespace WiFiDBUploader
             List<string> HashList = new List<string>();
             foreach (ListViewItem item in listView1.Items)
             {
-                if (item.SubItems[7].Text == "Waiting" || item.SubItems[7].Text == "Uploading" || item.SubItems[7].Text == "Error")
-                //{
-                //    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Removing: " + item.SubItems[6].Text + " |---| Hash:  " + item.SubItems[6].Text);
-                //    item.Remove();
-                //}else
+                if (item.SubItems[7].Text.ToLower() == "waiting" || item.SubItems[7].Text.ToLower() == "uploading" || item.SubItems[7].Text.ToLower() == "error")
                 {
                     HashList.Add(item.SubItems[6].Text);
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "CheckForImportUpdates: item.SubItems[6].Text: " + item.SubItems[6].Text);
                 }
-
             }
             StartUpdateWiaitng(HashList.ToArray());
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckForImportUpdates");
@@ -548,7 +562,7 @@ namespace WiFiDBUploader
         private void StartUpdateDaemonStats()
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: StartUpdateDaemonStats");
-            QueryArguments args = new QueryArguments(NextID++, "");
+            QueryArguments args = new QueryArguments(DaemonNextID++, "");
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateDaemonStatsDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_GetDaemonListViewProgressChanged);
@@ -561,7 +575,7 @@ namespace WiFiDBUploader
         private void StartGetDaemonStats()
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: StartGetDaemonStats");
-            QueryArguments args = new QueryArguments(NextID++, "");
+            QueryArguments args = new QueryArguments(DaemonNextID++, "");
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_GetDaemonStatsDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_GetDaemonListViewProgressChanged);
@@ -574,14 +588,19 @@ namespace WiFiDBUploader
         private void StartUpdateWiaitng(string[] Queries)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: StartUpdateWaiting");
-            QueryArguments args = new QueryArguments(NextID++, String.Join("|", Queries) );
+            QueryArguments args = new QueryArguments(ImportNextID++, String.Join("|", Queries) );
+            ImportUpdatesQueryArgsList.Add(args);
+
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_UpdateWaitingDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_UpdateListViewProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
-            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Background Worker: backgroundWorker_UpdateWaitingDoWork");
-
+            backgroundWorker1.WorkerSupportsCancellation = true;
+            backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_UpdateListViewCompleted);
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
+            ImportUpdatesBackgroungWorkersList.Add(backgroundWorker1);
+
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Background Worker: backgroundWorker_UpdateWaitingDoWork");
             backgroundWorker1.RunWorkerAsync(args);
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: StartUpdateWaiting");
         }
@@ -589,11 +608,12 @@ namespace WiFiDBUploader
         private void StartFileImport(string query)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: StartFileImport");
-            QueryArguments args = new QueryArguments(NextID++, query);
+            QueryArguments args = new QueryArguments(FileImportNextID++, query);
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_FileImportDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ImportProgressChanged);
             backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.WorkerSupportsCancellation = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: StartFileImport");
@@ -602,7 +622,7 @@ namespace WiFiDBUploader
         private void StartFolderImport(string query, bool ManualRun = false)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: StartFolderImport");
-            QueryArguments args = new QueryArguments(NextID++, query);
+            QueryArguments args = new QueryArguments(FolderImportNextID++, query);
             BackgroundWorker backgroundWorker1 = new BackgroundWorker();
             backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker_FolderImportDoWork);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ImportProgressChanged);
@@ -610,6 +630,7 @@ namespace WiFiDBUploader
             {
                 backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_ImportCompleted);
             }
+            backgroundWorker1.WorkerSupportsCancellation = true;
             backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_ImportWorkerCompleted);
             backgroundWorker1.RunWorkerAsync(args);
@@ -648,6 +669,7 @@ namespace WiFiDBUploader
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: importFolderToolStripMenuItem_Click");
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            //folderBrowserDialog1.SelectedPath = "C:\\Users\\ferph02\\Desktop\\VS1";
             folderBrowserDialog1.SelectedPath = "M:\\vi_wifidb_archives\\VS1_FILES\\duplicates";
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -931,17 +953,19 @@ namespace WiFiDBUploader
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: backgroundWorker_UpdateWaitingDoWork");
             QueryArguments args = (QueryArguments)e.Argument;
+
             ThreadName = "UpdateWaiting";
             WDBCommonObj.ThreadName = "UpdateWaiting";
 
             Random rand = new Random();
             foreach (string str in args.Query.Split('|'))
             {
-                Thread.Sleep( (rand.Next(5, 100) * 100 ) );
+                //Thread.Sleep( (rand.Next(5, 100) * 100 ) );
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Spawning Function for: " + str);
                 var backgroundWorker = sender as BackgroundWorker;
                 WDBCommonObj.GetHashStatus(str, backgroundWorker);
             }
+            e.Result = args.QueryID;
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: backgroundWorker_UpdateWaitingDoWork");
             ThreadName = "Main";
         }
@@ -1176,7 +1200,8 @@ namespace WiFiDBUploader
             string ImportID = "";
             string filehash = "";
 
-            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[0]);
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "e.UserState.ToString(): " + e.UserState.ToString() );
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "First of the Split array [0]: " + split[0]);
             switch (split[0])
             {
                 case "error":
@@ -1259,8 +1284,9 @@ namespace WiFiDBUploader
                     }
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), filehash);
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Parse Loop Message: " + message);
+                    listView1.BeginUpdate();
                     ListViewItem listViewItem = listView1.FindItemWithText(filehash);
-                    if( (status == "finished") || ( (ImportID != "") && (message != "") ) )
+                    if( (ImportID != "") )
                     {
                         ImportRowObj.ImportID = Int32.Parse(ImportID);
                         ImportRowObj.ImportTitle = title;
@@ -1275,7 +1301,11 @@ namespace WiFiDBUploader
                         listViewItem.SubItems[2].Text = title;
                         listViewItem.SubItems[7].Text = status;
                         listViewItem.SubItems[8].Text = message;
+                    }else
+                    {
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Status was not Finish, or ImportID was empty and Message was empty. Status: " + status + " ImportID: " + ImportID + " Message: " + message);
                     }
+                    listView1.EndUpdate();
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), " \n--------- End Parse ListView Update Return String -----------\n");
                     break;
             }
@@ -1453,6 +1483,15 @@ namespace WiFiDBUploader
         // Process Completed Functions
         //
         
+        private void backgroundWorker_UpdateListViewCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: backgroundWorker_UpdateListViewCompleted");
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "e.Result: " + e.Result);
+            //ImportUpdatesBackgroungWorkersList.RemoveAt(Convert.ToInt32(e.Result));
+            //ImportUpdatesQueryArgsList.RemoveAt(Convert.ToInt32(e.Result));
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: backgroundWorker_UpdateListViewCompleted");
+        }
+
         private void backgroundWorker1_ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: backgroundWorker1_ImportCompleted");
@@ -1478,6 +1517,14 @@ namespace WiFiDBUploader
         private void WiFiDBUploadMainForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void WiFiDBUploadMainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: WiFiDBUploadMainForm_FormClosed");
+            WDBSQLiteObj.Dispose(false);
+            Application.Exit();
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: WiFiDBUploadMainForm_FormClosed");
         }
     }
 
