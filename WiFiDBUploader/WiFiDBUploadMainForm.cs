@@ -1048,7 +1048,21 @@ namespace WiFiDBUploader
             ThreadName = "Main";
         }
 
+        private void UpdateListViewStatus(string hashish, string StatusStr, string MessageStr)
+        {
+            ListViewItem listViewItem1 = listView1.FindItemWithText(hashish);
 
+            try
+            {
+                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
+                listViewItem1.SubItems[7].Text = StatusStr;
+                listViewItem1.SubItems[8].Text = MessageStr;
+            }
+            catch(Exception e)
+            {
+                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Exception: " + e.Message);
+            }
+        }
         
         //
         // Progress Changed Functions
@@ -1092,12 +1106,59 @@ namespace WiFiDBUploader
                     {
                         WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[0]);
                         WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "HHmmmm...... e.UserState: " + e.UserState.ToString());
+
+
+                        string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+                        //string[] SplitData1 = SplitData[0].Split(stringSep3, StringSplitOptions.None);
+
+                        FilePath = SplitData[0];
+                        byte[] hashBytes;
+                        string hashish;
+                        using (var inputFileStream = File.Open(FilePath, FileMode.Open))
+                        {
+                            var md5 = MD5.Create();
+                            hashBytes = md5.ComputeHash(inputFileStream);
+                            hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import File Hash: " + hashish);
+                        }
+
+                        FileSizeString = new FileInfo(FilePath).Length.ToString();
+
+                        StatusStr = "Error";
+                        MessageStr = split[1];
+
+                        UpdateListViewStatus(hashish, StatusStr, MessageStr);
                     }
                     else
                     {
-                        if (items_err[0] == "Already Local Imported.")
+                        if( items_err[0] == "Already Local Imported." )
                         {
                             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Skip That Shit! : " + items_err[0]);
+                        }
+                        else if (items_err[0] == "Already Imported.")
+                        {
+                            string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+                            //string[] SplitData1 = SplitData[0].Split(stringSep3, StringSplitOptions.None);
+
+                            FilePath = SplitData[0];
+
+                            byte[] hashBytes;
+                            string hashish;
+                            using (var inputFileStream = File.Open(FilePath, FileMode.Open))
+                            {
+                                var md5 = MD5.Create();
+                                hashBytes = md5.ComputeHash(inputFileStream);
+                                hashish = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+                                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Import File Hash: " + hashish);
+                            }
+
+                            //FileHash = SplitData1[1].ToUpper();
+                            FileSizeString = new FileInfo(FilePath).Length.ToString();
+
+                            StatusStr = "Error";
+                            MessageStr = split[1];
+
+                            UpdateListViewStatus(hashish, StatusStr, MessageStr);
                         }
                         else
                         {
@@ -1122,23 +1183,7 @@ namespace WiFiDBUploader
                             StatusStr = "Error";
                             MessageStr = split[1];
 
-                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "split[0]: " + split[0]);
-                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "items_err[0]: " + items_err[0]);
-                            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "SplitData[0]: " + SplitData[0]); //FilePath
-                            //WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "SplitData[1]: " + SplitData1[0]); //FileHash
-
-                            ListViewItem listViewItem1 = listView1.FindItemWithText(hashish);
-
-                            try
-                            {
-                                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), listViewItem1.SubItems[1].Text + " ==== " + listViewItem1.SubItems.Count);
-                                listViewItem1.SubItems[7].Text = StatusStr;
-                                listViewItem1.SubItems[8].Text = MessageStr;
-                            }
-                            catch
-                            {
-
-                            }
+                            UpdateListViewStatus(hashish, StatusStr, MessageStr);
                         }
                         //InsertNewListViewRow(split, "Error");
                     }

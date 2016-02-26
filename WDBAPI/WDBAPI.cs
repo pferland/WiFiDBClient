@@ -309,7 +309,7 @@ namespace WDBAPI
                         switch(item.Name.ToString().ToLower())
                         {
                             case "unknown":
-                                ret = ret + "Error|~|";
+                                ret = ret + "Error|~|" + item.Value.ToString();
                                 break;
                             case "waiting":
                                 ret = ret + "|~|waiting|";
