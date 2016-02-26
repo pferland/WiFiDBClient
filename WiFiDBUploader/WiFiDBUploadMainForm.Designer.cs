@@ -47,7 +47,7 @@ namespace WiFiDBUploader
             this.loggingSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.listView1 = new ListViewNF();
+            this.listView1 = new WiFiDBUploader.ListViewNF();
             this.ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.User = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ImportTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -63,7 +63,7 @@ namespace WiFiDBUploader
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.listView2 = new ListViewNF();
+            this.listView2 = new WiFiDBUploader.ListViewNF();
             this.NodeName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.PidFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.PID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -387,8 +387,6 @@ namespace WiFiDBUploader
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "WiFiDBUploadMainForm";
             this.Text = "WiFiDB Uploader";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.WiFiDBUploadMainForm_FormClosed);
-            this.Load += new System.EventHandler(this.WiFiDBUploadMainForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);

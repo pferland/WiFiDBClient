@@ -106,7 +106,7 @@ namespace WDBCommon
             } else
             {
                 TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: IsFileImported");
-                return 1; //Hash Found
+                return 2; //Hash Found
             }            
         }
 
@@ -262,12 +262,18 @@ namespace WDBCommon
 
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Parse Response Result: " + response);
 
-                BW.ReportProgress(0, response+"::"+FilePath);
+                BW.ReportProgress(0, response + "::" + FilePath);
                 ArchiveImportedFile(FilePath);
             }
-            else
+            else if (IsFileImportedResult == 2)
             {
-                response = "error|~|Already Imported.-~-" + FilePath + "::" + hashish;
+                response = "error|~|Already Local Imported.-~-" + FilePath;
+                BW.ReportProgress(0, response);
+            }
+            else
+            { 
+                response = "error|~|Already Imported.-~-" + FilePath;
+                BW.ReportProgress(0, response);
             }
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "File Import Response return: " + response);
             TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ImportFile");
