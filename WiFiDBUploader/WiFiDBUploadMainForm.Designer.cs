@@ -386,7 +386,7 @@ namespace WiFiDBUploader
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "WiFiDBUploadMainForm";
-            this.Text = "WiFiDB Uploader";
+            this.Text = "WiFiDB Uploader V1.0 By Phil Ferland (2016/02/27)";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
