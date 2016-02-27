@@ -511,6 +511,8 @@ namespace WiFiDBUploader
                 MessageStr = split[1];
             }
 
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "ListView Update Type: " + Type);
+
             ImportRowObj.Username = Username;
             ImportRowObj.ImportTitle = "";
             ImportRowObj.DateTime = Date_Time;
@@ -961,7 +963,7 @@ namespace WiFiDBUploader
             Random rand = new Random();
             foreach (string str in args.Query.Split('|'))
             {
-                //Thread.Sleep( (rand.Next(5, 100) * 100 ) );
+                Thread.Sleep( (rand.Next(5, 100) * 100 ) );
                 WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Spawning Function for: " + str);
                 var backgroundWorker = sender as BackgroundWorker;
                 WDBCommonObj.GetHashStatus(str, backgroundWorker);
@@ -1060,7 +1062,7 @@ namespace WiFiDBUploader
             }
             catch(Exception e)
             {
-                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Exception: " + e.Message);
+                WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Exception: " + e.Message + " ListView Search Hash: " + hashish);
             }
         }
         
@@ -1092,26 +1094,38 @@ namespace WiFiDBUploader
             string[] stringSep2 = new string[] { "-~-" };
             string[] stringSep3 = new string[] { ": " };
 
-            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Split[0]" + split[0]);
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Split[0]: " + split[0]);
             switch (split[0].ToLower())
             {
                 case "newrow":
                     InsertNewListViewRow(split, "NewRow");
                     break;
+
                 case "error":
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[0]);
                     string[] items_err = split[1].Split(stringSep2, StringSplitOptions.None);
                     WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "items_err.Count(): " + items_err.Count().ToString());
-                    if (items_err.Count() <= 1)
+
+                    if (items_err.Count() < 2)  // error |~| There was An error during Import -~- No upload file found :( :: M:\vi
                     {
-                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[0]);
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), split[1]);
                         WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "HHmmmm...... e.UserState: " + e.UserState.ToString());
 
+                        /* if (items_err.Count() > 1)
+                        {
+                            string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
+                            //string[] SplitData1 = SplitData[0].Split(stringSep3, StringSplitOptions.None);
+                            FilePath = SplitData[0];
+                        }
+                        else
+                        { */
+                            string[] SplitData = items_err[0].Split(stringSep1, StringSplitOptions.None);
+                            //string[] SplitData1 = SplitData[0].Split(stringSep3, StringSplitOptions.None);
+                            FilePath = SplitData[1];
+                        //}
 
-                        string[] SplitData = items_err[1].Split(stringSep1, StringSplitOptions.None);
-                        //string[] SplitData1 = SplitData[0].Split(stringSep3, StringSplitOptions.None);
 
-                        FilePath = SplitData[0];
+
                         byte[] hashBytes;
                         string hashish;
                         using (var inputFileStream = File.Open(FilePath, FileMode.Open))
@@ -1245,10 +1259,12 @@ namespace WiFiDBUploader
                     }
                     break;
             }
-            listView1.TopItem = listView1.Items[listView1.Items.Count - 1];
+            if (listView1.Items.Count > 1)
+            {
+                listView1.TopItem = listView1.Items[listView1.Items.Count - 1];
+            }
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), e.ProgressPercentage.ToString());
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: backgroundWorker_ImportProgressChanged");
-
         }
 
         private void backgroundWorker_UpdateListViewProgressChanged(object sender, ProgressChangedEventArgs e)
