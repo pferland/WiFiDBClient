@@ -123,22 +123,16 @@ namespace WDBCommon
             
             string[] stringSeparators = new string[] { "|~|" };
             string[] split = response.Split(stringSeparators, StringSplitOptions.None);
+            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "split[1].ToLower(): " + split[1].ToLower());
 
-            if (split[0] == "error")
+            if (split[1].ToLower() == "hash not found in wifidb")
             {
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash: Error");
-                return -1;
-            }
-
-            TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "split[0].ToLower(): " + split[0].ToLower());
-            if (split[1].ToLower() == "")
-            {
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash");
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash: Hash Not Found");
                 return 0;
             }
             else
             {
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash");
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Call: CheckFileHash: Hash Found");
                 return 1;
             }
         }

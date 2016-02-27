@@ -12,8 +12,6 @@ namespace WDBAPI
 {
     public class WDBAPI
     {
-        public NameValueCollection parameters = null;
-
         public string LogPath;
         private string _ThreadName;
         public string ThreadName
@@ -52,13 +50,13 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
-                this.parameters.Add("func", "waiting");
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("username"));
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("apikey"));
+                parameters.Add("func", "waiting");
                 try
                 {
-                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
                 }catch(Exception e)
                 {
@@ -79,13 +77,13 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
-                this.parameters.Add("func", "finished");
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("username"));
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("apikey"));
+                parameters.Add("func", "finished");
                 try
                 {
-                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
                 }
                 catch (Exception e)
@@ -106,13 +104,13 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
-                this.parameters.Add("func", "bad");
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("username"));
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("apikey"));
+                parameters.Add("func", "bad");
                 try
                 {
-                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
                 }
                 catch (Exception e)
@@ -133,13 +131,13 @@ namespace WDBAPI
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
-                this.parameters.Add("func", "importing");
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("username"));
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("apikey"));
+                parameters.Add("func", "importing");
                 try
                 {
-                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
                 }
                 catch (Exception e)
@@ -161,17 +159,17 @@ namespace WDBAPI
             //Console.WriteLine("Upload File: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
-                this.parameters.Add("func", "daemonstatuses");
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("username"));
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("apikey"));
+                parameters.Add("func", "daemonstatuses");
                 if(query != "")
                 {
-                    this.parameters.Add("pidfile", query);
+                    parameters.Add("pidfile", query);
                 }
                 try
                 {
-                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", this.parameters);
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "schedule.php", "POST", parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
                     return response;
                 }
@@ -192,9 +190,9 @@ namespace WDBAPI
             //Console.WriteLine("Upload FIle: " + UploadFile);
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("apikey"));
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "UserName: " + parameters.Get("username"));
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "API Key: " + parameters.Get("apikey"));
                 byte[] hashBytes;
                 string hashish;
                 using (var inputFileStream = File.Open(UploadFile, FileMode.Open))
@@ -205,46 +203,45 @@ namespace WDBAPI
                 }
 
 
-                this.parameters.Add("title", ImportTitle);
-                this.parameters.Add("notes", ImportNotes);
+                parameters.Add("title", ImportTitle);
+                parameters.Add("notes", ImportNotes);
 
                 //parameters.Add("otherusers", "");
-                this.parameters.Add("hash", hashish);
+                parameters.Add("hash", hashish);
 
                 try
                 {
-                    client.QueryString = this.parameters;
+                    client.QueryString = parameters;
                     var responseBytes = client.UploadFile(ApiCompiledPath + "import.php", UploadFile);
                     response = Encoding.ASCII.GetString(responseBytes);
                     TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Response: " + response);
                 }
                 catch (Exception e)
                 {
-                    response = "Error";
+                    response = "Error|~|" + e.Message;
                     TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), e.Message);
                 }
-
-
                 TraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: ApiImportFile");
                 return response;
             }
         }
 
-        private void InitParameters()
+        private NameValueCollection InitParameters()
         {
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Start Function Call: Init Params.");
-            this.parameters = new NameValueCollection();
+            NameValueCollection parameters = new NameValueCollection();
 
-            this.parameters.Remove("output");
-            this.parameters.Remove("username");
-            this.parameters.Remove("apikey");
+            parameters.Remove("output");
+            parameters.Remove("username");
+            parameters.Remove("apikey");
 
-            this.parameters.Add("output", "xml");
-            this.parameters.Add("username", Username);
-            this.parameters.Add("apikey", ApiKey);
+            parameters.Add("output", "xml");
+            parameters.Add("username", Username);
+            parameters.Add("apikey", ApiKey);
             
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "InitParameters ApiKey: " + ApiKey);
             TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "End Function Call: Init Params.");
+            return parameters;
         }
         
         public string CheckFileHash(string FileHash)
@@ -253,15 +250,16 @@ namespace WDBAPI
             string response;
             using (WebClient client = new WebClient())
             {
-                InitParameters();
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), this.parameters.Get("username"));
+
+                NameValueCollection parameters = InitParameters();
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), parameters.Get("username"));
                 TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), ApiCompiledPath + "import.php");
-                this.parameters.Add("func", "check_hash");
-                this.parameters.Add("hash", FileHash);
-                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Number of Params for CheckFileHash: " + this.parameters.Count);
+                parameters.Add("func", "check_hash");
+                parameters.Add("hash", FileHash);
+                TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "Number of Params for CheckFileHash: " + parameters.Count);
                 try
                 {
-                    var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", this.parameters);
+                    var responseBytes = client.UploadValues(ApiCompiledPath + "import.php", "POST", parameters);
                     response = Encoding.ASCII.GetString(responseBytes);
                     TraceLogObj.WriteToLog(_ThreadName, ObjectName, GetCurrentMethod(), "CheckHash Response: " + response);
                 }
