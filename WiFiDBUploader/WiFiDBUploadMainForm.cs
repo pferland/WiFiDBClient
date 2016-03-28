@@ -21,6 +21,7 @@ namespace WiFiDBUploader
 
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Timer timer3;
 
         private List<ServerObj> ServerList;
         private List<BackgroundWorker> ImportUpdatesBackgroungWorkersList = new List<BackgroundWorker>();
@@ -54,8 +55,11 @@ namespace WiFiDBUploader
 
         private bool   ImportUpdateThreadEnable;
         private bool   DaemonUpdateThreadEnable;
+        private bool   AutoImportThreadEnable;
         private int    ImportUpdateThreadSeconds;
         private int    DaemonUpdateThreadSeconds;
+        private int    AutoImportThreadSeconds;
+
 
         private string LogPath;
         private bool   TraceLogEnable = false;
@@ -122,7 +126,12 @@ namespace WiFiDBUploader
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: AutoUploadCheck");
             if (AutoUploadFolder == true && SelectedServer != null)
             {
-                StartFolderImport(AutoUploadFolderPath);
+                string[] GUIValues = GetImportValues();
+                string Query = AutoUploadFolderPath + "|"
+                + GUIValues[0] + "|"
+                + GUIValues[1];
+
+                StartFolderImport(Query);
             }
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: AutoUploadCheck");
         }
@@ -167,7 +176,13 @@ namespace WiFiDBUploader
             }
             else
             {
-                if(ImportUpdateThreadEnable)
+
+
+                /*
+                Import Update Background Thread Init.
+                */
+
+                if (ImportUpdateThreadEnable)
                 {
                     if (timer1 != null)
                     {
@@ -189,7 +204,13 @@ namespace WiFiDBUploader
                     //CheckForImportUpdates(new object(), new EventArgs());
                 }
 
-                if(DaemonUpdateThreadEnable)
+
+
+                /*
+                Daemon Update Background Thread Init.
+                */
+
+                if (DaemonUpdateThreadEnable)
                 {
                     StartGetDaemonStats(); //prep the tables.
                     if (timer2 != null)
@@ -210,7 +231,78 @@ namespace WiFiDBUploader
                     timer2.Interval = (DaemonUpdateThreadSeconds * 1000); // in miliseconds
                     timer2.Start();
                 }
+
+
+                /*
+                Auto Import Background Thread Init.
+                */
+
+                if (AutoImportThreadEnable)
+                {
+                    if (timer3 != null)
+                    {
+                        WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Stopping Auto Import background Timer and Workers.");
+                        timer3.Stop();
+                        timer3.Dispose();
+                        timer3 = null;
+                        foreach (BackgroundWorker BW in DaemonBackgroungWorkersList)
+                        {
+                            BW.CancelAsync();
+                            BW.Dispose();
+                        }
+                    }
+                    WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Starting Auto Import background Timer.");
+                    timer3 = new System.Windows.Forms.Timer();
+                    timer3.Tick += new EventHandler(AutoBGUploadCheck);
+                    timer3.Interval = (AutoImportThreadSeconds * 1000); // in miliseconds
+                    timer3.Start();
+                }
+
+
             }
+        }
+
+        private void UpdateRegKeys()
+        {
+            Microsoft.Win32.RegistryKey rootKey;
+            rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
+            string[] SubKeys = rootKey.GetSubKeyNames();
+            int strIndex = 0;
+            int strIndex1 = 0;
+            int strNumber;
+            int strNumber1;
+
+            for (strNumber = 0; strNumber < SubKeys.Length; strNumber++)
+            {
+                strIndex = SubKeys[strNumber].IndexOf("AutoImportThreadEnabled");
+                if (strIndex >= 0)
+                    break;
+            }
+            for (strNumber1 = 0; strNumber1 < SubKeys.Length; strNumber1++)
+            {
+                strIndex1 = SubKeys[strNumber1].IndexOf("AutoImportThreadSeconds");
+                if (strIndex1 >= 0)
+                    break;
+            }
+            Console.WriteLine("String number: {0}\nString index: {1}",
+                strNumber, strIndex);
+
+            Console.WriteLine("String number: {0}\nString index: {1}",
+                strNumber1, strIndex1);
+            throw new Exception();
+
+            if ( strIndex == -1)
+            {
+                rootKey.SetValue("AutoImportThreadEnable", "False");
+            }
+            if (strIndex1 == -1)
+            {
+                rootKey.SetValue("AutoImportThreadSeconds", 30);
+            }
+
+
+            //
+            //
         }
 
         private void CreateRegistryKeys(Microsoft.Win32.RegistryKey rootKey)
@@ -229,12 +321,14 @@ namespace WiFiDBUploader
             rootKey.SetValue("ArchiveImportsFolderPath", "");
             rootKey.SetValue("AutoCloseEnable", "False");
             rootKey.SetValue("AutoCloseTimerSeconds", "30");
-            rootKey.SetValue("SQLiteDBPath", ".\\DB\\");
+            rootKey.SetValue("SQLiteDBPath", ".\\DB");
             rootKey.SetValue("SQLiteDBFile", "Uploader.db3");
             rootKey.SetValue("ImportUpdateThreadEnable", "True");
             rootKey.SetValue("ImportUpdateThreadSeconds", 30);
             rootKey.SetValue("DaemonUpdateThreadEnable", "True");
             rootKey.SetValue("DaemonUpdateThreadSeconds", 60);
+            rootKey.SetValue("AutoImportThreadEnable", "False");
+            rootKey.SetValue("AutoImportThreadSeconds", 30);
             rootKey.SetValue("TraceLogEnable", "False");
             rootKey.SetValue("LogPath", ".\\Logs\\");
             rootKey.SetValue("DEBUGEnable", "False");
@@ -251,7 +345,7 @@ namespace WiFiDBUploader
 
         private void LoadSettings()
         {
-            
+            UpdateRegKeys();
             Microsoft.Win32.RegistryKey rootKey;
             rootKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("SOFTWARE").CreateSubKey("Vistumbler").CreateSubKey("WiFiDB").CreateSubKey("Uploader");
             string[] SubKeys = rootKey.GetSubKeyNames();
@@ -263,8 +357,6 @@ namespace WiFiDBUploader
             }
             else
             {
-                Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
-
                 foreach (string value in rootKey.GetValueNames())
                 {
                     switch (value)
@@ -314,11 +406,17 @@ namespace WiFiDBUploader
                         case "DaemonUpdateThreadEnable":
                             DaemonUpdateThreadEnable = Convert.ToBoolean(rootKey.GetValue(value));
                             break;
+                        case "AutoImportThreadEnable":
+                            AutoImportThreadEnable = Convert.ToBoolean(rootKey.GetValue(value));
+                            break;
                         case "ImportUpdateThreadSeconds":
                             ImportUpdateThreadSeconds =  Int32.Parse(rootKey.GetValue(value).ToString());
                             break;
                         case "DaemonUpdateThreadSeconds":
                             DaemonUpdateThreadSeconds = Int32.Parse(rootKey.GetValue(value).ToString());
+                            break;
+                        case "AutoImportThreadSeconds":
+                            AutoImportThreadSeconds = Int32.Parse(rootKey.GetValue(value).ToString());
                             break;
                         case "TraceLogEnable":
                             TraceLogEnable = Convert.ToBoolean(rootKey.GetValue(value));
@@ -338,6 +436,7 @@ namespace WiFiDBUploader
                 SQLiteFile = SQLiteDBPath + SQLiteDBFile;
                 ServerList = new List<ServerObj>();
                 int Increment = 0;
+                Microsoft.Win32.RegistryKey ServerSubkeys = rootKey.CreateSubKey("Servers");
                 foreach (string subitem in ServerSubkeys.GetSubKeyNames())
                 {
                     Microsoft.Win32.RegistryKey ServerKey = ServerSubkeys.CreateSubKey(subitem);
@@ -539,6 +638,22 @@ namespace WiFiDBUploader
         /*
             Background init Funtions.
         */
+
+        private void AutoBGUploadCheck(object sender, EventArgs e)
+        {
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: AutoBGUploadCheck");
+            if (AutoUploadFolder == true && SelectedServer != null)
+            {
+                string[] GUIValues = GetImportValues();
+                string Query = AutoUploadFolderPath + "|"
+                + GUIValues[0] + "|"
+                + GUIValues[1];
+
+                StartFolderImport(Query);
+            }
+            WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "End Call: AutoBGUploadCheck");
+        }
+
         private void CheckForDaemonUpdates(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: CheckForDaemonUpdates");
@@ -778,17 +893,24 @@ namespace WiFiDBUploader
         private void backgroundThreadSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WDBTraceLogObj.WriteToLog(ThreadName, ObjectName, GetCurrentMethod(), "Start Call: backgroundThreadSettingsToolStripMenuItem_Click");
-            BGThreadsSettings BGThreadsSettingsForm = new BGThreadsSettings();
+
+            BGThreadsSettings BGThreadsSettingsForm         = new BGThreadsSettings();
             BGThreadsSettingsForm.DaemonUpdateThreadSeconds = DaemonUpdateThreadSeconds.ToString();
             BGThreadsSettingsForm.ImportUpdateThreadSeconds = ImportUpdateThreadSeconds.ToString();
-            BGThreadsSettingsForm.ImportUpdateThreadEnable = ImportUpdateThreadEnable;
-            BGThreadsSettingsForm.DaemonUpdateThreadEnable = DaemonUpdateThreadEnable;
-            if(BGThreadsSettingsForm.ShowDialog() == DialogResult.OK)
+            BGThreadsSettingsForm.AutoImportThreadSeconds   = AutoImportThreadSeconds.ToString();
+
+            BGThreadsSettingsForm.ImportUpdateThreadEnable  = ImportUpdateThreadEnable;
+            BGThreadsSettingsForm.DaemonUpdateThreadEnable  = DaemonUpdateThreadEnable;
+            BGThreadsSettingsForm.AutoImportThreadEnable    = AutoImportThreadEnable;
+
+            if (BGThreadsSettingsForm.ShowDialog() == DialogResult.OK)
             {
                 DaemonUpdateThreadSeconds = Int32.Parse(BGThreadsSettingsForm.DaemonUpdateThreadSeconds);
                 ImportUpdateThreadSeconds = Int32.Parse(BGThreadsSettingsForm.ImportUpdateThreadSeconds);
-                ImportUpdateThreadEnable = BGThreadsSettingsForm.ImportUpdateThreadEnable;
-                DaemonUpdateThreadEnable = BGThreadsSettingsForm.DaemonUpdateThreadEnable;
+                AutoImportThreadSeconds   = Int32.Parse(BGThreadsSettingsForm.AutoImportThreadSeconds);
+                ImportUpdateThreadEnable  = BGThreadsSettingsForm.ImportUpdateThreadEnable;
+                DaemonUpdateThreadEnable  = BGThreadsSettingsForm.DaemonUpdateThreadEnable;
+                AutoImportThreadEnable    = BGThreadsSettingsForm.AutoImportThreadEnable;
 
                 WriteGlobalSettings();
                 LoadSettings();
